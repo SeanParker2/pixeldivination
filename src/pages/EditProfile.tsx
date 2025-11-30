@@ -6,7 +6,7 @@ import { DatePicker } from '../components/profile/picker/DatePicker';
 import { LocationPicker } from '../components/profile/picker/LocationPicker';
 import { GenderPicker } from '../components/profile/picker/GenderPicker';
 import { useUserStore } from '../stores/useUserStore';
-import { formatDate, getZodiacSign } from '../lib/dateUtils';
+import { formatDate } from '../lib/dateUtils';
 
 export const EditProfile: React.FC = () => {
   const navigate = useNavigate();

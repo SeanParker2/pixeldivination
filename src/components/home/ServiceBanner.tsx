@@ -1,9 +1,15 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export const ServiceBanner: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="px-2 mt-4">
-      <div className="bg-pixel-card border border-pixel-border rounded-2xl p-4 flex items-center justify-between relative overflow-hidden group cursor-pointer">
+      <div 
+        onClick={() => navigate('/shop')}
+        className="bg-pixel-card border border-pixel-border rounded-2xl p-4 flex items-center justify-between relative overflow-hidden group cursor-pointer"
+      >
         <div className="w-1/2 z-10">
           <h3 className="text-xl text-white font-sans font-bold leading-tight">
             占卜歌者<br />

@@ -1,12 +1,16 @@
+import { useState } from 'react';
 import { MobileContainer } from '../components/layout/MobileContainer';
 import { HomeHeader } from '../components/home/HomeHeader';
 import { UserInfoCard } from '../components/home/UserInfoCard';
 import { DashboardGrid } from '../components/home/DashboardGrid';
 import { ServiceBanner } from '../components/home/ServiceBanner';
 import { InsightCard } from '../components/home/InsightCard';
+import { InsightModal } from '../components/home/InsightModal';
 import { QuickNavGrid } from '../components/home/QuickNavGrid';
 
 export default function Home() {
+  const [showInsight, setShowInsight] = useState(false);
+
   return (
     <MobileContainer 
       className="bg-pixel-midnight" 
@@ -22,9 +26,15 @@ export default function Home() {
             <UserInfoCard />
             <DashboardGrid />
             <ServiceBanner />
-            <InsightCard />
+            <InsightCard onClick={() => setShowInsight(true)} />
             <QuickNavGrid />
         </div>
+
+        {/* Modals */}
+        <InsightModal 
+          isOpen={showInsight} 
+          onClose={() => setShowInsight(false)} 
+        />
       </div>
     </MobileContainer>
   );

@@ -11,7 +11,7 @@ interface DatePickerProps {
 // Generate ranges
 const YEARS = Array.from({ length: 81 }, (_, i) => 1950 + i);
 const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
-const DAYS = Array.from({ length: 31 }, (_, i) => i + 1);
+// const DAYS = Array.from({ length: 31 }, (_, i) => i + 1); // Unused
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
 const MINUTES = Array.from({ length: 60 }, (_, i) => i);
 
@@ -108,11 +108,11 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   );
 };
 
-const PickerColumn = ({ items, value, onChange, label }: { 
-  items: number[], 
-  value: number, 
-  onChange: (val: number) => void,
-  label: string 
+const PickerColumn = ({ items, value, onChange }: {
+  items: number[] | string[];
+  value: number | string;
+  onChange: (val: any) => void;
+  label?: string; // Optional but unused in render
 }) => {
   return (
     <div className="flex-1 overflow-y-auto scrollbar-hide snap-y snap-mandatory py-20 text-center relative group">
