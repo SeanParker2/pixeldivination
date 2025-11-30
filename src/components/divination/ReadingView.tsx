@@ -43,10 +43,19 @@ export const ReadingView: React.FC = () => {
               initial={{ rotateY: 180 }}
               animate={{ rotateY: 0 }}
               transition={{ delay: index * 0.5 + 0.2, duration: 0.6 }}
-              className="w-20 h-28 bg-pixel-gold flex-shrink-0 rounded border-2 border-white flex items-center justify-center text-pixel-black font-bold text-center p-1 text-xs"
+              className="w-24 h-40 flex-shrink-0 rounded-lg shadow-lg overflow-hidden bg-pixel-card"
               style={{ backfaceVisibility: 'hidden' }}
             >
-              {card.name}
+              <img 
+                src={card.image} 
+                alt={card.name} 
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  e.currentTarget.parentElement!.classList.add('flex', 'items-center', 'justify-center', 'bg-pixel-gold');
+                  e.currentTarget.parentElement!.innerText = card.name;
+                }}
+              />
             </motion.div>
 
             {/* Text Content */}

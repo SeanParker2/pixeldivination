@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { DiceModal } from './DiceModal';
 import { LenormandModal } from './LenormandModal';
+import { FengShuiModal } from './FengShuiModal';
 
 const NAV_ITEMS = [
   { id: 'rider', label: '雷诺曼牌', img: '/images/home/nav_rider.png' },
@@ -11,12 +12,15 @@ const NAV_ITEMS = [
 export const QuickNavGrid: React.FC = () => {
   const [showDiceModal, setShowDiceModal] = useState(false);
   const [showLenormandModal, setShowLenormandModal] = useState(false);
+  const [showFengShuiModal, setShowFengShuiModal] = useState(false);
 
   const handleItemClick = (id: string) => {
     if (id === 'dice') {
       setShowDiceModal(true);
     } else if (id === 'rider') {
       setShowLenormandModal(true);
+    } else if (id === 'fengshui') {
+      setShowFengShuiModal(true);
     } else {
       // Placeholder for other features
       alert("功能开发中...");
@@ -55,6 +59,11 @@ export const QuickNavGrid: React.FC = () => {
       <LenormandModal
         isOpen={showLenormandModal}
         onClose={() => setShowLenormandModal(false)}
+      />
+
+      <FengShuiModal
+        isOpen={showFengShuiModal}
+        onClose={() => setShowFengShuiModal(false)}
       />
     </>
   );

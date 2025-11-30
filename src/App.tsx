@@ -6,6 +6,7 @@ import { Profile } from './pages/Profile';
 import DailyFortune from './pages/DailyFortune';
 import DivinationPage from './pages/Divination';
 import EditProfile from './pages/EditProfile';
+import ProductDetail from './pages/ProductDetail';
 import { MainLayout } from './components/layout/MainLayout';
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
       {/* Standalone Pages (No Footer) */}
       <Route path="/divination" element={<DivinationPage />} />
       <Route path="/profile/edit" element={<EditProfile />} />
+      <Route path="/shop/:id" element={<ProductDetail />} />
     </Routes>
   )
 }

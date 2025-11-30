@@ -1,7 +1,11 @@
 import React from 'react';
 import { User, Heart } from 'lucide-react';
 
-export const ReportActions: React.FC = () => {
+interface ReportActionsProps {
+  onNatalReading?: () => void;
+}
+
+export const ReportActions: React.FC<ReportActionsProps> = ({ onNatalReading }) => {
   return (
     <div className="w-full px-4 mt-auto">
       <div className="text-center mb-4">
@@ -23,13 +27,16 @@ export const ReportActions: React.FC = () => {
         </button>
 
         {/* Orange Card - 本命解读 */}
-        <button className="bg-orange-100 hover:bg-orange-200 transition-colors rounded-2xl p-4 flex flex-col items-start gap-3 border-2 border-transparent hover:border-orange-300">
+        <button 
+          onClick={onNatalReading}
+          className="bg-orange-100 hover:bg-orange-200 transition-colors rounded-2xl p-4 flex flex-col items-start gap-3 border-2 border-transparent hover:border-orange-300"
+        >
           <div className="p-2 bg-orange-200 rounded-full text-orange-700">
             <User size={20} />
           </div>
           <div className="text-left">
             <h3 className="text-orange-900 font-bold text-sm">本命解读</h3>
-            <span className="text-orange-700 text-xs">人生解读</span>
+            <span className="text-orange-700 text-xs">AI 深度解读</span>
           </div>
         </button>
       </div>

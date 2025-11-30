@@ -1,8 +1,7 @@
 import OpenAI from 'openai';
 import type { FortuneData } from '../types/fortune';
 import type { TarotCard } from '../stores/useDivinationStore';
-
-// ... existing imports
+import type { PlanetPosition } from '../lib/astrology';
 
 const MOCK_FORTUNE: FortuneData = {
   date: new Date().toISOString().split('T')[0],
@@ -86,6 +85,55 @@ Example JSON structure:
   }
 };
 
+export const fetchNatalChartReading = async (planets: PlanetPosition[]): Promise<string> => {
+  if (!DEEPSEEK_API_KEY) {
+    return `## 模拟本命盘解读 (系统离线)
+    
+### 核心性格
+你拥有坚韧不拔的意志力（模拟数据），在面对困难时总能展现出惊人的爆发力。火星的影响让你行动果断，但有时也容易冲动。
+
+### 情感模式
+在感情中，你渴望深度的灵魂共鸣。金星的位置显示你既热情又敏感，需要伴侣给予足够的安全感。
+
+### 天赋潜能
+你具备极强的直觉和洞察力，适合从事需要深度思考和创造力的工作。水星的相位表明你的沟通能力是开启成功的钥匙。`;
+  }
+
+  const planetDescriptions = planets.map(p => {
+    const signs = ['白羊', '金牛', '双子', '巨蟹', '狮子', '处女', '天秤', '天蝎', '射手', '摩羯', '水瓶', '双鱼'];
+    const signIndex = Math.floor(p.longitude / 30);
+    const sign = signs[signIndex % 12];
+    return `${p.name}落在${sign}座`;
+  }).join(', ');
+
+  const systemPrompt = `
+你是一个专业占星师。根据用户的星盘配置，生成一份约 300 字的本命盘深度解读。
+包含：【核心性格】、【情感模式】、【天赋潜能】三个板块。
+使用 Markdown 格式。
+语气风格：神秘、深刻、富有洞察力。
+`;
+
+  const userPrompt = `我的星盘配置如下：${planetDescriptions}。请解读我的本命盘。`;
+
+  try {
+    const completion = await openai.chat.completions.create({
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      model: 'deepseek-chat',
+      temperature: 1.2,
+    });
+
+    const content = completion.choices[0].message.content;
+    if (!content) throw new Error('Empty response from AI');
+    
+    return content;
+  } catch (error) {
+    console.error('DeepSeek API Error (Natal Chart):', error);
+    throw new Error('无法连接星象数据库，请稍后再试。');
+  }
+};
 
 /**
  * SECURITY WARNING:
@@ -98,73 +146,6 @@ const DEEPSEEK_API_KEY = import.meta.env.VITE_DEEPSEEK_API_KEY;
 
 const openai = new OpenAI({
   baseURL: 'https://api.deepseek.com',
-  apiKey: DEEPSEEK_API_KEY || 'sk-placeholder', // Fallback to prevent crash if env not set
-  dangerouslyAllowBrowser: true,
+  apiKey: DEEPSEEK_API_KEY,
+  dangerouslyAllowBrowser: true
 });
-
-export const fetchTarotReading = async (
-  question: string,
-  cards: TarotCard[]
-): Promise<string> => {
-  if (!DEEPSEEK_API_KEY) {
-    console.warn('DeepSeek API Key is missing. Please set VITE_DEEPSEEK_API_KEY in .env.local');
-    return `[系统离线模式] 
-    
-### 🔮 牌面综述
-命运的信号有些微弱... (请配置 DeepSeek API Key)
-
-### 👁️ 深度解码
-你抽到了 ${cards.map(c => c.name).join('、')}。
-虽然我现在无法连接到宇宙深处的数据库，但这些牌依然暗示着重要的转折。
-
-### ⚡ 行动指令
-检查你的 .env.local 文件。`;
-  }
-
-  const cardDescriptions = cards
-    .map((card, index) => {
-      const position = ['过去/因果', '现在/困境', '未来/趋势'][index] || `位置${index + 1}`;
-      return `${position}: ${card.name} (${card.nameEn}) - ${card.meaning}`;
-    })
-    .join('\n');
-
-  const systemPrompt = `
-你是一位赛博朋克风格的神秘占卜师，身处未来的霓虹都市。你的语言风格既有古老的智慧，又带有科技的隐喻（例如：‘命运的代码’、‘灵魂的算法’、‘量子纠缠’、‘系统过载’）。
-
-请根据用户的问题和抽到的三张塔罗牌进行解读。
-
-输出格式必须严格遵守以下 Markdown 结构：
-
-### 🔮 牌面综述
-(30字以内，一针见血的总结)
-
-### 👁️ 深度解码
-(结合三张牌的含义，详细分析过去因果、现状困境和未来趋势。请使用带有科技感的比喻)
-
-### ⚡ 行动指令
-(给出一个具体、可执行的建议，像是一条系统补丁或调试指令)
-`;
-
-  const userPrompt = `
-用户问题: "${question || '我的近期运势如何？'}"
-
-抽牌结果:
-${cardDescriptions}
-`;
-
-  try {
-    const completion = await openai.chat.completions.create({
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt },
-      ],
-      model: 'deepseek-chat',
-      temperature: 1.3, // Slightly higher creativity for divination
-    });
-
-    return completion.choices[0].message.content || '系统未能解码命运信号...';
-  } catch (error) {
-    console.error('DeepSeek API Error:', error);
-    throw new Error('连接宇宙数据库失败');
-  }
-};
