@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Star } from 'lucide-react';
+import { useHistoryStore } from '../../stores/useHistoryStore';
 
 interface DiceModalProps {
   isOpen: boolean;
@@ -60,12 +61,33 @@ export const DiceModal: React.FC<DiceModalProps> = ({ isOpen, onClose }) => {
     const timeout = setTimeout(() => {
       setIsRolling(false);
       // Final result
+      const finalPlanet = PLANETS[Math.floor(Math.random() * PLANETS.length)];
+      const finalSign = SIGNS[Math.floor(Math.random() * SIGNS.length)];
+      const finalHouse = HOUSES[Math.floor(Math.random() * HOUSES.length)];
+      
       setResult({
-        planet: PLANETS[Math.floor(Math.random() * PLANETS.length)],
-        sign: SIGNS[Math.floor(Math.random() * SIGNS.length)],
-        house: HOUSES[Math.floor(Math.random() * HOUSES.length)],
+        planet: finalPlanet,
+        sign: finalSign,
+        house: finalHouse,
       });
       clearInterval(interval);
+
+      // Save to history
+      const interpretation = `**星象指引**\n\n- **行星**: ${finalPlanet.symbol} ${finalPlanet.label}\n- **星座**: ${finalSign.symbol} ${finalSign.label}\n- **宫位**: 第 ${finalHouse} 宫\n\n此组合象征着...`;
+      
+      useHistoryStore.getState().addEntry({
+        type: 'dice',
+        summary: '星象骰子指引',
+        fullResult: interpretation,
+        data: {
+          dice: {
+            planet: finalPlanet,
+            sign: finalSign,
+            house: finalHouse
+          }
+        }
+      });
+
     }, 1000); // Roll for 1 second
 
     return () => {

@@ -1,19 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MobileContainer } from '../components/layout/MobileContainer';
 import { ShopHeader } from '../components/shop/ShopHeader';
 import { ShopBanner } from '../components/shop/ShopBanner';
 import { FilterBar } from '../components/shop/FilterBar';
 import { ProductCard } from '../components/shop/ProductCard';
+import { CartDrawer } from '../components/shop/CartDrawer';
 import { PRODUCTS } from '../data/products';
 
 export const Shop: React.FC = () => {
   const navigate = useNavigate();
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   return (
     <MobileContainer hideHeader={true} hideFooter={true} className="bg-[#161622]">
       {/* Header */}
-      <ShopHeader />
+      <ShopHeader onCartClick={() => setIsCartOpen(true)} />
 
       {/* Main Scrollable Content */}
       <div className="flex flex-col pb-32">
@@ -36,6 +38,9 @@ export const Shop: React.FC = () => {
           ))}
         </div>
       </div>
+
+      {/* Cart Drawer */}
+      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </MobileContainer>
   );
 };

@@ -6,11 +6,13 @@ import { DatePicker } from '../components/profile/picker/DatePicker';
 import { LocationPicker } from '../components/profile/picker/LocationPicker';
 import { GenderPicker } from '../components/profile/picker/GenderPicker';
 import { useUserStore } from '../stores/useUserStore';
+import { useToastStore } from '../stores/useToastStore';
 import { formatDate } from '../lib/dateUtils';
 
 export const EditProfile: React.FC = () => {
   const navigate = useNavigate();
   const { profile, updateProfile } = useUserStore();
+  const addToast = useToastStore(state => state.addToast);
   
   // Local state for pickers visibility
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -20,11 +22,10 @@ export const EditProfile: React.FC = () => {
 
   // Temporary state for nickname input
   const [nickname, setNickname] = useState(profile.nickname);
-  const [showToast, setShowToast] = useState(false);
 
   const handleSave = () => {
     updateProfile({ nickname });
-    setShowToast(true);
+    addToast('档案保存成功', 'success');
     setTimeout(() => {
       navigate('/');
     }, 1000);
@@ -42,11 +43,6 @@ export const EditProfile: React.FC = () => {
 
   return (
     <MobileContainer hideHeader={false} className="bg-[#161622]">
-      {showToast && (
-        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/80 text-white px-6 py-3 rounded-lg z-[60] font-pixel border border-white/20 backdrop-blur-sm animate-fade-in">
-          保存成功
-        </div>
-      )}
       <div className="pt-4 px-4 pb-24">
         <h1 className="text-xl text-white font-pixel mb-6 text-center">Magic Lightning</h1>
 
@@ -100,36 +96,45 @@ export const EditProfile: React.FC = () => {
       </div>
 
       {/* Pickers */}
-      <DatePicker 
-        isOpen={showDatePicker} 
-        onClose={() => setShowDatePicker(false)} 
-        initialDate={profile.birthDate}
-        onSelect={(date) => updateProfile({ birthDate: date })}
+      <DatePicker
+        isOpen={showDatePicker}
+        onClose={() => setShowDatePicker(false)}
+        initialDate={new Date(profile.birthDate)}
+        onConfirm={(date) => {
+          updateProfile({ birthDate: date.toISOString() });
+          setShowDatePicker(false);
+        }}
       />
 
       <LocationPicker
         isOpen={showBirthLocPicker}
         onClose={() => setShowBirthLocPicker(false)}
-        initialLocation={profile.birthLocation}
-        onSelect={(loc) => updateProfile({ birthLocation: loc })}
         title="选择出生地"
+        onConfirm={(loc) => {
+          updateProfile({ birthLocation: loc });
+          setShowBirthLocPicker(false);
+        }}
       />
 
       <LocationPicker
         isOpen={showCurrentLocPicker}
         onClose={() => setShowCurrentLocPicker(false)}
-        initialLocation={profile.currentLocation}
-        onSelect={(loc) => updateProfile({ currentLocation: loc })}
         title="选择现居地"
+        onConfirm={(loc) => {
+          updateProfile({ currentLocation: loc });
+          setShowCurrentLocPicker(false);
+        }}
       />
 
       <GenderPicker
         isOpen={showGenderPicker}
         onClose={() => setShowGenderPicker(false)}
         initialValue={profile.gender}
-        onSelect={(val) => updateProfile({ gender: val })}
+        onConfirm={(gender) => {
+          updateProfile({ gender });
+          setShowGenderPicker(false);
+        }}
       />
-
     </MobileContainer>
   );
 };

@@ -49,7 +49,7 @@ export const ReadingView: React.FC = () => {
               <img 
                 src={card.image} 
                 alt={card.name} 
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover rounded-lg"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
                   e.currentTarget.parentElement!.classList.add('flex', 'items-center', 'justify-center', 'bg-pixel-gold');

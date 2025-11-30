@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Shuffle, Sparkles } from 'lucide-react';
 import { LENORMAND_DECK, type LenormandCardData } from '../../data/lenormand';
 import { LenormandCard } from './LenormandCard';
+import { useHistoryStore } from '../../stores/useHistoryStore';
 
 interface LenormandModalProps {
   isOpen: boolean;
@@ -21,23 +22,33 @@ export const LenormandModal: React.FC<LenormandModalProps> = ({ isOpen, onClose 
     }
   }, [isOpen]);
 
-  const handleShuffle = () => {
-    setStep('shuffling');
-    // Simulate shuffle delay
-    setTimeout(() => {
-      // Draw 2 unique cards
-      const shuffled = [...LENORMAND_DECK].sort(() => 0.5 - Math.random());
-      setDrawnCards([shuffled[0], shuffled[1]]);
-      setStep('result');
-    }, 1500);
-  };
-
   // Interpretation generation (Mock)
   const getInterpretation = (cards: LenormandCardData[]) => {
     if (cards.length < 2) return "";
     const c1 = cards[0];
     const c2 = cards[1];
     return `核心议题是关于【${c1.name}】（${c1.keywords[0]}），建议你采取【${c2.name}】（${c2.keywords[1]}）的态度。${c1.meaning.split('，')[0]}，而${c2.meaning}`;
+  };
+
+  const handleShuffle = () => {
+    setStep('shuffling');
+    // Simulate shuffle delay
+    setTimeout(() => {
+      // Draw 2 unique cards
+      const shuffled = [...LENORMAND_DECK].sort(() => 0.5 - Math.random());
+      const cards = [shuffled[0], shuffled[1]];
+      setDrawnCards(cards);
+      setStep('result');
+      
+      // Save to history
+      const interpretation = getInterpretation(cards);
+      useHistoryStore.getState().addEntry({
+        type: 'lenormand',
+        summary: '今日雷诺曼指引',
+        fullResult: interpretation,
+        data: { cards }
+      });
+    }, 1500);
   };
 
   return (
