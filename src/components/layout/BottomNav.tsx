@@ -30,7 +30,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ className }) => {
       {/* Center Plus Button */}
       <div className="relative -top-6">
         <button 
-          onClick={() => navigate('/')} // Temporarily navigate to home or specific action
+          onClick={() => navigate('/divination')}
           className="w-14 h-14 rounded-full bg-pixel-gold flex items-center justify-center shadow-lg transform hover:scale-105 transition-transform"
         >
           <Plus size={28} className="text-pixel-black" strokeWidth={3} />

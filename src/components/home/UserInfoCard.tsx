@@ -1,17 +1,23 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Ellipsis } from 'lucide-react';
+import { useUserStore } from '../../stores/useUserStore';
+import { getZodiacSign, formatDate } from '../../lib/dateUtils';
 
 interface UserInfoProps {
-  name?: string;
-  date?: string;
   avatarUrl?: string;
 }
 
 export const UserInfoCard: React.FC<UserInfoProps> = ({ 
-  name = "白羊座 (示例)", 
-  date = "2000-04-15",
   avatarUrl = "/images/home/avatar_user.png"
 }) => {
+  const navigate = useNavigate();
+  const { profile } = useUserStore();
+  
+  const zodiac = getZodiacSign(profile.birthDate);
+  const displayDate = formatDate(profile.birthDate).split(' ')[0];
+  const displayName = profile.nickname || '未设置昵称';
+
   return (
     <div className="flex items-center justify-between py-4 px-2">
       <div className="flex items-center gap-3">
@@ -30,14 +36,22 @@ export const UserInfoCard: React.FC<UserInfoProps> = ({
         
         {/* Info */}
         <div className="flex flex-col">
-          <h2 className="text-white text-lg font-sans font-medium">{name}</h2>
-          <span className="text-pixel-secondary text-sm font-sans">{date}</span>
+          <div className="flex items-center gap-2">
+            <h2 className="text-white text-lg font-sans font-medium">{displayName}</h2>
+            <span className="text-pixel-gold text-xs border border-pixel-gold/30 px-1.5 py-0.5 rounded bg-pixel-gold/10 font-pixel">
+              {zodiac}
+            </span>
+          </div>
+          <span className="text-pixel-secondary text-sm font-sans">{displayDate}</span>
         </div>
       </div>
 
       {/* Actions */}
       <div className="flex items-center gap-3">
-        <button className="text-white text-sm font-sans hover:text-pixel-gold transition-colors">
+        <button 
+          onClick={() => navigate('/profile/edit')}
+          className="text-white text-sm font-sans hover:text-pixel-gold transition-colors"
+        >
           编辑
         </button>
         <button className="text-white hover:text-pixel-gold transition-colors">

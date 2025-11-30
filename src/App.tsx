@@ -3,6 +3,9 @@ import Home from './pages/Home';
 import { StarChart } from './pages/StarChart';
 import { Shop } from './pages/Shop';
 import { Profile } from './pages/Profile';
+import DailyFortune from './pages/DailyFortune';
+import DivinationPage from './pages/Divination';
+import EditProfile from './pages/EditProfile';
 import { MainLayout } from './components/layout/MainLayout';
 
 function App() {
@@ -10,12 +13,15 @@ function App() {
     <Routes>
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
+        <Route path="/daily-fortune" element={<DailyFortune />} />
         <Route path="/starchart" element={<StarChart />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/profile" element={<Profile />} />
-        {/* 中间按钮暂时导向首页或一个开发中的占位页 */}
-        <Route path="/divination" element={<Home />} />
       </Route>
+      
+      {/* Standalone Pages (No Footer) */}
+      <Route path="/divination" element={<DivinationPage />} />
+      <Route path="/profile/edit" element={<EditProfile />} />
     </Routes>
   )
 }

@@ -1,36 +1,48 @@
-import React from 'react';
-import { Star } from 'lucide-react';
-
-// Mock data type
-interface FortuneData {
-  love: number;
-  career: number;
-  wealth: number;
-  health: number;
-}
-
-const DEFAULT_FORTUNE: FortuneData = {
-  love: 85,
-  career: 85,
-  wealth: 85,
-  health: 85,
-};
+import React, { useEffect } from 'react';
+import { Star, Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useFortuneStore } from '../../stores/useFortuneStore';
+import { useUserStore } from '../../stores/useUserStore';
+import { getZodiacSign } from '../../lib/dateUtils';
+import type { FortuneScores } from '../../types/fortune';
 
 export const DashboardGrid: React.FC = () => {
+  const { fortune, isLoading, checkAndFetch } = useFortuneStore();
+  const { profile } = useUserStore();
+
+  useEffect(() => {
+    const zodiac = getZodiacSign(profile.birthDate);
+    checkAndFetch(zodiac);
+  }, [checkAndFetch, profile.birthDate]);
+
+  const displayScores: FortuneScores = fortune?.scores || {
+    love: 0,
+    career: 0,
+    wealth: 0,
+    health: 0,
+    academic: 0,
+    social: 0
+  };
+
   return (
     <div className="grid grid-cols-2 gap-4 px-2">
-      <DailyFortuneCard data={DEFAULT_FORTUNE} />
+      <DailyFortuneCard scores={displayScores} isLoading={isLoading} />
       <TarotEntryCard />
     </div>
   );
 };
 
-const DailyFortuneCard = ({ data }: { data: FortuneData }) => {
+const DailyFortuneCard = ({ scores, isLoading }: { scores: FortuneScores; isLoading: boolean }) => {
+  const navigate = useNavigate();
+
   return (
-    <div className="bg-pixel-card border border-pixel-border rounded-xl p-3 flex flex-col gap-3">
+    <div 
+      onClick={() => navigate('/daily-fortune')}
+      className="bg-pixel-card border border-pixel-border rounded-xl p-3 flex flex-col gap-3 cursor-pointer hover:border-pixel-gold/50 transition-colors group min-h-[160px]"
+    >
       {/* Header */}
       <div className="flex items-center justify-between">
-        <span className="text-white text-sm font-bold">今日运势</span>
+        <span className="text-white text-sm font-bold group-hover:text-pixel-gold transition-colors">今日运势</span>
         <span className="text-xs text-pixel-secondary">全部</span>
       </div>
       
@@ -42,13 +54,19 @@ const DailyFortuneCard = ({ data }: { data: FortuneData }) => {
         <Star size={12} className="text-white/30" />
       </div>
 
-      {/* Progress Bars */}
-      <div className="flex flex-col gap-2 mt-1">
-        <ProgressBar label="爱情运势" value={data.love} />
-        <ProgressBar label="事业运势" value={data.career} />
-        <ProgressBar label="财运指数" value={data.wealth} />
-        <ProgressBar label="健康指数" value={data.health} />
-      </div>
+      {/* Progress Bars or Loading */}
+      {isLoading ? (
+        <div className="flex-1 flex items-center justify-center">
+          <Loader2 className="animate-spin text-pixel-gold w-6 h-6" />
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2 mt-1">
+          <ProgressBar label="爱情运势" value={scores.love} />
+          <ProgressBar label="事业运势" value={scores.career} />
+          <ProgressBar label="财运指数" value={scores.wealth} />
+          <ProgressBar label="健康指数" value={scores.health} />
+        </div>
+      )}
     </div>
   );
 };
