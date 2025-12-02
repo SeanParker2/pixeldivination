@@ -13,8 +13,8 @@ export const HistoryDrawer: React.FC<HistoryDrawerProps> = ({ isOpen, onClose })
   const { history, removeEntry, clearHistory } = useHistoryStore();
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const formatDate = (timestamp: number) => {
-    return new Date(timestamp).toLocaleDateString('zh-CN', {
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString('zh-CN', {
       month: 'numeric',
       day: 'numeric',
       hour: '2-digit',
@@ -29,6 +29,7 @@ export const HistoryDrawer: React.FC<HistoryDrawerProps> = ({ isOpen, onClose })
   const getTypeStyles = (type: string) => {
     switch (type) {
       case 'tarot': return { color: 'bg-purple-500/20 text-purple-400', icon: Scroll, label: '塔罗占卜' };
+      case 'natal-chart':
       case 'starchart': return { color: 'bg-orange-500/20 text-orange-400', icon: Sparkles, label: '本命盘解读' };
       case 'lenormand': return { color: 'bg-cyan-500/20 text-cyan-400', icon: LayoutGrid, label: '雷诺曼指引' };
       case 'dice': return { color: 'bg-pink-500/20 text-pink-400', icon: Dices, label: '星象骰子' };
@@ -132,7 +133,7 @@ export const HistoryDrawer: React.FC<HistoryDrawerProps> = ({ isOpen, onClose })
                                   className="border-t border-white/10 bg-black/20"
                               >
                                   <div className="p-4 prose prose-invert prose-sm max-w-none prose-p:text-gray-300 prose-headings:text-gray-200">
-                                      <Markdown>{item.fullResult}</Markdown>
+                                      <Markdown>{item.details?.result || item.details?.report || ''}</Markdown>
                                   </div>
                                   <div className="flex justify-end p-2 border-t border-white/5">
                                       <button 

@@ -85,8 +85,8 @@ export const FengShuiModal: React.FC<FengShuiModalProps> = ({ isOpen, onClose })
     useHistoryStore.getState().addEntry({
         type: 'fengshui',
         summary: '办公风水罗盘',
-        fullResult: getAdvice(result),
-        data: {
+        details: {
+            result: getAdvice(result),
             kua: {
                 name: result.kuaName,
                 group: result.group,

@@ -37,8 +37,10 @@ export const InsightModal: React.FC<InsightModalProps> = ({ isOpen, onClose }) =
     useHistoryStore.getState().addEntry({
       type: 'insight',
       summary: '今日灵感',
-      fullResult: quote,
-      data: { quote }
+      details: {
+        result: quote,
+        quote
+      }
     });
     
     setIsSaved(true);

@@ -45,8 +45,10 @@ export const LenormandModal: React.FC<LenormandModalProps> = ({ isOpen, onClose 
       useHistoryStore.getState().addEntry({
         type: 'lenormand',
         summary: '今日雷诺曼指引',
-        fullResult: interpretation,
-        data: { cards }
+        details: {
+          result: interpretation,
+          cards
+        }
       });
     }, 1500);
   };

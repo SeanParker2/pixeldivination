@@ -78,8 +78,8 @@ export const DiceModal: React.FC<DiceModalProps> = ({ isOpen, onClose }) => {
       useHistoryStore.getState().addEntry({
         type: 'dice',
         summary: '星象骰子指引',
-        fullResult: interpretation,
-        data: {
+        details: {
+          result: interpretation,
           dice: {
             planet: finalPlanet,
             sign: finalSign,

@@ -1,36 +1,12 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { TarotCard } from './useDivinationStore';
-import type { LenormandCardData } from '../data/lenormand';
 
 export interface HistoryItem {
   id: string;
-  type: 'tarot' | 'starchart' | 'lenormand' | 'dice' | 'synastry' | 'transit' | 'sky' | 'insight' | 'fengshui';
-  date: number;
-  summary: string; // Short preview or title
-  fullResult: string; // The markdown content or just text
-  data?: {
-    cards?: TarotCard[] | LenormandCardData[];
-    planets?: any[];
-    transitPlanets?: any[];
-    partner?: {
-      name: string;
-      planets: any[];
-    };
-    dice?: {
-      planet: { symbol: string; label: string };
-      sign: { symbol: string; label: string };
-      house: number;
-    };
-    question?: string;
-    // New data types
-    quote?: string;
-    kua?: {
-      name: string;
-      group: string;
-      bestDirection: string;
-    };
-  }; 
+  type: 'tarot' | 'natal-chart' | 'starchart' | 'daily-fortune' | 'lenormand' | 'dice' | 'synastry' | 'transit' | 'sky' | 'insight' | 'fengshui';
+  date: string; // ISO string as requested or keep timestamp? User example said "date: string". I'll use string.
+  summary: string;
+  details: any;
 }
 
 interface HistoryState {
@@ -38,11 +14,12 @@ interface HistoryState {
   addEntry: (entry: Omit<HistoryItem, 'id' | 'date'>) => void;
   clearHistory: () => void;
   removeEntry: (id: string) => void;
+  getStats: () => { tarot: number; natalChart: number; daily: number; total: number };
 }
 
 export const useHistoryStore = create<HistoryState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       history: [],
       addEntry: (entry) =>
         set((state) => ({
@@ -50,7 +27,7 @@ export const useHistoryStore = create<HistoryState>()(
             {
               ...entry,
               id: crypto.randomUUID(),
-              date: Date.now(),
+              date: new Date().toISOString(),
             },
             ...state.history,
           ],
@@ -60,6 +37,15 @@ export const useHistoryStore = create<HistoryState>()(
         set((state) => ({
           history: state.history.filter((item) => item.id !== id),
         })),
+      getStats: () => {
+        const { history } = get();
+        return {
+          tarot: history.filter(i => i.type === 'tarot').length,
+          natalChart: history.filter(i => i.type === 'natal-chart' || i.type === 'starchart').length,
+          daily: history.filter(i => i.type === 'daily-fortune').length,
+          total: history.length
+        };
+      }
     }),
     {
       name: 'pixel-history-storage',

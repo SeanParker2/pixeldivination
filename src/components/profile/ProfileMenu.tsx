@@ -10,7 +10,7 @@ export const ProfileMenu: React.FC<ProfileMenuProps> = ({ onHistoryClick }) => {
     <div className="flex flex-col px-6 gap-2">
       <MenuItem icon={FileText} label="我的订单" />
       <MenuItem icon={Clock} label="占卜历史" onClick={onHistoryClick} />
-      <MenuItem icon={Inbox} label="我的档案" />
+      <MenuItem icon={Inbox} label="我的档案" onClick={onHistoryClick} />
     </div>
   );
 };

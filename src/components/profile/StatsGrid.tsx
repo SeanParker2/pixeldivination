@@ -1,11 +1,14 @@
 import React from 'react';
 import { Store, Disc, Heart } from 'lucide-react';
+import { useHistoryStore } from '../../stores/useHistoryStore';
 
 export const StatsGrid: React.FC = () => {
+  const stats = useHistoryStore(state => state.getStats());
+
   return (
     <div className="grid grid-cols-3 gap-4 px-6 mt-16 mb-8">
       <StatItem icon={Store} label="购物车" value="175" />
-      <StatItem icon={Disc} label="报告" value="312" />
+      <StatItem icon={Disc} label="报告" value={stats.total.toString()} />
       <StatItem icon={Heart} label="收藏" value="806" />
     </div>
   );

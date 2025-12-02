@@ -4,9 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { Loader2 } from 'lucide-react';
 import { useDivinationStore } from '../../stores/useDivinationStore';
+import { useHistoryStore } from '../../stores/useHistoryStore';
 
 export const ReadingView: React.FC = () => {
   const { selectedCards, resetDivination, generateReading, readingResult, isLoadingAI } = useDivinationStore();
+  const addHistoryEntry = useHistoryStore(state => state.addEntry);
   const navigate = useNavigate();
 
   // Trigger AI reading when all cards are revealed
@@ -21,6 +23,16 @@ export const ReadingView: React.FC = () => {
   }, [selectedCards, readingResult, generateReading]);
 
   const handleComplete = () => {
+    if (readingResult) {
+      addHistoryEntry({
+        type: 'tarot',
+        summary: '塔罗牌阵解读', // Or use question if available in store
+        details: {
+          cards: selectedCards,
+          result: readingResult
+        }
+      });
+    }
     resetDivination();
     navigate('/');
   };

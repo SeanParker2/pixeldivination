@@ -56,10 +56,10 @@ export const StarChart: React.FC = () => {
       localStorage.setItem('natal_chart_report', result);
 
       useHistoryStore.getState().addEntry({
-        type: 'starchart',
+        type: 'natal-chart',
         summary: '本命盘深度解读',
-        fullResult: result,
-        data: {
+        details: {
+          report: result,
           planets: data.planets
         }
       });
@@ -91,8 +91,8 @@ export const StarChart: React.FC = () => {
           useHistoryStore.getState().addEntry({
               type: 'synastry',
               summary: `与 ${partnerData.name} 的合盘分析`,
-              fullResult: result,
-              data: {
+              details: {
+                  result,
                   planets: userData.planets,
                   partner: {
                       name: partnerData.name,
@@ -131,8 +131,8 @@ export const StarChart: React.FC = () => {
       useHistoryStore.getState().addEntry({
         type: 'transit',
         summary: '近期行运推演',
-        fullResult: result,
-        data: {
+        details: {
+          result,
           planets: natalData.planets,
           transitPlanets: transitData.planets
         }
@@ -160,8 +160,8 @@ export const StarChart: React.FC = () => {
       useHistoryStore.getState().addEntry({
         type: 'sky',
         summary: '今日天象解读',
-        fullResult: result,
-        data: {
+        details: {
+          result,
           planets: skyData.planets
         }
       });
