@@ -1,18 +1,19 @@
 import React from 'react';
-import { User, Heart, Compass, MoonStar } from 'lucide-react';
+import { User, Heart, Compass, MoonStar, Loader2 } from 'lucide-react';
 
 interface ReportActionsProps {
   activeTab: string;
-  onNatalReading?: () => void;
-  onSynastryReading?: () => void;
+  onGenerate: () => void;
+  isLoading: boolean;
+  // Optional props for other tabs if we want to keep them working later
   onTransitReading?: () => void;
   onSkyReading?: () => void;
 }
 
 export const ReportActions: React.FC<ReportActionsProps> = ({ 
   activeTab,
-  onNatalReading, 
-  onSynastryReading,
+  onGenerate,
+  isLoading,
   onTransitReading,
   onSkyReading
 }) => {
@@ -22,10 +23,11 @@ export const ReportActions: React.FC<ReportActionsProps> = ({
         return (
           <button 
             onClick={onTransitReading}
-            className="w-full bg-blue-100 hover:bg-blue-200 transition-colors rounded-2xl p-4 flex flex-col items-start gap-3 border-2 border-transparent hover:border-blue-300"
+            disabled={isLoading}
+            className="w-full bg-blue-100 hover:bg-blue-200 transition-colors rounded-2xl p-4 flex flex-col items-start gap-3 border-2 border-transparent hover:border-blue-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <div className="p-2 bg-blue-200 rounded-full text-blue-700">
-               <Compass size={20} />
+               {isLoading ? <Loader2 size={20} className="animate-spin" /> : <Compass size={20} />}
             </div>
             <div className="text-left">
               <h3 className="text-blue-900 font-bold text-sm">行运推演</h3>
@@ -37,10 +39,11 @@ export const ReportActions: React.FC<ReportActionsProps> = ({
         return (
           <button 
             onClick={onSkyReading}
-            className="w-full bg-indigo-100 hover:bg-indigo-200 transition-colors rounded-2xl p-4 flex flex-col items-start gap-3 border-2 border-transparent hover:border-indigo-300"
+            disabled={isLoading}
+            className="w-full bg-indigo-100 hover:bg-indigo-200 transition-colors rounded-2xl p-4 flex flex-col items-start gap-3 border-2 border-transparent hover:border-indigo-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <div className="p-2 bg-indigo-200 rounded-full text-indigo-700">
-               <MoonStar size={20} />
+               {isLoading ? <Loader2 size={20} className="animate-spin" /> : <MoonStar size={20} />}
             </div>
             <div className="text-left">
               <h3 className="text-indigo-900 font-bold text-sm">天象解读</h3>
@@ -53,8 +56,9 @@ export const ReportActions: React.FC<ReportActionsProps> = ({
           <div className="grid grid-cols-2 gap-4 w-full">
             {/* Pink Card - 合盘报告 */}
             <button 
-              onClick={onSynastryReading}
-              className="bg-pink-100 hover:bg-pink-200 transition-colors rounded-2xl p-4 flex flex-col items-start gap-3 border-2 border-transparent hover:border-pink-300"
+              onClick={() => alert("功能开发中")}
+              disabled={isLoading}
+              className="bg-pink-100 hover:bg-pink-200 transition-colors rounded-2xl p-4 flex flex-col items-start gap-3 border-2 border-transparent hover:border-pink-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <div className="p-2 bg-pink-200 rounded-full text-pink-700">
                  <Heart size={20} />
@@ -67,14 +71,17 @@ export const ReportActions: React.FC<ReportActionsProps> = ({
 
             {/* Orange Card - 本命解读 */}
             <button 
-              onClick={onNatalReading}
-              className="bg-orange-100 hover:bg-orange-200 transition-colors rounded-2xl p-4 flex flex-col items-start gap-3 border-2 border-transparent hover:border-orange-300"
+              onClick={onGenerate}
+              disabled={isLoading}
+              className="bg-orange-100 hover:bg-orange-200 transition-colors rounded-2xl p-4 flex flex-col items-start gap-3 border-2 border-transparent hover:border-orange-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <div className="p-2 bg-orange-200 rounded-full text-orange-700">
-                <User size={20} />
+                {isLoading ? <Loader2 size={20} className="animate-spin" /> : <User size={20} />}
               </div>
               <div className="text-left">
-                <h3 className="text-orange-900 font-bold text-sm">本命解读</h3>
+                <h3 className="text-orange-900 font-bold text-sm">
+                  {isLoading ? "星象推演中..." : "本命解读"}
+                </h3>
                 <span className="text-orange-700 text-xs">AI 深度解读</span>
               </div>
             </button>

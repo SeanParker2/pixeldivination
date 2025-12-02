@@ -32,7 +32,8 @@ export const StarChart: React.FC = () => {
     }
   }, [activeTab]);
 
-  const handleNatalReport = async () => {
+  const handleGenerate = async () => {
+    if (activeTab !== "本命盘") setActiveTab("本命盘");
     if (report && activeTab === "本命盘") return;
 
     if (!profile.birthDate) {
@@ -281,14 +282,8 @@ export const StarChart: React.FC = () => {
                 {/* Footer Actions */}
                 <ReportActions 
                     activeTab={activeTab}
-                    onNatalReading={() => {
-                        setActiveTab('本命盘');
-                        handleNatalReport();
-                    }} 
-                    onSynastryReading={() => {
-                        setActiveTab('合盘');
-                        handleSynastryReport();
-                    }}
+                    onGenerate={handleGenerate}
+                    isLoading={isAnalyzing}
                     onTransitReading={handleTransitReport}
                     onSkyReading={handleSkyReport}
                 />
@@ -325,7 +320,7 @@ export const StarChart: React.FC = () => {
                                             if (activeTab === '合盘') handleSynastryReport();
                                             else if (activeTab === '行运盘') handleTransitReport();
                                             else if (activeTab === '天象盘') handleSkyReport();
-                                            else handleNatalReport();
+                                            else handleGenerate();
                                         }
                                     }}
                                     className="text-xs text-gray-500 hover:text-white transition-colors"
