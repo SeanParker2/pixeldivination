@@ -10,22 +10,31 @@ const ZODIAC_SIGNS = [
 const RADIUS = 160;
 const CENTER = 200;
 
-export const AstrologyWheel: React.FC = () => {
+interface AstrologyWheelProps {
+  date?: Date;
+  location?: string;
+}
+
+export const AstrologyWheel: React.FC<AstrologyWheelProps> = ({ date: propDate, location: propLocation }) => {
   const { profile } = useUserStore();
   const [chartData, setChartData] = useState<AstrologyData | null>(null);
 
   useEffect(() => {
-    if (profile?.birthDate && profile?.birthLocation) {
-      // Assuming birthLocation has a city field or we construct a string
-      const city = typeof profile.birthLocation === 'string' 
-        ? profile.birthLocation 
-        : (profile.birthLocation as any).city || '北京'; 
+    const targetDate = propDate || (profile?.birthDate ? new Date(profile.birthDate) : null);
+    
+    const targetLocation = propLocation || (
+      profile?.birthLocation 
+        ? (typeof profile.birthLocation === 'string' ? profile.birthLocation : (profile.birthLocation as any).city)
+        : null
+    );
+
+    if (targetDate && targetLocation) {
+      const city = targetLocation || '北京';
       const coords = getLatLong(city);
-      const date = new Date(profile.birthDate);
-      const data = calculateChart(date, coords);
+      const data = calculateChart(targetDate, coords);
       setChartData(data);
     }
-  }, [profile]);
+  }, [profile, propDate, propLocation]);
 
   if (!chartData) {
     return (

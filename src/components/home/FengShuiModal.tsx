@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
+import { X, Bookmark, Check } from 'lucide-react';
 import { useUserStore } from '../../stores/useUserStore';
+import { useHistoryStore } from '../../stores/useHistoryStore';
 import { calculateKua } from '../../lib/fengshui';
 import type { FengShuiResult, Direction, FengShuiType } from '../../lib/fengshui';
 
@@ -41,6 +42,7 @@ const polarToCartesian = (centerX: number, centerY: number, radius: number, angl
 export const FengShuiModal: React.FC<FengShuiModalProps> = ({ isOpen, onClose }) => {
   const { profile } = useUserStore();
   const [result, setResult] = useState<FengShuiResult | null>(null);
+  const [isSaved, setIsSaved] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -51,6 +53,7 @@ export const FengShuiModal: React.FC<FengShuiModalProps> = ({ isOpen, onClose })
       
       const res = calculateKua(birthYear, gender);
       setResult(res);
+      setIsSaved(false);
     }
   }, [isOpen, profile]);
 
@@ -74,6 +77,24 @@ export const FengShuiModal: React.FC<FengShuiModalProps> = ({ isOpen, onClose })
   const getAdvice = (res: FengShuiResult) => {
     const dirName = DIRECTION_LABELS[res.bestDirection];
     return `你的财位在【${dirName}方】，宜摆放绿植或水晶聚气。`;
+  };
+
+  const handleSave = () => {
+    if (isSaved || !result) return;
+    
+    useHistoryStore.getState().addEntry({
+        type: 'fengshui',
+        summary: '办公风水罗盘',
+        fullResult: getAdvice(result),
+        data: {
+            kua: {
+                name: result.kuaName,
+                group: result.group,
+                bestDirection: DIRECTION_LABELS[result.bestDirection]
+            }
+        }
+    });
+    setIsSaved(true);
   };
 
   return (
@@ -196,14 +217,38 @@ export const FengShuiModal: React.FC<FengShuiModalProps> = ({ isOpen, onClose })
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="text-center space-y-2"
+              className="text-center space-y-4 w-full"
             >
-              <p className="text-white font-medium text-lg">
-                {getAdvice(result)}
-              </p>
-              <p className="text-gray-400 text-sm">
-                命卦算法源自《八宅明镜》，仅供办公布局参考。
-              </p>
+              <div className="space-y-2">
+                <p className="text-white font-medium text-lg">
+                  {getAdvice(result)}
+                </p>
+                <p className="text-gray-400 text-sm">
+                  命卦算法源自《八宅明镜》，仅供办公布局参考。
+                </p>
+              </div>
+              
+              <button 
+                onClick={handleSave}
+                disabled={isSaved}
+                className={`flex items-center justify-center gap-2 w-full py-2 rounded-xl transition-all ${
+                  isSaved 
+                    ? 'bg-yellow-500/20 text-yellow-500 cursor-default' 
+                    : 'bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white'
+                }`}
+              >
+                {isSaved ? (
+                    <>
+                        <Check size={16} />
+                        <span>已保存到历史</span>
+                    </>
+                ) : (
+                    <>
+                        <Bookmark size={16} />
+                        <span>保存测试结果</span>
+                    </>
+                )}
+              </button>
             </motion.div>
 
           </motion.div>

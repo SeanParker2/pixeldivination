@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Clock, Trash2, Scroll, Sparkles, ChevronDown, ChevronUp, LayoutGrid, Dices } from 'lucide-react';
+import { X, Clock, Trash2, Scroll, Sparkles, ChevronDown, ChevronUp, LayoutGrid, Dices, Heart, Compass, MoonStar, Lightbulb, Wind } from 'lucide-react';
 import { useHistoryStore } from '../../stores/useHistoryStore';
 import Markdown from 'react-markdown';
 
@@ -32,6 +32,11 @@ export const HistoryDrawer: React.FC<HistoryDrawerProps> = ({ isOpen, onClose })
       case 'starchart': return { color: 'bg-orange-500/20 text-orange-400', icon: Sparkles, label: '本命盘解读' };
       case 'lenormand': return { color: 'bg-cyan-500/20 text-cyan-400', icon: LayoutGrid, label: '雷诺曼指引' };
       case 'dice': return { color: 'bg-pink-500/20 text-pink-400', icon: Dices, label: '星象骰子' };
+      case 'synastry': return { color: 'bg-rose-500/20 text-rose-400', icon: Heart, label: '双人合盘' };
+      case 'transit': return { color: 'bg-blue-500/20 text-blue-400', icon: Compass, label: '行运盘推运' };
+      case 'sky': return { color: 'bg-indigo-500/20 text-indigo-400', icon: MoonStar, label: '天象盘解读' };
+      case 'insight': return { color: 'bg-yellow-500/20 text-yellow-400', icon: Lightbulb, label: '每日灵感' };
+      case 'fengshui': return { color: 'bg-emerald-500/20 text-emerald-400', icon: Wind, label: '风水罗盘' };
       default: return { color: 'bg-gray-500/20 text-gray-400', icon: Sparkles, label: '未知记录' };
     }
   };

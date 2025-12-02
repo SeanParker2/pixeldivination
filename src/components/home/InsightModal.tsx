@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Play, SkipBack, SkipForward, Share2 } from 'lucide-react';
+import { X, Play, SkipBack, SkipForward, Share2, Bookmark, Check } from 'lucide-react';
+import { useHistoryStore } from '../../stores/useHistoryStore';
 
 export interface InsightModalProps {
   isOpen: boolean;
@@ -19,13 +20,29 @@ const QUOTES = [
 ];
 
 export const InsightModal: React.FC<InsightModalProps> = ({ isOpen, onClose }) => {
-  // Pick a random quote each time modal opens (or stable one, but random is fine for "Daily")
-  // To keep it consistent during one open session, we can use a memo or just let it re-render if parent doesn't force update.
-  // For simplicity here, we'll just pick one on render, but since it's inside AnimatePresence, 
-  // it's better to pick it once or use a fixed index passed from parent.
-  // However, for this MVP, picking one on render is okay as long as it doesn't flicker.
-  // Better: Use a random index based on date or just random.
-  const quote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+  const [quote, setQuote] = useState('');
+  const [isSaved, setIsSaved] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      const randomQuote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+      setQuote(randomQuote);
+      setIsSaved(false);
+    }
+  }, [isOpen]);
+
+  const handleSave = () => {
+    if (isSaved) return;
+    
+    useHistoryStore.getState().addEntry({
+      type: 'insight',
+      summary: '今日灵感',
+      fullResult: quote,
+      data: { quote }
+    });
+    
+    setIsSaved(true);
+  };
 
   return (
     <AnimatePresence>
@@ -91,7 +108,13 @@ export const InsightModal: React.FC<InsightModalProps> = ({ isOpen, onClose }) =
 
               {/* Controls */}
               <div className="flex items-center justify-between px-4">
-                <button className="text-gray-400 hover:text-white"><Share2 size={20} /></button>
+                <button 
+                  onClick={handleSave}
+                  className={`${isSaved ? 'text-pixel-gold' : 'text-gray-400 hover:text-white'} transition-colors`}
+                  disabled={isSaved}
+                >
+                  {isSaved ? <Check size={20} /> : <Bookmark size={20} />}
+                </button>
                 <div className="flex items-center gap-6">
                   <button className="text-white hover:text-pixel-gold"><SkipBack size={24} /></button>
                   <button className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-transform">
@@ -99,7 +122,7 @@ export const InsightModal: React.FC<InsightModalProps> = ({ isOpen, onClose }) =
                   </button>
                   <button className="text-white hover:text-pixel-gold"><SkipForward size={24} /></button>
                 </div>
-                <button className="text-gray-400 hover:text-white opacity-0 cursor-default"><Share2 size={20} /></button>
+                <button className="text-gray-400 hover:text-white opacity-50"><Share2 size={20} /></button>
               </div>
             </div>
 

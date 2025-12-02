@@ -5,19 +5,31 @@ import type { LenormandCardData } from '../data/lenormand';
 
 export interface HistoryItem {
   id: string;
-  type: 'tarot' | 'starchart' | 'lenormand' | 'dice';
+  type: 'tarot' | 'starchart' | 'lenormand' | 'dice' | 'synastry' | 'transit' | 'sky' | 'insight' | 'fengshui';
   date: number;
   summary: string; // Short preview or title
-  fullResult: string; // The markdown content
+  fullResult: string; // The markdown content or just text
   data?: {
     cards?: TarotCard[] | LenormandCardData[];
     planets?: any[];
+    transitPlanets?: any[];
+    partner?: {
+      name: string;
+      planets: any[];
+    };
     dice?: {
       planet: { symbol: string; label: string };
       sign: { symbol: string; label: string };
       house: number;
     };
     question?: string;
+    // New data types
+    quote?: string;
+    kua?: {
+      name: string;
+      group: string;
+      bestDirection: string;
+    };
   }; 
 }
 

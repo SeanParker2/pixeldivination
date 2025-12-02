@@ -135,6 +135,173 @@ export const fetchNatalChartReading = async (planets: PlanetPosition[]): Promise
   }
 };
 
+export const fetchSynastryReading = async (userPlanets: PlanetPosition[], partnerPlanets: PlanetPosition[], partnerName: string): Promise<string> => {
+  if (!DEEPSEEK_API_KEY) {
+    return `## 双人合盘解读 (系统离线)
+
+### 核心契合度
+你与${partnerName}的星盘显示出强烈的宿命感（模拟数据）。你们的太阳与月亮呈现和谐相位，意味着在生活目标和情感需求上能够互相理解。
+
+### 情感互动
+金星的连接暗示着强烈的吸引力，但同时也伴随着挑战。你们需要学会在激情与平淡之间找到平衡。
+
+### 长期发展
+土星的相位显示这段关系需要经历时间的考验。如果能共同克服困难，将建立起坚不可摧的羁绊。`;
+  }
+
+  const getPlanetDesc = (planets: PlanetPosition[]) => planets.map(p => {
+    const signs = ['白羊', '金牛', '双子', '巨蟹', '狮子', '处女', '天秤', '天蝎', '射手', '摩羯', '水瓶', '双鱼'];
+    const signIndex = Math.floor(p.longitude / 30);
+    const sign = signs[signIndex % 12];
+    return `${p.name}在${sign}`;
+  }).join(', ');
+
+  const userDesc = getPlanetDesc(userPlanets);
+  const partnerDesc = getPlanetDesc(partnerPlanets);
+
+  const systemPrompt = `
+你是一个专业占星师，擅长双人合盘（Synastry）分析。
+根据双方的星盘配置，生成一份约 300-400 字的合盘深度解读。
+包含：【核心契合度】、【情感互动】、【长期发展】三个板块。
+使用 Markdown 格式。
+语气风格：客观、深入、富有启发性，指出关系中的优势与挑战。
+`;
+
+  const userPrompt = `
+我的星盘：${userDesc}。
+对方(${partnerName})的星盘：${partnerDesc}。
+请解读我们的关系走向和契合度。
+`;
+
+  try {
+    const completion = await openai.chat.completions.create({
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      model: 'deepseek-chat',
+      temperature: 1.2,
+    });
+
+    const content = completion.choices[0].message.content;
+    if (!content) throw new Error('Empty response from AI');
+    
+    return content;
+  } catch (error) {
+    console.error('DeepSeek API Error (Synastry):', error);
+    throw new Error('无法连接星象数据库，请稍后再试。');
+  }
+};
+
+export const fetchTransitReading = async (natalPlanets: PlanetPosition[], transitPlanets: PlanetPosition[]): Promise<string> => {
+  if (!DEEPSEEK_API_KEY) {
+    return `## 行运盘解读 (系统离线)
+
+### 近期运势总览
+行运木星正穿过你的核心宫位，为你带来扩张与成长的机遇（模拟数据）。这是开始新项目或学习新技能的好时机。
+
+### 挑战与机遇
+土星的压力可能让你感到责任重大，但只要稳扎稳打，这些挑战终将转化为实实在在的成就。
+
+### 行动建议
+保持开放的心态，留意身边出现的新机会，同时注意劳逸结合，避免过度消耗。`;
+  }
+
+  const getPlanetDesc = (planets: PlanetPosition[]) => planets.map(p => {
+    const signs = ['白羊', '金牛', '双子', '巨蟹', '狮子', '处女', '天秤', '天蝎', '射手', '摩羯', '水瓶', '双鱼'];
+    const signIndex = Math.floor(p.longitude / 30);
+    const sign = signs[signIndex % 12];
+    return `${p.name}在${sign}`;
+  }).join(', ');
+
+  const natalDesc = getPlanetDesc(natalPlanets);
+  const transitDesc = getPlanetDesc(transitPlanets);
+
+  const systemPrompt = `
+你是一个专业占星师，擅长行运盘（Transit）推运。
+根据本命盘和当前行运星盘，生成一份约 300 字的近期运势解读。
+包含：【近期运势总览】、【挑战与机遇】、【行动建议】三个板块。
+使用 Markdown 格式。
+语气风格：务实、具有指导意义、鼓舞人心。
+`;
+
+  const userPrompt = `
+我的本命盘：${natalDesc}。
+当前行运星盘：${transitDesc}。
+请解读我近期的运势走向。
+`;
+
+  try {
+    const completion = await openai.chat.completions.create({
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      model: 'deepseek-chat',
+      temperature: 1.2,
+    });
+
+    const content = completion.choices[0].message.content;
+    if (!content) throw new Error('Empty response from AI');
+    
+    return content;
+  } catch (error) {
+    console.error('DeepSeek API Error (Transit):', error);
+    throw new Error('无法连接星象数据库，请稍后再试。');
+  }
+};
+
+export const fetchSkyReading = async (currentPlanets: PlanetPosition[]): Promise<string> => {
+  if (!DEEPSEEK_API_KEY) {
+    return `## 天象盘解读 (系统离线)
+
+### 今日宇宙能量
+今天的星象充满了变革的能量（模拟数据）。天王星的活跃可能带来突如其来的灵感或变动，适合打破常规。
+
+### 适合做的事
+尝试新鲜事物、进行头脑风暴、接触前沿科技。
+
+### 需要注意
+避免过于固执己见，保持灵活变通，以免错失良机。`;
+  }
+
+  const planetDesc = currentPlanets.map(p => {
+    const signs = ['白羊', '金牛', '双子', '巨蟹', '狮子', '处女', '天秤', '天蝎', '射手', '摩羯', '水瓶', '双鱼'];
+    const signIndex = Math.floor(p.longitude / 30);
+    const sign = signs[signIndex % 12];
+    return `${p.name}在${sign}`;
+  }).join(', ');
+
+  const systemPrompt = `
+你是一个专业占星师，擅长解读当下天象（Horary/Sky Chart）。
+根据当前的星盘配置，生成一份约 200-300 字的今日天象解读。
+包含：【今日宇宙能量】、【适合做的事】、【需要注意】三个板块。
+使用 Markdown 格式。
+语气风格：宏观、启发性、像天气预报一样提供指引。
+`;
+
+  const userPrompt = `当前天象星盘：${planetDesc}。请解读今天的整体能量氛围。`;
+
+  try {
+    const completion = await openai.chat.completions.create({
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      model: 'deepseek-chat',
+      temperature: 1.2,
+    });
+
+    const content = completion.choices[0].message.content;
+    if (!content) throw new Error('Empty response from AI');
+    
+    return content;
+  } catch (error) {
+    console.error('DeepSeek API Error (Sky):', error);
+    throw new Error('无法连接星象数据库，请稍后再试。');
+  }
+};
+
 /**
  * SECURITY WARNING:
  * In a production environment, NEVER expose your API Key in the frontend code.
