@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { DiceModal } from './DiceModal';
 import { LenormandModal } from './LenormandModal';
 import { FengShuiModal } from './FengShuiModal';
+import { playSound } from '../../lib/audio';
+import { triggerHaptic } from '../../lib/haptics';
 
 const NAV_ITEMS = [
   { id: 'rider', label: '雷诺曼牌', img: '/images/home/nav_rider.png' },
@@ -15,6 +17,8 @@ export const QuickNavGrid: React.FC = () => {
   const [showFengShuiModal, setShowFengShuiModal] = useState(false);
 
   const handleItemClick = (id: string) => {
+    playSound('tap');
+    triggerHaptic('light');
     if (id === 'dice') {
       setShowDiceModal(true);
     } else if (id === 'rider') {

@@ -1,15 +1,20 @@
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useDivinationStore } from '../../stores/useDivinationStore';
+import { playSound, stopSound } from '../../lib/audio';
 
 export const ShuffleDeck: React.FC = () => {
   const { setStep } = useDivinationStore();
 
   useEffect(() => {
+    playSound('shuffle');
     const timer = setTimeout(() => {
       setStep('draw');
     }, 3000);
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      stopSound('shuffle');
+    };
   }, [setStep]);
 
   return (

@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { useFortuneStore } from '../../stores/useFortuneStore';
 import { useUserStore } from '../../stores/useUserStore';
 import { getZodiacSign } from '../../lib/dateUtils';
+import { playSound } from '../../lib/audio';
+import { triggerHaptic } from '../../lib/haptics';
 import type { FortuneScores } from '../../types/fortune';
 
 export const DashboardGrid: React.FC = () => {
@@ -37,7 +39,11 @@ const DailyFortuneCard = ({ scores, isLoading }: { scores: FortuneScores; isLoad
 
   return (
     <div 
-      onClick={() => navigate('/daily-fortune')}
+      onClick={() => {
+        playSound('tap');
+        triggerHaptic('light');
+        navigate('/daily-fortune');
+      }}
       className="bg-pixel-card border border-pixel-border rounded-xl p-3 flex flex-col gap-3 cursor-pointer hover:border-pixel-gold/50 transition-colors group min-h-[160px]"
     >
       {/* Header */}

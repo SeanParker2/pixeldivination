@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Markdown from 'react-markdown';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Loader2, Heart, X, Compass, MoonStar } from 'lucide-react';
+import { Sparkles, Loader2, Heart, X, Compass, MoonStar, Share2, Download } from 'lucide-react';
+import html2canvas from 'html2canvas';
 import { MobileContainer } from '../components/layout/MobileContainer';
 import { ChartHeader } from '../components/starchart/ChartHeader';
 import { ChartInfoPanel } from '../components/starchart/ChartInfoPanel';
@@ -12,14 +13,19 @@ import { useUserStore } from '../stores/useUserStore';
 import { calculateChart, getLatLong } from '../lib/astrology';
 import { fetchNatalChartReading, fetchSynastryReading, fetchTransitReading, fetchSkyReading } from '../services/aiService';
 import { useHistoryStore } from '../stores/useHistoryStore';
+import { ShareCard } from '../components/share/ShareCard';
 
 export const StarChart: React.FC = () => {
-  const { profile } = useUserStore();
+  const { profile, activePersona } = useUserStore();
   const [activeTab, setActiveTab] = useState("本命盘");
   const [report, setReport] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   
   const [partnerData, setPartnerData] = useState<PartnerData | null>(null);
+
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [shareImage, setShareImage] = useState<string | null>(null);
+  const shareCardRef = useRef<HTMLDivElement>(null);
 
   // Load cached report
   useEffect(() => {
@@ -31,6 +37,26 @@ export const StarChart: React.FC = () => {
         setReport(null); 
     }
   }, [activeTab]);
+
+  const handleShare = async () => {
+    if (!shareCardRef.current) return;
+    
+    try {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      const canvas = await html2canvas(shareCardRef.current, {
+        backgroundColor: '#18181b',
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+      });
+      
+      setShareImage(canvas.toDataURL('image/png'));
+      setShowShareModal(true);
+    } catch (error) {
+      console.error('Failed to generate share card:', error);
+    }
+  };
 
   const handleGenerateReport = async () => {
     if (activeTab !== "本命盘") setActiveTab("本命盘");
@@ -51,7 +77,7 @@ export const StarChart: React.FC = () => {
       const date = new Date(profile.birthDate);
       const data = calculateChart(date, coords);
 
-      const result = await fetchNatalChartReading(data);
+      const result = await fetchNatalChartReading(data, activePersona);
       setReport(result);
       localStorage.setItem('natal_chart_report', result);
 
@@ -85,7 +111,7 @@ export const StarChart: React.FC = () => {
           const partnerDateObj = new Date(`${partnerData.birthDate}T${partnerData.birthTime}`);
           const partnerChartData = calculateChart(partnerDateObj, partnerCoords);
 
-          const result = await fetchSynastryReading(userData.planets, partnerChartData.planets, partnerData.name);
+          const result = await fetchSynastryReading(userData.planets, partnerChartData.planets, partnerData.name, activePersona);
           setReport(result);
           
           useHistoryStore.getState().addEntry({
@@ -125,7 +151,7 @@ export const StarChart: React.FC = () => {
       const now = new Date();
       const transitData = calculateChart(now, coords);
 
-      const result = await fetchTransitReading(natalData.planets, transitData.planets);
+      const result = await fetchTransitReading(natalData.planets, transitData.planets, activePersona);
       setReport(result);
 
       useHistoryStore.getState().addEntry({
@@ -154,7 +180,7 @@ export const StarChart: React.FC = () => {
       const now = new Date();
       const skyData = calculateChart(now, coords);
 
-      const result = await fetchSkyReading(skyData.planets);
+      const result = await fetchSkyReading(skyData.planets, activePersona);
       setReport(result);
 
       useHistoryStore.getState().addEntry({
@@ -309,6 +335,14 @@ export const StarChart: React.FC = () => {
                                 <h3 className="text-white font-bold text-lg">
                                     {getReportTitle()}
                                 </h3>
+                                {report && !isAnalyzing && (
+                                  <button 
+                                    onClick={handleShare}
+                                    className="ml-2 text-pixel-gold hover:text-white transition-colors"
+                                  >
+                                    <Share2 size={18} />
+                                  </button>
+                                )}
                              </div>
                              {report && !isAnalyzing && (
                                 <button 
@@ -351,6 +385,56 @@ export const StarChart: React.FC = () => {
             )}
         </AnimatePresence>
       </div>
+
+      {/* Hidden Share Card */}
+      <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
+        <ShareCard 
+          ref={shareCardRef}
+          userName={profile.nickname}
+          date={new Date().toLocaleDateString()}
+          type="natal-chart"
+          summary={report || ''}
+        />
+      </div>
+
+      {/* Share Modal */}
+      <AnimatePresence>
+        {showShareModal && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-6"
+            onClick={() => setShowShareModal(false)}
+          >
+            <div className="relative w-full max-w-sm" onClick={e => e.stopPropagation()}>
+              <button 
+                onClick={() => setShowShareModal(false)}
+                className="absolute -top-10 right-0 text-white/60 hover:text-white"
+              >
+                <X size={24} />
+              </button>
+              
+              {shareImage && (
+                <div className="space-y-4">
+                  <img src={shareImage} alt="Share Card" className="w-full rounded-xl shadow-2xl border border-white/10" />
+                  <div className="flex justify-center">
+                     <a 
+                       href={shareImage} 
+                       download={`pixel-starchart-${new Date().getTime()}.png`}
+                       className="flex items-center gap-2 bg-pixel-gold text-black px-6 py-3 rounded-full font-bold text-sm hover:bg-pixel-gold/90 transition-colors"
+                     >
+                       <Download size={18} />
+                       保存图片
+                     </a>
+                  </div>
+                  <p className="text-center text-white/40 text-xs">或长按图片保存</p>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </MobileContainer>
   );
 };

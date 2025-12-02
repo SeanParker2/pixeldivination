@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { fetchTarotReading } from '../services/aiService';
+import { useUserStore } from './useUserStore';
 
 export interface TarotCard {
   id: number;
@@ -137,7 +138,8 @@ export const useDivinationStore = create<DivinationState>((set, get) => ({
 
     try {
       const cardNames = selectedCards.map(c => c.name);
-      const result = await fetchTarotReading(question || '请解读我的塔罗牌阵', cardNames);
+      const activePersona = useUserStore.getState().activePersona;
+      const result = await fetchTarotReading(question || '请解读我的塔罗牌阵', cardNames, activePersona);
       set({ readingResult: result });
     } catch {
       set({ error: '无法连接到宇宙信号，请稍后再试。' });

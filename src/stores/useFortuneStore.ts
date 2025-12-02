@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { FortuneData } from '../types/fortune';
 import { fetchDailyFortune } from '../services/aiService';
+import { useUserStore } from './useUserStore';
 
 interface FortuneState {
   fortune: FortuneData | null;
@@ -33,7 +34,8 @@ export const useFortuneStore = create<FortuneState>()(
         set({ isLoading: true, error: null });
 
         try {
-          const data = await fetchDailyFortune(zodiac, today);
+          const activePersona = useUserStore.getState().activePersona;
+          const data = await fetchDailyFortune(zodiac, today, activePersona);
           set({ fortune: data, isLoading: false });
         } catch (err) {
           set({ 

@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
 import type { FortuneData } from '../types/fortune';
 import type { PlanetPosition } from '../lib/astrology';
+import { PERSONAS, type PersonaType } from '../types/ai';
 
 const MOCK_FORTUNE: FortuneData = {
   date: new Date().toISOString().split('T')[0],
@@ -22,17 +23,19 @@ const MOCK_FORTUNE: FortuneData = {
   }
 };
 
-export const fetchDailyFortune = async (zodiac: string, date: string): Promise<FortuneData> => {
+export const fetchDailyFortune = async (zodiac: string, date: string, persona: PersonaType = 'neon'): Promise<FortuneData> => {
   if (!DEEPSEEK_API_KEY) {
     console.warn('DeepSeek API Key is missing using mock data');
     return { ...MOCK_FORTUNE, zodiac, date };
   }
 
+  const basePrompt = PERSONAS[persona].prompt;
   const systemPrompt = `
-你是一位精通星象学的赛博占卜师。请根据用户的星座和日期，推演今日运势。
+${basePrompt}
+请根据用户的星座和日期，推演今日运势。
 必须返回纯 JSON 格式，不要包含 markdown 标记。
 JSON 结构需包含 scores (6个维度的0-100评分) 和 texts (5个板块的详细解读)。
-解读风格：神秘、直觉敏锐，稍微带一点点警告或鼓励，不要太官方。
+解读风格：符合你的人设，${persona === 'neon' ? '神秘、直觉敏锐，稍微带一点点警告或鼓励' : persona === 'forest' ? '温柔、治愈、充满自然意象' : '犀利、一针见血、不留情面'}。
 
 Example JSON structure:
 {
@@ -84,7 +87,7 @@ Example JSON structure:
   }
 };
 
-export const fetchNatalChartReading = async (chartData: unknown): Promise<string> => {
+export const fetchNatalChartReading = async (chartData: unknown, persona: PersonaType = 'neon'): Promise<string> => {
   if (!DEEPSEEK_API_KEY) {
     return `## 模拟本命盘解读 (系统离线)
     
@@ -98,8 +101,10 @@ export const fetchNatalChartReading = async (chartData: unknown): Promise<string
 你具备极强的直觉和洞察力，适合从事需要深度思考和创造力的工作。水星的相位表明你的沟通能力是开启成功的钥匙。`;
   }
 
+  const basePrompt = PERSONAS[persona].prompt;
   const systemPrompt = `
-你是一位专业占星师。请根据用户的星盘数据（行星落座与宫位），生成一份简练深刻的本命盘报告。包含三个部分：【核心人格】、【情感模式】、【天赋潜能】。使用 Markdown 格式，语气神秘而专业。
+${basePrompt}
+请根据用户的星盘数据（行星落座与宫位），生成一份简练深刻的本命盘报告。包含三个部分：【核心人格】、【情感模式】、【天赋潜能】。使用 Markdown 格式，语气符合你的人设。
 `;
 
   const userPrompt = `我的星盘数据：${JSON.stringify(chartData)}。请解读我的本命盘。`;
@@ -124,7 +129,7 @@ export const fetchNatalChartReading = async (chartData: unknown): Promise<string
   }
 };
 
-export const fetchTarotReading = async (question: string, cards: string[]): Promise<string> => {
+export const fetchTarotReading = async (question: string, cards: string[], persona: PersonaType = 'neon'): Promise<string> => {
   if (!DEEPSEEK_API_KEY) {
     return `## 塔罗指引 (模拟)
     
@@ -135,8 +140,10 @@ export const fetchTarotReading = async (question: string, cards: string[]): Prom
 建议保持耐心，静待时机成熟。`;
   }
 
+  const basePrompt = PERSONAS[persona].prompt;
   const systemPrompt = `
-你是一位精通塔罗牌的占卜师。请根据用户的问题和抽出的牌面，进行深度解读。
+${basePrompt}
+请根据用户的问题和抽出的牌面，进行深度解读。
 包含：【核心洞察】、【现状分析】、【未来指引】三个部分。
 使用 Markdown 格式。
 `;
@@ -163,7 +170,7 @@ export const fetchTarotReading = async (question: string, cards: string[]): Prom
   }
 };
 
-export const fetchSynastryReading = async (userPlanets: PlanetPosition[], partnerPlanets: PlanetPosition[], partnerName: string): Promise<string> => {
+export const fetchSynastryReading = async (userPlanets: PlanetPosition[], partnerPlanets: PlanetPosition[], partnerName: string, persona: PersonaType = 'neon'): Promise<string> => {
   if (!DEEPSEEK_API_KEY) {
     return `## 双人合盘解读 (系统离线)
 
@@ -187,12 +194,13 @@ export const fetchSynastryReading = async (userPlanets: PlanetPosition[], partne
   const userDesc = getPlanetDesc(userPlanets);
   const partnerDesc = getPlanetDesc(partnerPlanets);
 
+  const basePrompt = PERSONAS[persona].prompt;
   const systemPrompt = `
-你是一个专业占星师，擅长双人合盘（Synastry）分析。
+${basePrompt}
 根据双方的星盘配置，生成一份约 300-400 字的合盘深度解读。
 包含：【核心契合度】、【情感互动】、【长期发展】三个板块。
 使用 Markdown 格式。
-语气风格：客观、深入、富有启发性，指出关系中的优势与挑战。
+语气风格：符合你的人设。
 `;
 
   const userPrompt = `
@@ -221,7 +229,7 @@ export const fetchSynastryReading = async (userPlanets: PlanetPosition[], partne
   }
 };
 
-export const fetchTransitReading = async (natalPlanets: PlanetPosition[], transitPlanets: PlanetPosition[]): Promise<string> => {
+export const fetchTransitReading = async (natalPlanets: PlanetPosition[], transitPlanets: PlanetPosition[], persona: PersonaType = 'neon'): Promise<string> => {
   if (!DEEPSEEK_API_KEY) {
     return `## 行运盘解读 (系统离线)
 
@@ -245,12 +253,13 @@ export const fetchTransitReading = async (natalPlanets: PlanetPosition[], transi
   const natalDesc = getPlanetDesc(natalPlanets);
   const transitDesc = getPlanetDesc(transitPlanets);
 
+  const basePrompt = PERSONAS[persona].prompt;
   const systemPrompt = `
-你是一个专业占星师，擅长行运盘（Transit）推运。
+${basePrompt}
 根据本命盘和当前行运星盘，生成一份约 300 字的近期运势解读。
 包含：【近期运势总览】、【挑战与机遇】、【行动建议】三个板块。
 使用 Markdown 格式。
-语气风格：务实、具有指导意义、鼓舞人心。
+语气风格：符合你的人设。
 `;
 
   const userPrompt = `
@@ -279,7 +288,7 @@ export const fetchTransitReading = async (natalPlanets: PlanetPosition[], transi
   }
 };
 
-export const fetchSkyReading = async (currentPlanets: PlanetPosition[]): Promise<string> => {
+export const fetchSkyReading = async (currentPlanets: PlanetPosition[], persona: PersonaType = 'neon'): Promise<string> => {
   if (!DEEPSEEK_API_KEY) {
     return `## 天象盘解读 (系统离线)
 
@@ -300,12 +309,13 @@ export const fetchSkyReading = async (currentPlanets: PlanetPosition[]): Promise
     return `${p.name}在${sign}`;
   }).join(', ');
 
+  const basePrompt = PERSONAS[persona].prompt;
   const systemPrompt = `
-你是一个专业占星师，擅长解读当下天象（Horary/Sky Chart）。
+${basePrompt}
 根据当前的星盘配置，生成一份约 200-300 字的今日天象解读。
 包含：【今日宇宙能量】、【适合做的事】、【需要注意】三个板块。
 使用 Markdown 格式。
-语气风格：宏观、启发性、像天气预报一样提供指引。
+语气风格：符合你的人设。
 `;
 
   const userPrompt = `当前天象星盘：${planetDesc}。请解读今天的整体能量氛围。`;

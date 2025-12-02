@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Star } from 'lucide-react';
 import { useHistoryStore } from '../../stores/useHistoryStore';
+import { playSound } from '../../lib/audio';
+import { triggerHaptic } from '../../lib/haptics';
 
 interface DiceModalProps {
   isOpen: boolean;
@@ -149,7 +151,11 @@ export const DiceModal: React.FC<DiceModalProps> = ({ isOpen, onClose }) => {
 
             {/* Action Button */}
             <button
-              onClick={() => setIsRolling(true)}
+              onClick={() => {
+                setIsRolling(true);
+                triggerHaptic('medium');
+                playSound('dice');
+              }}
               disabled={isRolling}
               className={`
                 w-full py-4 rounded-xl font-pixel text-lg font-bold relative overflow-hidden group

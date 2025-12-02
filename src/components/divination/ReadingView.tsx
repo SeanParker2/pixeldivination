@@ -1,15 +1,24 @@
-import React, { useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useState, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Share2, X, Download } from 'lucide-react';
+import html2canvas from 'html2canvas';
 import { useDivinationStore } from '../../stores/useDivinationStore';
 import { useHistoryStore } from '../../stores/useHistoryStore';
+import { useUserStore } from '../../stores/useUserStore';
+import { playSound } from '../../lib/audio';
+import { ShareCard } from '../../components/share/ShareCard';
 
 export const ReadingView: React.FC = () => {
   const { selectedCards, resetDivination, generateReading, readingResult, isLoadingAI } = useDivinationStore();
   const addHistoryEntry = useHistoryStore(state => state.addEntry);
+  const userProfile = useUserStore(state => state.profile);
   const navigate = useNavigate();
+  
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [shareImage, setShareImage] = useState<string | null>(null);
+  const shareCardRef = useRef<HTMLDivElement>(null);
 
   // Trigger AI reading when all cards are revealed
   useEffect(() => {
@@ -37,9 +46,40 @@ export const ReadingView: React.FC = () => {
     navigate('/');
   };
 
+  const handleShare = async () => {
+    if (!shareCardRef.current) return;
+    
+    try {
+      // Small delay to ensure rendering
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      const canvas = await html2canvas(shareCardRef.current, {
+        backgroundColor: '#18181b',
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+      });
+      
+      setShareImage(canvas.toDataURL('image/png'));
+      setShowShareModal(true);
+    } catch (error) {
+      console.error('Failed to generate share card:', error);
+    }
+  };
+
   return (
-    <div className="flex flex-col items-center h-full pt-12 pb-8 px-4 overflow-y-auto scrollbar-hide">
-      <h2 className="text-xl text-white font-pixel mb-8 flex-shrink-0">命运启示</h2>
+    <div className="flex flex-col items-center h-full pt-12 pb-8 px-4 overflow-y-auto scrollbar-hide relative">
+      <div className="w-full max-w-md flex justify-between items-center mb-8 flex-shrink-0">
+        <h2 className="text-xl text-white font-pixel">命运启示</h2>
+        {readingResult && (
+          <button 
+            onClick={handleShare}
+            className="p-2 text-pixel-gold hover:bg-white/10 rounded-full transition-colors"
+          >
+            <Share2 size={20} />
+          </button>
+        )}
+      </div>
 
       <div className="w-full max-w-md space-y-6 flex-shrink-0">
         {selectedCards.map((card, index) => (
@@ -55,6 +95,7 @@ export const ReadingView: React.FC = () => {
               initial={{ rotateY: 180 }}
               animate={{ rotateY: 0 }}
               transition={{ delay: index * 0.5 + 0.2, duration: 0.6 }}
+              onAnimationStart={() => playSound('flip')}
               className="w-24 h-40 flex-shrink-0 rounded-lg shadow-lg overflow-hidden"
               style={{ backfaceVisibility: 'hidden' }}
             >
@@ -114,6 +155,57 @@ export const ReadingView: React.FC = () => {
       >
         完成占卜
       </motion.button>
+
+      {/* Hidden Share Card */}
+      <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
+        <ShareCard 
+          ref={shareCardRef}
+          userName={userProfile.nickname}
+          date={new Date().toLocaleDateString()}
+          type="tarot"
+          tarotCards={selectedCards}
+          summary={readingResult || ''}
+        />
+      </div>
+
+      {/* Share Modal */}
+      <AnimatePresence>
+        {showShareModal && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-6"
+            onClick={() => setShowShareModal(false)}
+          >
+            <div className="relative w-full max-w-sm" onClick={e => e.stopPropagation()}>
+              <button 
+                onClick={() => setShowShareModal(false)}
+                className="absolute -top-10 right-0 text-white/60 hover:text-white"
+              >
+                <X size={24} />
+              </button>
+              
+              {shareImage && (
+                <div className="space-y-4">
+                  <img src={shareImage} alt="Share Card" className="w-full rounded-xl shadow-2xl border border-white/10" />
+                  <div className="flex justify-center">
+                     <a 
+                       href={shareImage} 
+                       download={`pixel-tarot-${new Date().getTime()}.png`}
+                       className="flex items-center gap-2 bg-pixel-gold text-black px-6 py-3 rounded-full font-bold text-sm hover:bg-pixel-gold/90 transition-colors"
+                     >
+                       <Download size={18} />
+                       保存图片
+                     </a>
+                  </div>
+                  <p className="text-center text-white/40 text-xs">或长按图片保存</p>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
