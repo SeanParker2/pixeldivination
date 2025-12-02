@@ -1,5 +1,5 @@
 import React from 'react';
-import { Hexagon, Search } from 'lucide-react';
+import { Settings, Search } from 'lucide-react';
 
 export const ProfileHeader: React.FC = () => {
   return (
@@ -20,7 +20,7 @@ export const ProfileHeader: React.FC = () => {
 
       {/* Top Left Icon: Settings */}
       <button className="absolute top-4 left-4 text-orange-200 hover:text-white transition-colors p-2 bg-black/10 rounded-full backdrop-blur-sm">
-        <Hexagon size={24} />
+        <Settings size={24} />
       </button>
 
       {/* Top Right Icon: Search */}

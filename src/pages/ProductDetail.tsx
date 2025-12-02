@@ -22,7 +22,7 @@ const ProductDetail: React.FC = () => {
   const handleAddToCart = () => {
     if (product) {
       addItem(product.id);
-      addToast(`已将 "${product.title}" 加入购物车`, 'success');
+      addToast('已加入购物车', 'success');
     }
   };
 

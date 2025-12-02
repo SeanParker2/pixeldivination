@@ -56,7 +56,7 @@ export const ReportActions: React.FC<ReportActionsProps> = ({
           <div className="grid grid-cols-2 gap-4 w-full">
             {/* Pink Card - 合盘报告 */}
             <button 
-              onClick={() => alert("功能开发中")}
+              onClick={() => alert("合盘功能即将上线")}
               disabled={isLoading}
               className="bg-pink-100 hover:bg-pink-200 transition-colors rounded-2xl p-4 flex flex-col items-start gap-3 border-2 border-transparent hover:border-pink-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >

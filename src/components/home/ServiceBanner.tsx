@@ -5,10 +5,12 @@ export const ServiceBanner: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="px-2 mt-4">
+    <div 
+      onClick={() => navigate('/shop')}
+      className="px-2 mt-4 cursor-pointer"
+    >
       <div 
-        onClick={() => navigate('/shop')}
-        className="bg-pixel-card border border-pixel-border rounded-2xl p-4 flex items-center justify-between relative overflow-hidden group cursor-pointer"
+        className="bg-pixel-card border border-pixel-border rounded-2xl p-4 flex items-center justify-between relative overflow-hidden group"
       >
         <div className="w-1/2 z-10">
           <h3 className="text-xl text-white font-sans font-bold leading-tight">

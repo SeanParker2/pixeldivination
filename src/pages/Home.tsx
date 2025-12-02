@@ -26,7 +26,9 @@ export default function Home() {
             <UserInfoCard />
             <DashboardGrid />
             <ServiceBanner />
-            <InsightCard onClick={() => setShowInsight(true)} />
+            <div onClick={() => setShowInsight(true)}>
+              <InsightCard />
+            </div>
             <QuickNavGrid />
         </div>
 

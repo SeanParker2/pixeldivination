@@ -32,7 +32,7 @@ export const StarChart: React.FC = () => {
     }
   }, [activeTab]);
 
-  const handleGenerate = async () => {
+  const handleGenerateReport = async () => {
     if (activeTab !== "本命盘") setActiveTab("本命盘");
     if (report && activeTab === "本命盘") return;
 
@@ -51,7 +51,7 @@ export const StarChart: React.FC = () => {
       const date = new Date(profile.birthDate);
       const data = calculateChart(date, coords);
 
-      const result = await fetchNatalChartReading(data.planets);
+      const result = await fetchNatalChartReading(data);
       setReport(result);
       localStorage.setItem('natal_chart_report', result);
 
@@ -282,7 +282,7 @@ export const StarChart: React.FC = () => {
                 {/* Footer Actions */}
                 <ReportActions 
                     activeTab={activeTab}
-                    onGenerate={handleGenerate}
+                    onGenerate={handleGenerateReport}
                     isLoading={isAnalyzing}
                     onTransitReading={handleTransitReport}
                     onSkyReading={handleSkyReport}
@@ -299,7 +299,7 @@ export const StarChart: React.FC = () => {
                     exit={{ opacity: 0, height: 0, y: 20 }}
                     className="px-4 mt-6 mb-8"
                 >
-                    <div className="bg-[#1E1E2E] rounded-2xl p-6 border border-white/10 shadow-xl">
+                    <div className="bg-black/50 rounded-2xl p-6 border border-white/10 shadow-xl backdrop-blur-sm">
                         <div className="flex items-center justify-between mb-6 border-b border-white/10 pb-4">
                              <div className="flex items-center gap-2">
                                 {React.createElement(getReportIcon(), { 
@@ -320,7 +320,7 @@ export const StarChart: React.FC = () => {
                                             if (activeTab === '合盘') handleSynastryReport();
                                             else if (activeTab === '行运盘') handleTransitReport();
                                             else if (activeTab === '天象盘') handleSkyReport();
-                                            else handleGenerate();
+                                            else handleGenerateReport();
                                         }
                                     }}
                                     className="text-xs text-gray-500 hover:text-white transition-colors"

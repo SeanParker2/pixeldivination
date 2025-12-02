@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { MobileContainer } from '../components/layout/MobileContainer';
 import { ProfileField } from '../components/profile/ProfileField';
 import { DatePicker } from '../components/profile/picker/DatePicker';
-import { LocationPicker } from '../components/profile/picker/LocationPicker';
+import { LocationPicker, type Location } from '../components/profile/picker/LocationPicker';
 import { GenderPicker } from '../components/profile/picker/GenderPicker';
 import { useUserStore } from '../stores/useUserStore';
 import { useToastStore } from '../stores/useToastStore';
@@ -99,9 +99,9 @@ export const EditProfile: React.FC = () => {
       <DatePicker
         isOpen={showDatePicker}
         onClose={() => setShowDatePicker(false)}
-        initialDate={new Date(profile.birthDate)}
-        onConfirm={(date) => {
-          updateProfile({ birthDate: date.toISOString() });
+        initialDate={profile.birthDate}
+        onSelect={(date: string) => {
+          updateProfile({ birthDate: date.split('T')[0] });
           setShowDatePicker(false);
         }}
       />
@@ -110,7 +110,8 @@ export const EditProfile: React.FC = () => {
         isOpen={showBirthLocPicker}
         onClose={() => setShowBirthLocPicker(false)}
         title="选择出生地"
-        onConfirm={(loc) => {
+        initialLocation={profile.birthLocation}
+        onConfirm={(loc: Location) => {
           updateProfile({ birthLocation: loc });
           setShowBirthLocPicker(false);
         }}
@@ -120,7 +121,8 @@ export const EditProfile: React.FC = () => {
         isOpen={showCurrentLocPicker}
         onClose={() => setShowCurrentLocPicker(false)}
         title="选择现居地"
-        onConfirm={(loc) => {
+        initialLocation={profile.currentLocation}
+        onConfirm={(loc: Location) => {
           updateProfile({ currentLocation: loc });
           setShowCurrentLocPicker(false);
         }}

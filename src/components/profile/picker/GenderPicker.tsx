@@ -5,14 +5,14 @@ interface GenderPickerProps {
   isOpen: boolean;
   onClose: () => void;
   initialValue: 'male' | 'female' | 'other';
-  onSelect: (val: 'male' | 'female' | 'other') => void;
+  onConfirm: (val: 'male' | 'female' | 'other') => void;
 }
 
 export const GenderPicker: React.FC<GenderPickerProps> = ({
   isOpen,
   onClose,
   initialValue,
-  onSelect
+  onConfirm
 }) => {
   const [selected, setSelected] = React.useState(initialValue);
 
@@ -21,7 +21,7 @@ export const GenderPicker: React.FC<GenderPickerProps> = ({
   }, [isOpen, initialValue]);
 
   const handleConfirm = () => {
-    onSelect(selected);
+    onConfirm(selected);
     onClose();
   };
 

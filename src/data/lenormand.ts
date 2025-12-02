@@ -3,8 +3,11 @@ import {
   Archive, Flower, Axe, Bird, User, Folder, Shield, 
   Star, Store, Cat, Castle, Building, Mountain, Map, 
   MousePointer, Heart, Bell, Book, MessageCircle, UserPlus, UserMinus, 
-  Sun, Moon, Key, Database, Anchor, Plus, type LucideIcon 
+  Sun, Moon, Key, Database, Anchor, Plus
 } from 'lucide-react';
+
+// Define LucideIcon type locally since it might not be exported as type in all versions
+type LucideIcon = React.ComponentType<any>;
 
 export interface LenormandCardData {
   id: number;

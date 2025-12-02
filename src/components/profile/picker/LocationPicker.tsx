@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BottomSheet } from './BottomSheet';
 
-interface Location {
+export interface Location {
   province: string;
   city: string;
   district: string;
@@ -11,7 +11,7 @@ interface LocationPickerProps {
   isOpen: boolean;
   onClose: () => void;
   initialLocation: Location;
-  onSelect: (loc: Location) => void;
+  onConfirm: (loc: Location) => void;
   title?: string;
 }
 
@@ -37,7 +37,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
   isOpen,
   onClose,
   initialLocation,
-  onSelect,
+  onConfirm,
   title = '选择地区'
 }) => {
   const [province, setProvince] = useState(initialLocation.province);
@@ -68,7 +68,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
   }, [city, districts, district]);
 
   const handleConfirm = () => {
-    onSelect({ province, city, district });
+    onConfirm({ province, city, district });
     onClose();
   };
 

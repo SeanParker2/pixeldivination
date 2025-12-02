@@ -1,6 +1,5 @@
 import OpenAI from 'openai';
 import type { FortuneData } from '../types/fortune';
-import type { TarotCard } from '../stores/useDivinationStore';
 import type { PlanetPosition } from '../lib/astrology';
 
 const MOCK_FORTUNE: FortuneData = {
@@ -85,11 +84,11 @@ Example JSON structure:
   }
 };
 
-export const fetchNatalChartReading = async (planets: PlanetPosition[]): Promise<string> => {
+export const fetchNatalChartReading = async (chartData: unknown): Promise<string> => {
   if (!DEEPSEEK_API_KEY) {
     return `## 模拟本命盘解读 (系统离线)
     
-### 核心性格
+### 核心人格
 你拥有坚韧不拔的意志力（模拟数据），在面对困难时总能展现出惊人的爆发力。火星的影响让你行动果断，但有时也容易冲动。
 
 ### 情感模式
@@ -99,21 +98,11 @@ export const fetchNatalChartReading = async (planets: PlanetPosition[]): Promise
 你具备极强的直觉和洞察力，适合从事需要深度思考和创造力的工作。水星的相位表明你的沟通能力是开启成功的钥匙。`;
   }
 
-  const planetDescriptions = planets.map(p => {
-    const signs = ['白羊', '金牛', '双子', '巨蟹', '狮子', '处女', '天秤', '天蝎', '射手', '摩羯', '水瓶', '双鱼'];
-    const signIndex = Math.floor(p.longitude / 30);
-    const sign = signs[signIndex % 12];
-    return `${p.name}落在${sign}座`;
-  }).join(', ');
-
   const systemPrompt = `
-你是一个专业占星师。根据用户的星盘配置，生成一份约 300 字的本命盘深度解读。
-包含：【核心性格】、【情感模式】、【天赋潜能】三个板块。
-使用 Markdown 格式。
-语气风格：神秘、深刻、富有洞察力。
+你是一位专业占星师。请根据用户的星盘数据（行星落座与宫位），生成一份简练深刻的本命盘报告。包含三个部分：【核心人格】、【情感模式】、【天赋潜能】。使用 Markdown 格式，语气神秘而专业。
 `;
 
-  const userPrompt = `我的星盘配置如下：${planetDescriptions}。请解读我的本命盘。`;
+  const userPrompt = `我的星盘数据：${JSON.stringify(chartData)}。请解读我的本命盘。`;
 
   try {
     const completion = await openai.chat.completions.create({
@@ -132,6 +121,45 @@ export const fetchNatalChartReading = async (planets: PlanetPosition[]): Promise
   } catch (error) {
     console.error('DeepSeek API Error (Natal Chart):', error);
     throw new Error('无法连接星象数据库，请稍后再试。');
+  }
+};
+
+export const fetchTarotReading = async (question: string, cards: string[]): Promise<string> => {
+  if (!DEEPSEEK_API_KEY) {
+    return `## 塔罗指引 (模拟)
+    
+### 核心洞察
+针对你的问题“${question}”，牌面显示出强烈的变革能量。
+    
+### 具体建议
+建议保持耐心，静待时机成熟。`;
+  }
+
+  const systemPrompt = `
+你是一位精通塔罗牌的占卜师。请根据用户的问题和抽出的牌面，进行深度解读。
+包含：【核心洞察】、【现状分析】、【未来指引】三个部分。
+使用 Markdown 格式。
+`;
+
+  const userPrompt = `问题：${question}。牌面：${cards.join(', ')}。`;
+
+  try {
+    const completion = await openai.chat.completions.create({
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      model: 'deepseek-chat',
+      temperature: 1.2,
+    });
+
+    const content = completion.choices[0].message.content;
+    if (!content) throw new Error('Empty response from AI');
+    
+    return content;
+  } catch (error) {
+    console.error('DeepSeek API Error (Tarot):', error);
+    throw new Error('无法连接星象数据库');
   }
 };
 

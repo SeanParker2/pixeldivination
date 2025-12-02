@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useUserStore } from '../../stores/useUserStore';
-import { calculateChart, getLatLong, type AstrologyData } from '../../lib/astrology';
+import { calculateChart, getLatLong } from '../../lib/astrology';
 
 const ZODIAC_SIGNS = [
   '♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏', '♐', '♑', '♒', '♓'
@@ -17,9 +17,8 @@ interface AstrologyWheelProps {
 
 export const AstrologyWheel: React.FC<AstrologyWheelProps> = ({ date: propDate, location: propLocation }) => {
   const { profile } = useUserStore();
-  const [chartData, setChartData] = useState<AstrologyData | null>(null);
 
-  useEffect(() => {
+  const chartData = useMemo(() => {
     const targetDate = propDate || (profile?.birthDate ? new Date(profile.birthDate) : null);
     
     const targetLocation = propLocation || (
@@ -31,9 +30,9 @@ export const AstrologyWheel: React.FC<AstrologyWheelProps> = ({ date: propDate, 
     if (targetDate && targetLocation) {
       const city = targetLocation || '北京';
       const coords = getLatLong(city);
-      const data = calculateChart(targetDate, coords);
-      setChartData(data);
+      return calculateChart(targetDate, coords);
     }
+    return null;
   }, [profile, propDate, propLocation]);
 
   if (!chartData) {

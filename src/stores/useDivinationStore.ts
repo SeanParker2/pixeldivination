@@ -13,8 +13,9 @@ export interface TarotCard {
 // Helper arrays
 const SUITS = ['wands', 'cups', 'swords', 'coins'];
 const RANKS = ['ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'page', 'knight', 'queen', 'king'];
+const SUIT_NAMES: Record<string, string> = { wands: '权杖', cups: '圣杯', swords: '宝剑', coins: '星币' };
 
-// Major Arcana Mapping
+// Major Arcana Mapping (Exact filenames based on user upload)
 const MAJOR_ARCANA = [
   { id: 0, name: '愚者', nameEn: 'The Fool', file: 'the_fool.png', meaning: '新的开始，冒险' },
   { id: 1, name: '魔术师', nameEn: 'The Magician', file: 'the_magician.png', meaning: '创造力，显化' },
@@ -42,15 +43,25 @@ const MAJOR_ARCANA = [
 
 const generateDeck = () => {
   const deck: TarotCard[] = [];
-  MAJOR_ARCANA.forEach(card => deck.push({ ...card, image: `/images/tarot/${card.file}` }));
   
+  // Majors
+  MAJOR_ARCANA.forEach(c => {
+    deck.push({
+      id: c.id,
+      name: c.name,
+      nameEn: c.nameEn,
+      meaning: c.meaning,
+      image: `/images/tarot/${c.file}`
+    });
+  });
+
+  // Minors
   let idCounter = 22;
-  const suitNames = { wands: '权杖', cups: '圣杯', swords: '宝剑', coins: '星币' };
   SUITS.forEach(suit => {
     RANKS.forEach(rank => {
       deck.push({
         id: idCounter++,
-        name: `${suitNames[suit as keyof typeof suitNames]} ${rank}`,
+        name: `${SUIT_NAMES[suit]} ${rank}`,
         nameEn: `${rank} of ${suit}`,
         meaning: '小阿卡纳指引',
         image: `/images/tarot/${rank}_of_${suit}.png`
@@ -126,7 +137,8 @@ export const useDivinationStore = create<DivinationState>((set, get) => ({
     set({ isLoadingAI: true, error: null });
 
     try {
-      const result = await fetchTarotReading(selectedCards, question);
+      const cardNames = selectedCards.map(c => c.name);
+      const result = await fetchTarotReading(question || '请解读我的塔罗牌阵', cardNames);
       set({ readingResult: result });
 
       // Save to history
@@ -139,7 +151,7 @@ export const useDivinationStore = create<DivinationState>((set, get) => ({
           question
         }
       });
-    } catch (err) {
+    } catch {
       set({ error: '无法连接到宇宙信号，请稍后再试。' });
     } finally {
       set({ isLoadingAI: false });
