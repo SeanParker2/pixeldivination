@@ -23,7 +23,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ className }) => {
   const activeTab = getActiveTab(pathname);
 
   return (
-    <div className={cn("fixed bottom-0 w-full max-w-md bg-pixel-midnight border-t border-pixel-border h-20 px-6 flex items-center justify-between z-50", className)}>
+    <div className={cn("w-full max-w-md bg-pixel-midnight border-t border-pixel-border h-20 px-6 flex items-center justify-between z-50", className)}>
       <NavItem icon={Disc} label="首页" active={activeTab === 'home'} onClick={() => navigate('/')} />
       <NavItem icon={Aperture} label="星盘" active={activeTab === 'chart'} onClick={() => navigate('/starchart')} />
       
@@ -31,9 +31,12 @@ export const BottomNav: React.FC<BottomNavProps> = ({ className }) => {
       <div className="relative -top-8">
         <button 
           onClick={() => navigate('/divination')}
-          className="w-16 h-16 rounded-full bg-pixel-gold border-4 border-[#2C2C2C] flex items-center justify-center shadow-lg transform hover:scale-105 transition-transform"
+          className="w-16 h-16 rounded-full border-4 border-[#1E1E2E] flex items-center justify-center shadow-lg transform hover:scale-105 transition-transform"
+          style={{
+            background: 'linear-gradient(180deg, #E8CDA8 0%, #F4E6CF 100%)'
+          }}
         >
-          <Plus size={28} className="text-black" strokeWidth={3} />
+          <Plus size={32} className="text-[#1E1E2E]" strokeWidth={3} />
         </button>
       </div>
 
@@ -54,18 +57,18 @@ const NavItem = ({
     active?: boolean,
     onClick?: () => void
 }) => (
-  <button onClick={onClick} className="flex flex-col items-center gap-1 group">
+  <button onClick={onClick} className="flex flex-col items-center gap-1 group flex-1">
     <Icon 
         size={24} 
         className={cn(
             "transition-colors",
-            active ? "text-white fill-white" : "text-pixel-secondary group-hover:text-white"
+            active ? "text-[#E8CDA8]" : "text-[#494c52] group-hover:text-[#E8CDA8]"
         )} 
         strokeWidth={active ? 2.5 : 2}
     />
     <span className={cn(
-        "text-[10px]",
-        active ? "text-white font-medium" : "text-pixel-secondary group-hover:text-white"
+        "text-[10px] font-medium",
+        active ? "text-[#E8CDA8]" : "text-[#494c52] group-hover:text-[#E8CDA8]"
     )}>
         {label}
     </span>

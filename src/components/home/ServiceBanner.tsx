@@ -7,32 +7,33 @@ export const ServiceBanner: React.FC = () => {
   return (
     <div 
       onClick={() => navigate('/shop')}
-      className="px-2 mt-4 cursor-pointer"
+      className="px-4 mt-4 cursor-pointer"
     >
       <div 
-        className="bg-pixel-card border border-pixel-border rounded-2xl p-4 flex items-center justify-between relative overflow-hidden group"
+        className="w-full h-[138px] relative rounded-lg overflow-hidden flex items-center"
       >
-        <div className="w-1/2 z-10">
-          <h3 className="text-xl text-white font-sans font-bold leading-tight">
-            占卜歌者<br />
-            <span className="text-white/80">100%的</span><br />
+        {/* Text Content */}
+        <div className="absolute left-0 top-[44px] z-10 pl-0">
+           <h3 className="text-[#e4ded7] text-lg font-medium leading-7 font-sans">
+            占卜歌者<span className="text-[#e4ded7]">100%的</span><br />
             灵魂传递
           </h3>
         </div>
-        
-        <div className="w-1/2 flex justify-end z-10">
-          <img 
+
+        {/* Image */}
+        <div className="absolute right-0 top-0 h-full w-[165px]">
+           <img 
             src="/images/home/banner_wizards.png" 
             alt="Wizards Banner" 
-            className="w-32 h-24 object-cover rounded-lg transform group-hover:scale-105 transition-transform"
+            className="w-full h-full object-cover"
             onError={(e) => {
                 (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZkNzAwIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTUgMTJoMTRNMTIgNXYxNCI+PC9wYXRoPjwvc3ZnPg==';
             }}
           />
         </div>
         
-        {/* Background Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/20 to-transparent pointer-events-none" />
+        {/* Background (if needed, or handled by image?) */}
+        {/* home.html doesn't explicitly show a background color rect, maybe it's transparent or part of the container? */}
       </div>
     </div>
   );

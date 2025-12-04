@@ -33,24 +33,24 @@ export const QuickNavGrid: React.FC = () => {
 
   return (
     <>
-      <div className="grid grid-cols-3 gap-4 px-4 mt-6">
+      <div className="flex justify-between px-4 mt-6 pb-20">
         {NAV_ITEMS.map((item) => (
           <div 
             key={item.id} 
             onClick={() => handleItemClick(item.id)}
-            className="flex flex-col items-center gap-2 group cursor-pointer"
+            className="flex flex-col items-center gap-1 group cursor-pointer w-[100px]"
           >
-            <div className="w-full aspect-square bg-white/5 rounded-xl border border-white/5 overflow-hidden flex items-center justify-center group-hover:bg-white/10 group-hover:border-pixel-gold/50 transition-colors">
+            <div className="w-full h-[100px] flex items-center justify-center transition-transform group-hover:scale-105">
               <img 
                   src={item.img} 
                   alt={item.label} 
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                   onError={(e) => {
                       (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cmVjdCB4PSIzIiB5PSIzIiB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHJ4PSIyIiByeT0iMiI+PC9yZWN0Pjwvc3ZnPg==';
                   }}
               />
             </div>
-            <span className="text-white text-sm font-medium">{item.label}</span>
+            <span className="text-[#e4ded7] text-sm font-medium font-sans mt-1">{item.label}</span>
           </div>
         ))}
       </div>

@@ -11,14 +11,16 @@ export default function Home() {
   const [showInsight, setShowInsight] = useState(false);
 
   return (
-    <div className="flex flex-col relative p-4 space-y-6">
+    <div className="flex flex-col relative pb-24 bg-[#1E1E2E] min-h-screen">
       {/* Header Section */}
       <HomeHeader />
       
       {/* Main Content */}
-      <div className="space-y-6">
+      <div className="flex flex-col">
           <UserInfoCard />
-          <DashboardGrid />
+          <div className="mt-2">
+            <DashboardGrid />
+          </div>
           <ServiceBanner />
           <div onClick={() => setShowInsight(true)} className="cursor-pointer active:scale-[0.98] transition-transform">
             <InsightCard />

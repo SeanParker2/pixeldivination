@@ -19,10 +19,11 @@ export const UserInfoCard: React.FC<UserInfoProps> = ({
   const displayName = profile.nickname || '未设置昵称';
 
   return (
-    <div className="flex items-center justify-between py-4 px-2">
-      <div className="flex items-center gap-3">
+    <div className="flex items-center justify-between px-4 pt-3 pb-5 relative">
+      {/* Left: Avatar and Info */}
+      <div className="flex items-center gap-3.5">
         {/* Avatar Circle */}
-        <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/20 bg-white/10 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-full overflow-hidden border border-white/20 bg-white/10 flex items-center justify-center relative shrink-0">
             <img 
                 src={avatarUrl} 
                 alt="User Avatar" 
@@ -35,27 +36,22 @@ export const UserInfoCard: React.FC<UserInfoProps> = ({
         </div>
         
         {/* Info */}
-        <div className="flex flex-col">
-          <div className="flex items-center gap-2">
-            <h2 className="text-white text-lg font-sans font-medium">{displayName}</h2>
-            <span className="text-pixel-gold text-xs border border-pixel-gold/30 px-1.5 py-0.5 rounded bg-pixel-gold/10 font-pixel">
-              {zodiac}
-            </span>
-          </div>
-          <span className="text-pixel-secondary text-sm font-sans">{displayDate}</span>
+        <div className="flex flex-col justify-center h-10">
+          <h2 className="text-[#e4ded7] text-lg font-medium font-sans leading-tight">{displayName}</h2>
+          <span className="text-[#e4ded7] text-xs font-normal font-sans mt-0.5">{displayDate}</span>
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="flex items-center gap-3">
+      {/* Right: Actions */}
+      <div className="flex items-center gap-4">
         <button 
           onClick={() => navigate('/profile/edit')}
-          className="text-white text-sm font-sans hover:text-pixel-gold transition-colors"
+          className="text-[#e4ded7] text-sm font-normal font-sans hover:text-pixel-gold transition-colors"
         >
           编辑
         </button>
-        <button className="text-white hover:text-pixel-gold transition-colors">
-          <Ellipsis size={20} />
+        <button className="text-[#e4ded7] hover:text-pixel-gold transition-colors flex items-center justify-center">
+          <Ellipsis size={16} />
         </button>
       </div>
     </div>
