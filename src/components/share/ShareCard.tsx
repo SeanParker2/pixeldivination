@@ -1,23 +1,103 @@
 import React, { forwardRef } from 'react';
 import type { TarotCard } from '../../stores/useDivinationStore';
+import type { PartnerData } from '../starchart/PartnerInputForm';
 import { AstrologyWheel } from '../starchart/AstrologyWheel';
+import { X, Download } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-interface ShareCardProps {
-  userName: string;
-  date: string;
-  type: 'tarot' | 'natal-chart';
+export interface ShareCardProps {
+  activeTab?: string; // '本命盘' | '合盘' | '天象'
+  report?: string | null;
+  partnerData?: PartnerData | null;
+  
+  // Original props (for compatibility or removal later)
+  userName?: string;
+  date?: string;
+  type?: 'tarot' | 'natal-chart';
   tarotCards?: TarotCard[];
-  summary: string;
+  summary?: string;
+
+  // Modal props
+  isOpen?: boolean;
+  onClose?: () => void;
+  shareImage?: string | null;
 }
 
 export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(({
+  activeTab,
+  report,
+  partnerData,
+  
   userName,
   date,
   type,
   tarotCards,
-  summary
+  summary,
+
+  isOpen,
+  onClose,
+  shareImage
 }, ref) => {
+  
+  // If used as a modal wrapper
+  if (isOpen !== undefined) {
+    return (
+      <AnimatePresence>
+         {isOpen && (
+           <motion.div 
+             initial={{ opacity: 0 }}
+             animate={{ opacity: 1 }}
+             exit={{ opacity: 0 }}
+             className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-6"
+             onClick={onClose}
+           >
+             <div className="relative w-full max-w-sm" onClick={e => e.stopPropagation()}>
+               <button 
+                 onClick={onClose}
+                 className="absolute -top-10 right-0 text-white/60 hover:text-white"
+               >
+                 <X size={24} />
+               </button>
+               
+               {shareImage && (
+                 <div className="space-y-4">
+                   <img src={shareImage} alt="Share Card" className="w-full rounded-xl shadow-2xl border border-white/10" />
+                   <div className="flex justify-center">
+                      <a 
+                        href={shareImage} 
+                        download={`pixel-share-${new Date().getTime()}.png`}
+                        className="flex items-center gap-2 bg-pixel-gold text-black px-6 py-3 rounded-full font-bold text-sm hover:bg-pixel-gold/90 transition-colors"
+                      >
+                        <Download size={18} />
+                        保存图片
+                      </a>
+                   </div>
+                   <p className="text-center text-white/40 text-xs">或长按图片保存</p>
+                 </div>
+               )}
+             </div>
+           </motion.div>
+         )}
+       </AnimatePresence>
+    );
+  }
+
+  // If used as the hidden render target
+  const displayType = type || (['本命盘', '合盘', '行运盘', '天象盘'].includes(activeTab || '') ? 'astrology' : 'tarot');
+  const displaySummary = summary || report || '';
+  
+  const getTitle = () => {
+    if (displayType === 'tarot') return '塔罗指引';
+    switch (activeTab) {
+      case '合盘': return '双人合盘';
+      case '行运盘': return '行运推演';
+      case '天象盘': return '今日天象';
+      default: return '本命星盘';
+    }
+  };
+
   return (
+    <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
     <div 
       ref={ref}
       className="relative w-[375px] h-[667px] bg-zinc-900 overflow-hidden flex flex-col"
@@ -38,7 +118,7 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(({
         <div>
           <div className="text-xs text-pixel-gold mb-1">PIXEL DIVINATION</div>
           <h2 className="text-xl text-white leading-tight tracking-tighter">
-            {type === 'tarot' ? '塔罗指引' : '本命星盘'}
+            {getTitle()}
           </h2>
         </div>
         <div className="text-right">
@@ -49,7 +129,7 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(({
 
       {/* Main Visual */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 z-10 relative">
-        {type === 'tarot' && tarotCards && (
+        {displayType === 'tarot' && tarotCards && (
           <div className="w-full space-y-4">
             {/* Main Card (Middle or First) */}
             <div className="flex justify-center">
@@ -81,14 +161,21 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(({
           </div>
         )}
 
-        {type === 'natal-chart' && (
+        {displayType === 'astrology' && (
           <div className="w-full aspect-square relative scale-90">
              <div className="absolute inset-0 rounded-full border border-white/10 animate-pulse" />
              {/* Pass static props if needed, or just render the visual */}
              {/* Note: AstrologyWheel needs to be able to render without interactivity here */}
              <div className="pointer-events-none">
-               <AstrologyWheel /> 
+               <AstrologyWheel 
+                 date={['行运盘', '天象盘'].includes(activeTab || '') ? new Date() : undefined}
+               /> 
              </div>
+             {activeTab === '合盘' && partnerData && (
+               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 mt-16 bg-black/50 px-3 py-1 rounded-full text-[10px] text-pink-300 border border-pink-500/30 backdrop-blur-sm">
+                 & {partnerData.name}
+               </div>
+             )}
           </div>
         )}
       </div>
@@ -100,26 +187,28 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(({
           <div className="absolute -bottom-2 -right-2 w-4 h-4 border-b-2 border-r-2 border-pixel-gold" />
           
           <p className="text-xs text-gray-300 leading-relaxed line-clamp-4 font-sans">
-            {summary.replace(/[#*`]/g, '')}
+            {displaySummary.replace(/[#*`]/g, '')}
           </p>
         </div>
 
         <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
           <div className="flex flex-col">
              <span className="text-[10px] text-gray-500">SCAN TO PLAY</span>
-             <span className="text-sm text-white font-bold tracking-widest">PIXEL.AI</span>
+             <span className="text-xs text-pixel-gold font-bold">PIXELDIVINATION.APP</span>
           </div>
-          <div className="w-12 h-12 bg-white p-1 rounded-sm">
-             {/* Placeholder QR Code */}
-             <div className="w-full h-full bg-black grid grid-cols-4 grid-rows-4 gap-0.5 p-0.5">
-                <div className="bg-white col-span-2 row-span-2" />
-                <div className="bg-white col-start-4" />
-                <div className="bg-white row-start-3" />
-                <div className="bg-white col-start-3 row-start-4" />
-             </div>
+          
+          {/* Fake QR Code */}
+          <div className="w-12 h-12 bg-white p-1">
+            <div className="w-full h-full border-2 border-black relative">
+               <div className="absolute top-1 left-1 w-2 h-2 bg-black" />
+               <div className="absolute top-1 right-1 w-2 h-2 bg-black" />
+               <div className="absolute bottom-1 left-1 w-2 h-2 bg-black" />
+               <div className="absolute bottom-3 right-3 w-2 h-2 bg-black rounded-full" />
+            </div>
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 });

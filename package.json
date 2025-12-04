@@ -17,6 +17,7 @@
     "framer-motion": "^12.23.24",
     "howler": "^2.2.4",
     "html2canvas": "^1.4.1",
+    "lucide-react": "^0.555.0",
     "openai": "^6.9.1",
     "postcss": "^8.5.6",
     "react": "^19.2.0",

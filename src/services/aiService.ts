@@ -349,8 +349,10 @@ ${basePrompt}
 
 const DEEPSEEK_API_KEY = import.meta.env.VITE_DEEPSEEK_API_KEY;
 
+// Prevent crash if API key is missing by providing a dummy key.
+// The actual API calls are guarded by checking DEEPSEEK_API_KEY inside the functions.
 const openai = new OpenAI({
   baseURL: 'https://api.deepseek.com',
-  apiKey: DEEPSEEK_API_KEY,
+  apiKey: DEEPSEEK_API_KEY || 'dummy-key-for-mock-mode',
   dangerouslyAllowBrowser: true
 });

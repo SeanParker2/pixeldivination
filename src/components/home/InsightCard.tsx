@@ -13,7 +13,7 @@ export const InsightCard: React.FC<InsightCardProps> = ({ onClick }) => {
         className="bg-pixel-card border border-pixel-border rounded-xl p-3 flex gap-4 items-center relative overflow-hidden cursor-pointer hover:border-pixel-gold/50 transition-colors group"
       >
         {/* Left Image Box */}
-        <div className="w-24 h-24 bg-white/10 rounded-lg border-2 border-white/20 shrink-0 overflow-hidden">
+        <div className="w-24 h-24 bg-white/10 rounded-lg border border-white/10 shadow-inner shrink-0 overflow-hidden">
              <img 
                 src="/images/home/card_big_illustration.png" 
                 alt="Insight Illustration" 
@@ -34,9 +34,9 @@ export const InsightCard: React.FC<InsightCardProps> = ({ onClick }) => {
           </div>
           
           <div className="flex justify-start mt-2">
-            <div className="bg-white/10 px-2 py-1 rounded flex items-center gap-1">
-              <Music size={12} className="text-white" />
-              <span className="text-white text-xs font-medium">999+</span>
+            <div className="bg-pixel-gold px-2 py-1 rounded flex items-center gap-1">
+              <Music size={12} className="text-black" />
+              <span className="text-black text-xs font-medium">999+</span>
             </div>
           </div>
         </div>

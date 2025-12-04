@@ -42,7 +42,7 @@ export const EditProfile: React.FC = () => {
   }[profile.gender];
 
   return (
-    <MobileContainer hideHeader={false} className="bg-[#161622]">
+    <MobileContainer hideHeader={false} className="bg-pixel-midnight">
       <div className="pt-4 px-4 pb-24">
         <h1 className="text-xl text-white font-pixel mb-6 text-center">Magic Lightning</h1>
 

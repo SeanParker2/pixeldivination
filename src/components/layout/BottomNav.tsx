@@ -28,12 +28,12 @@ export const BottomNav: React.FC<BottomNavProps> = ({ className }) => {
       <NavItem icon={Aperture} label="星盘" active={activeTab === 'chart'} onClick={() => navigate('/starchart')} />
       
       {/* Center Plus Button */}
-      <div className="relative -top-6">
+      <div className="relative -top-8">
         <button 
           onClick={() => navigate('/divination')}
-          className="w-14 h-14 rounded-full bg-pixel-gold flex items-center justify-center shadow-lg transform hover:scale-105 transition-transform"
+          className="w-16 h-16 rounded-full bg-pixel-gold border-4 border-[#2C2C2C] flex items-center justify-center shadow-lg transform hover:scale-105 transition-transform"
         >
-          <Plus size={28} className="text-pixel-black" strokeWidth={3} />
+          <Plus size={28} className="text-black" strokeWidth={3} />
         </button>
       </div>
 

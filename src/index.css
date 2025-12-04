@@ -13,12 +13,17 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: none;
   -moz-osx-font-smoothing: grayscale;
+  
+  /* Safe Area Variables */
+  --safe-area-inset-top: env(safe-area-inset-top);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom);
 }
 
 body {
   margin: 0;
   display: flex;
   place-items: center;
+  justify-content: center;
   min-width: 320px;
   min-height: 100vh;
   background-color: #2C2C2C; /* Dark background outside the phone container */
@@ -44,20 +49,21 @@ html {
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 12px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #E6E6E6;
+  background: #1E1E2E;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #577348;
-  border: 2px solid #1A1A1A;
+  background: #2D2D3A;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #8B4513;
+  background: #FFD700;
 }
 
 @layer utilities {
@@ -68,4 +74,29 @@ html {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+  
+  .text-shadow {
+    text-shadow: 2px 2px 0 #000;
+  }
+  
+  .text-shadow-sm {
+    text-shadow: 1px 1px 0 #000;
+  }
+  
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+/* Animation Utilities */
+.animate-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-up {
+  animation: slideUp 0.4s ease-out;
 }

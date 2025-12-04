@@ -44,7 +44,7 @@ const DailyFortuneCard = ({ scores, isLoading }: { scores: FortuneScores; isLoad
         triggerHaptic('light');
         navigate('/daily-fortune');
       }}
-      className="bg-pixel-card border border-pixel-border rounded-xl p-3 flex flex-col gap-3 cursor-pointer hover:border-pixel-gold/50 transition-colors group min-h-[160px]"
+      className="bg-[#1E1E2E]/80 backdrop-blur-md border border-pixel-border rounded-xl p-3 flex flex-col gap-3 cursor-pointer hover:border-pixel-gold/50 transition-colors group min-h-[160px]"
     >
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -55,7 +55,7 @@ const DailyFortuneCard = ({ scores, isLoading }: { scores: FortuneScores; isLoad
       {/* Stars */}
       <div className="flex gap-0.5">
         {[1, 2, 3, 4].map((i) => (
-          <Star key={i} size={12} className="fill-[#8B5CF6] text-[#8B5CF6]" />
+          <Star key={i} size={12} className="fill-[#A78BFA] text-[#A78BFA]" />
         ))}
         <Star size={12} className="text-white/30" />
       </div>
@@ -80,9 +80,9 @@ const DailyFortuneCard = ({ scores, isLoading }: { scores: FortuneScores; isLoad
 const ProgressBar = ({ label, value }: { label: string; value: number }) => (
   <div className="flex items-center gap-2">
     <span className="text-[10px] text-white whitespace-nowrap w-12">{label}</span>
-    <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+    <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
       <div 
-        className="h-full bg-[#8B5CF6] rounded-full" 
+        className="h-full bg-gradient-to-r from-[#8B5CF6] to-[#A78BFA] rounded-full" 
         style={{ width: `${value}%` }} 
       />
     </div>

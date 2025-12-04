@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, Share2, ShoppingCart, Headphones } from 'lucide-react';
+import { MobileContainer } from '../components/layout/MobileContainer';
 import { PRODUCTS } from '../data/products';
 import { useCartStore } from '../stores/useCartStore';
 import { useToastStore } from '../stores/useToastStore';
@@ -36,38 +37,45 @@ const ProductDetail: React.FC = () => {
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-[#161622] text-white flex items-center justify-center">
-        <div className="text-center">
-          <p className="mb-4">未找到商品</p>
-          <button 
-            onClick={() => navigate('/shop')}
-            className="px-4 py-2 bg-pixel-gold text-black rounded-lg"
-          >
-            返回商城
-          </button>
+      <MobileContainer hideHeader hideFooter>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <p className="mb-4 text-white">未找到商品</p>
+            <button 
+              onClick={() => navigate('/shop')}
+              className="px-4 py-2 bg-pixel-gold text-black rounded-lg font-pixel"
+            >
+              返回商城
+            </button>
+          </div>
         </div>
-      </div>
+      </MobileContainer>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#161622] text-white font-pixel pb-24 relative">
-      {/* Navbar */}
-      <div className="fixed top-0 left-0 right-0 z-50 h-14 bg-[#161622]/80 backdrop-blur-md flex items-center justify-between px-4 border-b border-white/5">
-        <button 
-          onClick={() => navigate(-1)}
-          className="w-10 h-10 flex items-center justify-center -ml-2 text-white/80 hover:text-white"
-        >
-          <ChevronLeft size={24} />
-        </button>
-        <h1 className="text-base font-medium">商品详情</h1>
-        <button className="w-10 h-10 flex items-center justify-center -mr-2 text-white/80 hover:text-white">
-          <Share2 size={20} />
-        </button>
-      </div>
+    <MobileContainer hideHeader hideFooter className="bg-pixel-midnight">
+      <div className="min-h-full text-white font-pixel pb-24 relative">
+        {/* Navbar */}
+        <div className="absolute top-0 left-0 right-0 z-50 h-14 bg-pixel-midnight/80 backdrop-blur-md flex items-center justify-between px-4 border-b border-white/5">
+                <button 
+                  onClick={() => navigate(-1)}
+                  className="w-10 h-10 flex items-center justify-center -ml-2 text-white/80 hover:text-white"
+                  aria-label="返回"
+                >
+                  <ChevronLeft size={24} />
+                </button>
+                <h1 className="text-base font-medium">商品详情</h1>
+                <button 
+                  className="w-10 h-10 flex items-center justify-center -mr-2 text-white/80 hover:text-white"
+                  aria-label="分享"
+                >
+                  <Share2 size={20} />
+                </button>
+              </div>
 
-      {/* Content */}
-      <div className="pt-14">
+        {/* Content */}
+        <div className="pt-14">
         {/* Image Gallery */}
         <div className="w-full aspect-square bg-white/5 relative">
           <img 
@@ -164,7 +172,8 @@ const ProductDetail: React.FC = () => {
           </button>
         </div>
       </div>
-    </div>
+      </div>
+    </MobileContainer>
   );
 };
 

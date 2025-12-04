@@ -16,11 +16,19 @@ export const MobileContainer: React.FC<MobileContainerProps> = ({
   hideFooter = false
 }) => {
   return (
-    <div className="min-h-screen w-full bg-pixel-dark flex justify-center items-start overflow-hidden font-pixel">
+    <div className="min-h-screen w-full bg-pixel-dark flex justify-center items-start overflow-hidden font-pixel relative">
+      {/* Desktop Background Pattern */}
+      <div 
+        className="absolute inset-0 opacity-10 pointer-events-none z-0"
+        style={{
+            backgroundImage: 'radial-gradient(#577348 1px, transparent 1px)',
+            backgroundSize: '20px 20px'
+        }}
+      />
+
       <div 
         className={cn(
-          "w-full max-w-md min-h-screen bg-pixel-beige relative shadow-2xl flex flex-col",
-          "border-x-4 border-pixel-black",
+          "w-full max-w-md h-[100dvh] bg-pixel-midnight relative shadow-2xl flex flex-col border-x-4 border-pixel-border z-10",
           className
         )}
       >

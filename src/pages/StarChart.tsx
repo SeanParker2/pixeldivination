@@ -2,8 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import Markdown from 'react-markdown';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Loader2, Heart, X, Compass, MoonStar, Share2, Download } from 'lucide-react';
-import html2canvas from 'html2canvas';
-import { MobileContainer } from '../components/layout/MobileContainer';
 import { ChartHeader } from '../components/starchart/ChartHeader';
 import { ChartInfoPanel } from '../components/starchart/ChartInfoPanel';
 import { AstrologyWheel } from '../components/starchart/AstrologyWheel';
@@ -43,6 +41,8 @@ export const StarChart: React.FC = () => {
     
     try {
       await new Promise(resolve => setTimeout(resolve, 100));
+      
+      const html2canvas = (await import('html2canvas')).default;
       
       const canvas = await html2canvas(shareCardRef.current, {
         backgroundColor: '#18181b',
@@ -236,12 +236,11 @@ export const StarChart: React.FC = () => {
   };
 
   return (
-    <MobileContainer hideHeader={true} hideFooter={true} className="bg-[#161622]">
-      {/* Custom Header */}
+    <div className="min-h-full pb-24 px-4 pt-6 relative">
       <ChartHeader activeTab={activeTab} onTabChange={setActiveTab} />
-
-      {/* Main Content Area */}
-      <div className="flex flex-col min-h-full pb-32">
+      
+      {/* Main Content */}
+      <div className="space-y-6">
         
         {activeTab === '合盘' && !partnerData ? (
             <div className="flex-1 flex flex-col items-center justify-center px-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -276,6 +275,7 @@ export const StarChart: React.FC = () => {
                             <button 
                                 onClick={() => setPartnerData(null)}
                                 className="ml-1 hover:text-white"
+                                aria-label="移除合盘对象"
                             >
                                 <X size={12} />
                             </button>
@@ -339,6 +339,7 @@ export const StarChart: React.FC = () => {
                                   <button 
                                     onClick={handleShare}
                                     className="ml-2 text-pixel-gold hover:text-white transition-colors"
+                                    aria-label="分享解读"
                                   >
                                     <Share2 size={18} />
                                   </button>
@@ -386,55 +387,15 @@ export const StarChart: React.FC = () => {
         </AnimatePresence>
       </div>
 
-      {/* Hidden Share Card */}
-      <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
-        <ShareCard 
-          ref={shareCardRef}
-          userName={profile.nickname}
-          date={new Date().toLocaleDateString()}
-          type="natal-chart"
-          summary={report || ''}
-        />
-      </div>
-
-      {/* Share Modal */}
-      <AnimatePresence>
-        {showShareModal && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-6"
-            onClick={() => setShowShareModal(false)}
-          >
-            <div className="relative w-full max-w-sm" onClick={e => e.stopPropagation()}>
-              <button 
-                onClick={() => setShowShareModal(false)}
-                className="absolute -top-10 right-0 text-white/60 hover:text-white"
-              >
-                <X size={24} />
-              </button>
-              
-              {shareImage && (
-                <div className="space-y-4">
-                  <img src={shareImage} alt="Share Card" className="w-full rounded-xl shadow-2xl border border-white/10" />
-                  <div className="flex justify-center">
-                     <a 
-                       href={shareImage} 
-                       download={`pixel-starchart-${new Date().getTime()}.png`}
-                       className="flex items-center gap-2 bg-pixel-gold text-black px-6 py-3 rounded-full font-bold text-sm hover:bg-pixel-gold/90 transition-colors"
-                     >
-                       <Download size={18} />
-                       保存图片
-                     </a>
-                  </div>
-                  <p className="text-center text-white/40 text-xs">或长按图片保存</p>
-                </div>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </MobileContainer>
+      <ShareCard 
+        ref={shareCardRef}
+        activeTab={activeTab}
+        report={report}
+        partnerData={partnerData}
+        onClose={() => setShowShareModal(false)}
+        isOpen={showShareModal}
+        shareImage={shareImage}
+      />
+    </div>
   );
 };

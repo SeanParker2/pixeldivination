@@ -40,7 +40,7 @@ export const QuickNavGrid: React.FC = () => {
             onClick={() => handleItemClick(item.id)}
             className="flex flex-col items-center gap-2 group cursor-pointer"
           >
-            <div className="w-full aspect-square bg-white/5 rounded-xl border border-white/10 overflow-hidden flex items-center justify-center group-hover:border-pixel-gold/50 transition-colors">
+            <div className="w-full aspect-square bg-white/5 rounded-xl border border-white/5 overflow-hidden flex items-center justify-center group-hover:bg-white/10 group-hover:border-pixel-gold/50 transition-colors">
               <img 
                   src={item.img} 
                   alt={item.label} 

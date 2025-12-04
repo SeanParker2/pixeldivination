@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
-import { MobileContainer } from '../components/layout/MobileContainer';
 import { UserInfoCard } from '../components/home/UserInfoCard';
 import { FortuneStats } from '../components/fortune/FortuneStats';
 import { FortuneContent } from '../components/fortune/FortuneContent';
@@ -35,12 +34,11 @@ export const DailyFortune: React.FC = () => {
   const texts = fortune?.texts || DEFAULT_TEXTS;
 
   return (
-    <MobileContainer hideHeader className="bg-pixel-dark">
-      <div className="pt-6 px-4">
-        {/* Header Section */}
-        <UserInfoCard />
-        
-        {/* Time Range Tabs */}
+    <div className="pt-6 px-4 min-h-full relative">
+      {/* Header Section */}
+      <UserInfoCard />
+      
+      {/* Time Range Tabs */}
         <div className="flex items-center justify-around mt-6 mb-6 border-b border-white/10">
           <TabItem 
             label="今日" 
@@ -73,8 +71,7 @@ export const DailyFortune: React.FC = () => {
               <FortuneContent texts={texts} />
           </div>
         )}
-      </div>
-    </MobileContainer>
+    </div>
   );
 };
 
