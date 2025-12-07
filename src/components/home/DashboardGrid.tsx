@@ -27,7 +27,7 @@ export const DashboardGrid: React.FC = () => {
   };
 
   return (
-    <div className="grid grid-cols-2 gap-3 px-0">
+    <div className="flex flex-col gap-4 px-4">
       <DailyFortuneCard scores={displayScores} isLoading={isLoading} />
       <TarotEntryCard />
     </div>
@@ -44,7 +44,7 @@ const DailyFortuneCard = ({ scores, isLoading }: { scores: FortuneScores; isLoad
         triggerHaptic('light');
         navigate('/daily-fortune');
       }}
-      className="glass-card flex flex-col gap-2 cursor-pointer hover:border-[#fbbf24]/50 transition-colors h-[160px] p-4 m-0"
+      className="glass-card flex flex-col gap-2 cursor-pointer hover:border-[#fbbf24]/50 transition-colors p-4"
     >
       {/* Header */}
       <div className="flex justify-between items-center mb-1">
@@ -54,11 +54,11 @@ const DailyFortuneCard = ({ scores, isLoading }: { scores: FortuneScores; isLoad
 
       {/* Progress Bars */}
       {isLoading ? (
-        <div className="flex-1 flex items-center justify-center">
+        <div className="flex-1 flex items-center justify-center py-4">
           <Loader2 className="animate-spin text-[#fbbf24] w-6 h-6" />
         </div>
       ) : (
-        <div className="flex flex-col justify-between flex-1">
+        <div className="flex flex-col gap-2 flex-1">
           <ProgressBar label="爱情" value={scores.love} />
           <ProgressBar label="财运" value={scores.wealth} />
           <ProgressBar label="事业" value={scores.career} />
@@ -76,26 +76,26 @@ const ProgressBar = ({ label, value }: { label: string; value: number }) => (
     </div>
     <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
       <div 
-        className="h-full rounded-full" 
-        style={{ 
-            width: `${value}%`,
-            background: 'linear-gradient(90deg, #8b5cf6, #d8b4fe)',
-            boxShadow: '0 0 8px rgba(139, 92, 246, 0.6)'
-        }} 
+        className="h-full rounded-full bg-gradient-to-r from-purple-500 to-pink-500" 
+        style={{ width: `${value}%` }} 
       />
     </div>
   </div>
 );
 
 const TarotEntryCard = () => {
+  const navigate = useNavigate();
   return (
-    <div className="glass-card relative overflow-hidden flex flex-col p-4 m-0 h-[160px]"
-         style={{
-             borderColor: 'var(--border-glow)',
-             boxShadow: '0 0 15px rgba(139, 92, 246, 0.2)'
-         }}>
+    <div 
+      onClick={() => {
+        playSound('tap');
+        triggerHaptic('light');
+        navigate('/divination');
+      }}
+      className="glass-card relative overflow-hidden flex flex-col p-4 h-[160px] cursor-pointer hover:border-[#fbbf24]/50 transition-colors"
+    >
       {/* Radial Gradient Overlay */}
-      <div className="absolute inset-0 z-0" 
+      <div className="absolute inset-0 z-0 pointer-events-none" 
            style={{ background: 'radial-gradient(circle at center, rgba(139, 92, 246, 0.2), transparent)' }} />
       
       <div className="z-10 relative">
@@ -104,12 +104,10 @@ const TarotEntryCard = () => {
       </div>
       
       <div className="mt-auto flex justify-center z-10 h-[80px]">
-        {/* Using a background image style as per homedemo or an img tag. 
-            homedemo uses a div with background-image. I will use img tag for better accessibility and sizing control in React. */}
         <img 
             src="https://upload.wikimedia.org/wikipedia/commons/9/90/RWS_Tarot_00_Fool.jpg" 
             alt="The Fool" 
-            className="h-full object-contain opacity-80"
+            className="h-full object-contain opacity-80 group-hover:scale-105 transition-transform duration-500"
             style={{ filter: 'grayscale(0.5) contrast(1.2)' }}
         />
       </div>

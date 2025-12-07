@@ -1,185 +1,67 @@
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  font-family: 'VT323', monospace;
-  line-height: 1.5;
-  font-weight: 400;
-  
-  /* Color Palette from homedemo.html */
   --bg-dark: #09090b;
-  --bg-card: rgba(30, 41, 59, 0.7);
-  --border-glow: rgba(139, 92, 246, 0.5);
+  --bg-card: rgba(30, 41, 59, 0.6);
   --text-gold: #fbbf24;
   --text-neon: #e2e8f0;
   --accent-purple: #8b5cf6;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: none;
-  -moz-osx-font-smoothing: grayscale;
-  
-  /* Safe Area Variables */
-  --safe-area-inset-top: env(safe-area-inset-top);
-  --safe-area-inset-bottom: env(safe-area-inset-bottom);
+  --border-dim: rgba(255, 255, 255, 0.1);
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  justify-content: center;
-  min-width: 320px;
-  min-height: 100vh;
   background-color: var(--bg-dark);
   color: var(--text-neon);
+  font-family: 'VT323', monospace;
+  -webkit-font-smoothing: none; /* 保持像素字的锐利 */
   overflow-x: hidden;
 }
 
-/* Glass Card Utility */
-.glass-card {
-  background: rgba(30, 41, 59, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-  transition: all 0.3s ease;
-}
-.glass-card:active { transform: scale(0.98); }
-
-/* Neon Text Utilities */
-.neon-text-gold {
-  color: var(--text-gold);
-  text-shadow: 0 0 10px rgba(251, 191, 36, 0.8);
-}
-
-.neon-text-red {
-  color: #f43f5e;
-  text-shadow: 0 0 10px rgba(244, 63, 94, 0.4);
-}
-
-.neon-text-purple {
-  color: #a78bfa;
-  text-shadow: 0 0 5px #a78bfa;
-}
-
-@keyframes text-flicker {
-  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
-      text-shadow: 0 0 5px rgba(251, 191, 36, 0.6), 2px 2px 0px #000;
-      opacity: 1;
-  }
-  20%, 24%, 55% {
-      text-shadow: none;
-      opacity: 0.5;
-  }
-}
-
-.animate-text-flicker {
-  animation: text-flicker 3s infinite;
-}
-
-/* Pixel Art Specifics */
-* {
-  box-sizing: border-box;
-}
-
-img, canvas, svg {
-  image-rendering: pixelated;
-  image-rendering: -moz-crisp-edges;
-  image-rendering: crisp-edges;
-}
-
-/* Disable user zoom for App-like feel */
-html {
-  touch-action: manipulation;
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #1E1E2E;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #2D2D3A;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #FFD700;
-}
-
-@layer utilities {
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  
-  .text-shadow {
-    text-shadow: 2px 2px 0 #000;
-  }
-  
-  .text-shadow-sm {
-    text-shadow: 1px 1px 0 #000;
-  }
-  
-  .pb-safe {
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-  
-  .pt-safe {
-    padding-top: env(safe-area-inset-top);
-  }
-}
-
-/* Global Effects */
-.scanlines {
-  position: fixed;
-  inset: 0;
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-  background-size: 100% 2px, 3px 100%;
+/* === 全局特效层 === */
+.stars-bg {
+  position: fixed; inset: 0;
+  background: #000 url('http://www.script-tutorials.com/demos/360/images/stars.png') repeat top center;
+  z-index: 0; opacity: 0.5;
+  animation: move-stars 200s linear infinite;
   pointer-events: none;
-  z-index: 100;
+}
+
+.scanlines {
+  position: fixed; inset: 0;
+  background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+  background-size: 100% 4px;
+  z-index: 50; pointer-events: none;
 }
 
 .vignette {
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(circle, transparent 50%, #000 100%);
-  pointer-events: none;
-  z-index: 99;
+  position: fixed; inset: 0;
+  background: radial-gradient(circle, transparent 60%, rgba(0,0,0,0.9) 100%);
+  z-index: 49; pointer-events: none;
 }
 
-@keyframes flicker {
-  0% { opacity: 0.97; }
-  5% { opacity: 0.95; }
-  10% { opacity: 0.9; }
-  15% { opacity: 0.95; }
-  20% { opacity: 0.98; }
-  50% { opacity: 0.95; }
-  80% { opacity: 0.9; }
-  100% { opacity: 0.97; }
+/* === 通用组件样式 === */
+.glass-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-dim);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s;
 }
+.glass-card:active { transform: scale(0.98); }
 
-.animate-flicker {
-  animation: flicker 0.15s infinite;
-}
+/* 文字特效 */
+.text-glow-gold { text-shadow: 0 0 10px rgba(251, 191, 36, 0.6); }
+.text-glow-white { text-shadow: 0 0 8px rgba(255, 255, 255, 0.5); }
 
-/* Animation Utilities */
-.animate-in {
-  animation: fadeIn 0.3s ease-out;
-}
-
-.animate-up {
-  animation: slideUp 0.4s ease-out;
+/* 动画定义 */
+@keyframes move-stars { from {background-position:0 0;} to {background-position:0 10000px;} }
+@keyframes text-flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; text-shadow: none; }
 }

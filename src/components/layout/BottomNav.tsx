@@ -23,15 +23,15 @@ export const BottomNav: React.FC<BottomNavProps> = ({ className }) => {
   const activeTab = getActiveTab(pathname);
 
   return (
-    <div className={cn("w-full h-[70px] bg-[#0f172a] border-t border-[#334155] flex justify-around items-center pb-2.5 z-[200]", className)}>
+    <div className={cn("fixed bottom-0 w-full max-w-md h-[70px] bg-[#0f172a] border-t border-white/10 flex justify-around items-center pb-2 z-[200]", className)}>
       <NavItem icon={Disc} label="首页" active={activeTab === 'home'} onClick={() => navigate('/')} />
       <NavItem icon={Aperture} label="星盘" active={activeTab === 'chart'} onClick={() => navigate('/starchart')} />
       
       {/* Center Floating Button */}
-      <div className="relative -top-[25px]">
+      <div className="relative -top-8">
         <button 
           onClick={() => navigate('/divination')}
-          className="w-[64px] h-[64px] rounded-full bg-[#fbbf24] flex items-center justify-center text-[#000] border-[6px] border-[#09090b] shadow-[0_0_20px_rgba(251,191,36,0.4)] hover:scale-105 transition-transform"
+          className="w-16 h-16 rounded-full bg-pixel-gold flex items-center justify-center text-black border-[6px] border-[#09090b] shadow-[0_0_20px_rgba(251,191,36,0.4)] hover:scale-105 transition-transform"
         >
           <Plus size={32} strokeWidth={3} />
         </button>
@@ -54,9 +54,9 @@ const NavItem = ({
     active?: boolean,
     onClick?: () => void
 }) => (
-  <button onClick={onClick} className={cn("flex flex-col items-center gap-1", active ? "text-white" : "text-[#64748b]")}>
+  <button onClick={onClick} className={cn("flex flex-col items-center gap-1", active ? "text-white" : "text-slate-500")}>
     <Icon 
-        size={20} 
+        size={24} 
         className={cn("transition-all", active && "drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]")} 
         strokeWidth={active ? 2.5 : 2}
     />

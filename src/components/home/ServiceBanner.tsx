@@ -7,28 +7,22 @@ export const ServiceBanner: React.FC = () => {
   return (
     <div 
       onClick={() => navigate('/shop')}
-      className="glass-card flex items-center relative overflow-hidden h-[100px] px-5 mt-4 cursor-pointer"
-      style={{
-          background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)',
-          border: '1px solid rgba(139, 92, 246, 0.5)'
-      }}
+      className="glass-card mx-4 mt-4 relative overflow-hidden h-32 flex items-center px-6 cursor-pointer group"
     >
-      <div className="z-10 relative">
-        <h3 className="text-white text-[24px] font-medium leading-[1.1] m-0 font-sans">
+       {/* Glow Effect */}
+       <div className="absolute right-[-20px] top-[-20px] w-32 h-32 bg-pixel-gold blur-[60px] opacity-20 pointer-events-none" />
+
+       <div className="z-10 relative flex-1">
+        <h3 className="text-white text-2xl font-medium leading-tight font-sans">
           占卜歌者<br/>
-          <span className="text-[#fbbf24]">100% 灵魂传递</span>
+          <span className="text-pixel-gold">100% 灵魂传递</span>
         </h3>
       </div>
-      
-      {/* Banner Glow */}
-      <div 
-        className="absolute -right-5 w-[100px] h-[100px] bg-[#fbbf24] opacity-30 blur-[50px]"
-      />
       
       <img 
         src="https://api.dicebear.com/7.x/pixel-art/svg?seed=Wizard" 
         alt="Wizard" 
-        className="absolute right-2.5 h-[80px] drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]"
+        className="absolute right-4 h-20 drop-shadow-[0_0_10px_rgba(255,255,255,0.3)] group-hover:scale-105 transition-transform duration-300"
       />
     </div>
   );

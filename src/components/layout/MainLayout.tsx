@@ -1,40 +1,22 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { BottomNav } from './BottomNav';
-import { StarBackground } from '../ui/StarBackground';
 
 export const MainLayout: React.FC = () => {
   return (
-    <div className="min-h-screen w-full bg-pixel-dark flex justify-center items-start font-pixel relative overflow-hidden">
-      {/* CRT Effects */}
-      <div className="fixed inset-0 pointer-events-none z-[100] scanlines opacity-30" />
-      <div className="fixed inset-0 pointer-events-none z-[100] vignette" />
-      
-      {/* Dynamic Star Background */}
-      <StarBackground />
+    <div className="min-h-screen bg-[#09090b] text-[#e2e8f0] font-pixel relative overflow-hidden">
+      {/* Background Effects */}
+      <div className="stars-bg" />
+      <div className="scanlines" />
+      <div className="vignette" />
 
-      {/* Desktop Background Pattern (Optional overlay for texture) */}
-      <div 
-        className="absolute inset-0 opacity-5 pointer-events-none z-0"
-        style={{
-            backgroundImage: 'radial-gradient(#577348 1px, transparent 1px)',
-            backgroundSize: '20px 20px'
-        }}
-      />
-
-      {/* Phone Frame */}
-      <div className="w-full max-w-md h-[100dvh] bg-pixel-midnight relative shadow-2xl flex flex-col border-x-4 border-pixel-border z-10">
-        {/* Status Bar / Safe Area (Visual only) */}
-        <div className="h-safe-top w-full bg-pixel-midnight shrink-0" />
-
-        {/* Main Content Area - Scrollable */}
-        <main className="flex-1 overflow-y-auto scrollbar-hide w-full relative">
+      {/* Main Content */}
+      <main className="w-full relative z-10">
           <Outlet />
-        </main>
-        
-        {/* Bottom Navigation */}
-        <BottomNav className="sticky bottom-0 z-50" />
-      </div>
+      </main>
+      
+      {/* Bottom Nav */}
+      <BottomNav className="left-0 right-0 mx-auto z-50" />
     </div>
   );
 };
