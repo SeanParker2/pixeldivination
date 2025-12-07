@@ -7,6 +7,7 @@ interface ReportActionsProps {
   isLoading: boolean;
   onTransitReading?: () => void;
   onSkyReading?: () => void;
+  onSynastry?: () => void;
 }
 
 export const ReportActions: React.FC<ReportActionsProps> = ({ 
@@ -14,12 +15,14 @@ export const ReportActions: React.FC<ReportActionsProps> = ({
   onGenerate,
   isLoading,
   onTransitReading,
-  onSkyReading
+  onSkyReading,
+  onSynastry
 }) => {
   
   const handleClick = () => {
       if (activeTab === '行运盘' && onTransitReading) onTransitReading();
       else if (activeTab === '天象盘' && onSkyReading) onSkyReading();
+      else if (activeTab === '合盘' && onSynastry) onSynastry();
       else onGenerate();
   };
 
@@ -27,6 +30,7 @@ export const ReportActions: React.FC<ReportActionsProps> = ({
       if (isLoading) return "星象推演中...";
       if (activeTab === '行运盘') return "✨ AI 行运推演";
       if (activeTab === '天象盘') return "✨ AI 天象解读";
+      if (activeTab === '合盘') return "✨ AI 合盘分析";
       return "✨ AI 深度解读命盘";
   };
 

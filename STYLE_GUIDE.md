@@ -59,6 +59,23 @@
     - VS Code 可能会报 `Unknown at rule @tailwind`。
     - **解决方案**：已在 `.vscode/settings.json` 中配置忽略规则。
 
+### 4.1 全局视觉风格 (Global Visual Style)
+为了保持复古科幻（Retro Sci-Fi）的视觉体验，所有页面应遵循以下样式标准：
+
+- **全局特效**：
+    - 页面根容器必须包含 scanlines 和 vignette 层。
+    - 使用 `index.css` 中的 `.scanlines` 和 `.vignette` 类。
+
+- **卡片样式 (Glassmorphism)**：
+    - 背景色统一使用 `rgba(30, 41, 59, 0.6)`。
+    - 必须应用 `backdrop-filter: blur(10px)`。
+    - 边框颜色统一使用 `rgba(255, 255, 255, 0.1)`。
+    - 示例：`className="bg-slate-800/60 backdrop-blur-md border border-white/10"`
+
+- **字体与排版**：
+    - 关键数据（如价格、评分、运势指数）使用 `font-vt323`。
+    - 强调文字应应用霓虹阴影效果（如 `.neon-text-purple`, `.neon-text-yellow`）。
+
 ## 5. Linting & Workflow
 
 ### 5.1 Lint 检查

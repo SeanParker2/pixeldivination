@@ -1,5 +1,5 @@
 import React from 'react';
-import { Star } from 'lucide-react';
+
 import type { FortuneScores } from '../../types/fortune';
 
 interface Props {

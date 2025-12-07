@@ -87,6 +87,49 @@ Example JSON structure:
   }
 };
 
+export const fetchSynastryReading = async (chartA: PlanetPosition[], chartB: PlanetPosition[], partnerName: string, persona: PersonaType = 'neon'): Promise<string> => {
+  if (!DEEPSEEK_API_KEY) {
+    return `## 模拟合盘分析 (系统离线)
+    
+### 吸引力
+你们之间存在着强烈的磁场吸引（模拟数据）。金星与火星的相位暗示着激情与浪漫的火花。
+
+### 冲突点
+水星的刑克相位可能带来沟通上的误解，建议多倾听对方的想法。
+
+### 相处建议
+保持独立的个人空间，同时培养共同的兴趣爱好，将有助于关系的长期发展。`;
+  }
+
+  const basePrompt = PERSONAS[persona].prompt;
+  const systemPrompt = `
+${basePrompt}
+你是一位精通比较盘（Synastry）的占星师。
+请分析这两个星盘的关系（合盘）。
+A的行星：${JSON.stringify(chartA)}
+B的行星（伴侣/对方）：${JSON.stringify(chartB)}
+
+请从【吸引力】、【冲突点】、【相处建议】三个维度生成一份Markdown报告。
+语气要求：浪漫且客观，符合你的人设。
+`;
+
+  try {
+    const completion = await openai.chat.completions.create({
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: `请分析我与 ${partnerName} 的合盘。` },
+      ],
+      model: 'deepseek-chat',
+      temperature: 1.2,
+    });
+
+    return completion.choices[0].message.content || '解读生成失败';
+  } catch (error) {
+    console.error('DeepSeek API Error (Synastry):', error);
+    throw new Error('无法连接星象数据库');
+  }
+};
+
 export const fetchNatalChartReading = async (chartData: unknown, persona: PersonaType = 'neon'): Promise<string> => {
   if (!DEEPSEEK_API_KEY) {
     return `## 模拟本命盘解读 (系统离线)
@@ -170,64 +213,6 @@ ${basePrompt}
   }
 };
 
-export const fetchSynastryReading = async (userPlanets: PlanetPosition[], partnerPlanets: PlanetPosition[], partnerName: string, persona: PersonaType = 'neon'): Promise<string> => {
-  if (!DEEPSEEK_API_KEY) {
-    return `## 双人合盘解读 (系统离线)
-
-### 核心契合度
-你与${partnerName}的星盘显示出强烈的宿命感（模拟数据）。你们的太阳与月亮呈现和谐相位，意味着在生活目标和情感需求上能够互相理解。
-
-### 情感互动
-金星的连接暗示着强烈的吸引力，但同时也伴随着挑战。你们需要学会在激情与平淡之间找到平衡。
-
-### 长期发展
-土星的相位显示这段关系需要经历时间的考验。如果能共同克服困难，将建立起坚不可摧的羁绊。`;
-  }
-
-  const getPlanetDesc = (planets: PlanetPosition[]) => planets.map(p => {
-    const signs = ['白羊', '金牛', '双子', '巨蟹', '狮子', '处女', '天秤', '天蝎', '射手', '摩羯', '水瓶', '双鱼'];
-    const signIndex = Math.floor(p.longitude / 30);
-    const sign = signs[signIndex % 12];
-    return `${p.name}在${sign}`;
-  }).join(', ');
-
-  const userDesc = getPlanetDesc(userPlanets);
-  const partnerDesc = getPlanetDesc(partnerPlanets);
-
-  const basePrompt = PERSONAS[persona].prompt;
-  const systemPrompt = `
-${basePrompt}
-根据双方的星盘配置，生成一份约 300-400 字的合盘深度解读。
-包含：【核心契合度】、【情感互动】、【长期发展】三个板块。
-使用 Markdown 格式。
-语气风格：符合你的人设。
-`;
-
-  const userPrompt = `
-我的星盘：${userDesc}。
-对方(${partnerName})的星盘：${partnerDesc}。
-请解读我们的关系走向和契合度。
-`;
-
-  try {
-    const completion = await openai.chat.completions.create({
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt },
-      ],
-      model: 'deepseek-chat',
-      temperature: 1.2,
-    });
-
-    const content = completion.choices[0].message.content;
-    if (!content) throw new Error('Empty response from AI');
-    
-    return content;
-  } catch (error) {
-    console.error('DeepSeek API Error (Synastry):', error);
-    throw new Error('无法连接星象数据库，请稍后再试。');
-  }
-};
 
 export const fetchTransitReading = async (natalPlanets: PlanetPosition[], transitPlanets: PlanetPosition[], persona: PersonaType = 'neon'): Promise<string> => {
   if (!DEEPSEEK_API_KEY) {

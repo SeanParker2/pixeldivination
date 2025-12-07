@@ -20,6 +20,7 @@ export const StarChart: React.FC = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   
   const [partnerData, setPartnerData] = useState<PartnerData | null>(null);
+  const [showPartnerModal, setShowPartnerModal] = useState(false);
 
   const [showShareModal, setShowShareModal] = useState(false);
   const [shareImage, setShareImage] = useState<string | null>(null);
@@ -64,7 +65,8 @@ export const StarChart: React.FC = () => {
 
   const handleMainAction = async () => {
     if (activeTab === '合盘') {
-        await handleSynastryReport();
+        if (partnerData) await handleSynastry(partnerData);
+        else setShowPartnerModal(true);
     } else {
         await handleNatalReport();
     }
@@ -109,31 +111,32 @@ export const StarChart: React.FC = () => {
     }
   };
 
-  const handleSynastryReport = async () => {
-      if (!partnerData) return;
-      
+  const handleSynastry = async (data: PartnerData) => {
+      setPartnerData(data);
+      setShowPartnerModal(false);
       setIsAnalyzing(true);
+      
       try {
           const userCity = typeof profile.birthLocation === 'string' ? profile.birthLocation : profile.birthLocation.city || '北京';
           const userCoords = getLatLong(userCity);
           const userDate = new Date(profile.birthDate!);
           const userData = calculateChart(userDate, userCoords);
 
-          const partnerCoords = getLatLong(partnerData.birthCity);
-          const partnerDateObj = new Date(`${partnerData.birthDate}T${partnerData.birthTime}`);
+          const partnerCoords = getLatLong(data.birthCity);
+          const partnerDateObj = new Date(`${data.birthDate}T${data.birthTime}`);
           const partnerChartData = calculateChart(partnerDateObj, partnerCoords);
 
-          const result = await fetchSynastryReading(userData.planets, partnerChartData.planets, partnerData.name, activePersona);
+          const result = await fetchSynastryReading(userData.planets, partnerChartData.planets, data.name, activePersona);
           setReport(result);
           
           useHistoryStore.getState().addEntry({
               type: 'synastry',
-              summary: `与 ${partnerData.name} 的合盘分析`,
+              summary: `与 ${data.name} 的合盘分析`,
               details: {
                   result,
                   planets: userData.planets,
                   partner: {
-                      name: partnerData.name,
+                      name: data.name,
                       planets: partnerChartData.planets
                   }
               }
@@ -256,20 +259,8 @@ export const StarChart: React.FC = () => {
       {/* Main Content */}
       <div className="space-y-6">
         
-        {activeTab === '合盘' && !partnerData ? (
-            <div className="flex-1 flex flex-col items-center justify-center px-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <PartnerInputForm 
-                    onSubmit={(data) => setPartnerData(data)} 
-                    onCancel={() => setActiveTab('本命盘')} 
-                />
-                <p className="mt-6 text-xs text-gray-500 max-w-xs text-center leading-relaxed">
-                    请输入对方的出生信息。我们将对比双方的星盘配置，解读你们的灵魂契合度与缘分走向。
-                </p>
-            </div>
-        ) : (
-            <>
-                {/* Info Panel */}
-                <ChartInfoPanel />
+        {/* Info Panel */}
+        <ChartInfoPanel />
 
                 {/* Visualizer */}
                 <div className="flex-1 flex items-center justify-center my-4 relative">
@@ -326,9 +317,8 @@ export const StarChart: React.FC = () => {
                     isLoading={isAnalyzing}
                     onTransitReading={handleTransitReport}
                     onSkyReading={handleSkyReport}
+                    onSynastry={() => setShowPartnerModal(true)}
                 />
-            </>
-        )}
 
         {/* Inline Report Section */}
         <AnimatePresence>
@@ -380,6 +370,26 @@ export const StarChart: React.FC = () => {
             )}
         </AnimatePresence>
       </div>
+
+      <AnimatePresence>
+        {showPartnerModal && (
+            <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+                onClick={(e) => {
+                    if (e.target === e.currentTarget) setShowPartnerModal(false);
+                }}
+            >
+                <PartnerInputForm 
+                    onSubmit={handleSynastry} 
+                    onCancel={() => setShowPartnerModal(false)}
+                    initialData={partnerData}
+                />
+            </motion.div>
+        )}
+      </AnimatePresence>
 
       <ShareCard 
         ref={shareCardRef}

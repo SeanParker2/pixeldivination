@@ -71,3 +71,14 @@ export default defineConfig([
   },
 ])
 ```
+
+## Project Updates (2025-12-07)
+
+### Features
+- **Synastry Report**: Activated "合盘报告" in StarChart with PartnerInputForm and AI integration.
+- **Audio System**: Replaced local audio files with stable CDN links in `src/lib/audio.ts`.
+- **UI Refactoring**: Updated Divination, DailyFortune, and ProductDetail pages to match high-fidelity HTML prototypes (scanlines, vignette, neon effects).
+
+### Coding Standards
+- **Linting**: Strict adherence to TypeScript `verbatimModuleSyntax` and removal of unused imports.
+- **Styling**: See `STYLE_GUIDE.md` for detailed visual standards (Global Effects, Glassmorphism, Typography).
