@@ -88,7 +88,7 @@ export const ReadingView: React.FC = () => {
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.5, duration: 0.5 }}
-            className="bg-white/5 border border-white/10 p-3 rounded-lg flex gap-4"
+            className="glass-card p-3 flex gap-4 mb-4"
           >
             {/* Card Visual (Flip Effect) */}
             <motion.div
@@ -96,13 +96,13 @@ export const ReadingView: React.FC = () => {
               animate={{ rotateY: 0 }}
               transition={{ delay: index * 0.5 + 0.2, duration: 0.6 }}
               onAnimationStart={() => playSound('flip')}
-              className="w-24 h-40 flex-shrink-0 rounded-lg shadow-lg overflow-hidden"
+              className="w-24 h-40 flex-shrink-0 rounded-lg shadow-lg overflow-hidden border border-pixel-gold"
               style={{ backfaceVisibility: 'hidden' }}
             >
               <img 
                 src={card.image} 
                 alt={card.name} 
-                className="w-full h-full object-cover rounded-lg"
+                className="w-full h-full object-cover"
               />
             </motion.div>
 
@@ -113,7 +113,7 @@ export const ReadingView: React.FC = () => {
                transition={{ delay: index * 0.5 + 0.4 }}
                className="flex-1 flex flex-col justify-center"
             >
-               <h3 className="text-base text-pixel-gold font-bold mb-1">{card.nameEn}</h3>
+               <h3 className="text-xl text-pixel-gold font-bold mb-1 neon-text-gold tracking-widest">{card.nameEn}</h3>
                <p className="text-gray-300 text-xs leading-relaxed">{card.meaning}</p>
             </motion.div>
           </motion.div>
@@ -136,9 +136,10 @@ export const ReadingView: React.FC = () => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-black/30 border border-pixel-gold/30 p-6 rounded-xl backdrop-blur-md"
+              className="glass-card p-6"
             >
               <div className="prose prose-invert prose-sm max-w-none font-sans text-gray-200">
+                <span className="text-pixel-gold font-bold mr-2">[DeepSeek]:</span>
                 <ReactMarkdown>{readingResult}</ReactMarkdown>
               </div>
             </motion.div>

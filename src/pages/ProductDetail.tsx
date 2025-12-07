@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Share2, ShoppingCart, Headphones } from 'lucide-react';
+import { ChevronLeft, ShoppingCart, Headphones } from 'lucide-react';
 import { MobileContainer } from '../components/layout/MobileContainer';
 import { PRODUCTS } from '../data/products';
 import { useCartStore } from '../stores/useCartStore';
@@ -56,83 +56,73 @@ const ProductDetail: React.FC = () => {
   return (
     <MobileContainer hideHeader hideFooter className="bg-pixel-midnight">
       <div className="min-h-full text-white font-pixel pb-24 relative">
+        <div className="scanlines" />
+        <div className="vignette" />
+        
         {/* Navbar */}
-        <div className="absolute top-0 left-0 right-0 z-50 h-14 bg-pixel-midnight/80 backdrop-blur-md flex items-center justify-between px-4 border-b border-white/5">
-                <button 
-                  onClick={() => navigate(-1)}
-                  className="w-10 h-10 flex items-center justify-center -ml-2 text-white/80 hover:text-white"
-                  aria-label="返回"
-                >
-                  <ChevronLeft size={24} />
-                </button>
-                <h1 className="text-base font-medium">商品详情</h1>
-                <button 
-                  className="w-10 h-10 flex items-center justify-center -mr-2 text-white/80 hover:text-white"
-                  aria-label="分享"
-                >
-                  <Share2 size={20} />
-                </button>
-              </div>
+        <div className="absolute top-4 left-4 z-50">
+          <button 
+            onClick={() => navigate(-1)}
+            className="w-10 h-10 flex items-center justify-center bg-black/50 backdrop-blur-md rounded-full border border-white/20 hover:bg-white/10 transition-colors"
+            aria-label="返回"
+          >
+            <ChevronLeft size={24} />
+          </button>
+        </div>
 
-        {/* Content */}
-        <div className="pt-14">
-        {/* Image Gallery */}
-        <div className="w-full aspect-square bg-white/5 relative">
+        {/* Hero Image */}
+        <div className="w-full h-[360px] relative">
           <img 
             src={product.image} 
             alt={product.title} 
             className="w-full h-full object-cover"
+            style={{
+              maskImage: 'linear-gradient(to bottom, black 80%, transparent 100%)',
+              WebkitMaskImage: 'linear-gradient(to bottom, black 80%, transparent 100%)'
+            }}
             onError={(e) => {
                 (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiB2aWV3Qm94PSIwIDAgNDAwIDQwMCI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSI0MDAiIGZpbGw9IiMxZjFmMjMiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiM2NjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkltYWdlIE5vdCBGb3VuZDwvdGV4dD48L3N2Zz4=';
             }}
           />
         </div>
 
-        {/* Info Section */}
-        <div className="px-4 py-6 space-y-4">
-          {/* Price & Title */}
-          <div>
-            <div className="text-[#FF4D4F] text-2xl font-bold font-sans mb-2">
-              ¥ {product.price}
-            </div>
-            <h2 className="text-xl font-medium leading-snug text-white">
-              {product.title}
-            </h2>
+        {/* Floating Info Card */}
+        <div className="mx-5 -mt-10 relative z-10 glass-card p-5 mb-6">
+          <div className="text-[#F43F5E] text-3xl font-bold font-pixel mb-2 neon-text-red">
+            ¥ {product.price}
           </div>
+          <h2 className="text-2xl font-medium leading-snug text-white mb-3">
+            {product.title}
+          </h2>
 
-          {/* Tags */}
           <div className="flex flex-wrap gap-2">
-            <span className="px-3 py-1 bg-white/5 rounded-full text-xs text-gray-300 border border-white/10">
+            <span className="px-3 py-1 bg-[#FBBF24]/10 border border-[#FBBF24]/30 rounded text-xs text-[#FBBF24]">
               {product.category}
             </span>
-            <span className="px-3 py-1 bg-white/5 rounded-full text-xs text-[#EAB308] border border-[#EAB308]/30">
+            <span className="px-3 py-1 bg-[#FBBF24]/10 border border-[#FBBF24]/30 rounded text-xs text-[#FBBF24]">
               {product.buff}
             </span>
-            <span className="px-3 py-1 bg-white/5 rounded-full text-xs text-gray-300 border border-white/10">
+            <span className="px-3 py-1 bg-[#FBBF24]/10 border border-[#FBBF24]/30 rounded text-xs text-[#FBBF24]">
               正品保证
             </span>
-            <span className="px-3 py-1 bg-white/5 rounded-full text-xs text-gray-300 border border-white/10">
-              极速发货
-            </span>
           </div>
+        </div>
 
-          {/* Divider */}
-          <div className="h-px bg-white/10 my-2" />
-
-          {/* Description */}
-          <div className="space-y-3">
-            <h3 className="text-base font-bold text-white/90">商品详情</h3>
-            <p className="text-sm text-gray-400 leading-relaxed">
+        {/* Description */}
+        <div className="px-5 space-y-6">
+          <div>
+            <h3 className="text-lg text-white mb-3 border-l-[3px] border-pixel-gold pl-3 font-pixel">
+              商品详情
+            </h3>
+            <p className="text-base text-slate-400 leading-relaxed font-sans">
               {product.description || "暂无详细介绍。"}
             </p>
-            
-            {/* Mock Long Content */}
-            <p className="text-sm text-gray-400 leading-relaxed">
+          </div>
+          
+          <div>
+            <p className="text-base text-slate-400 leading-relaxed font-sans">
               温馨提示：天然水晶/矿石内部可能存在冰裂、棉絮、矿缺等自然现象，非质量问题。请避免接触化学物品，定期消磁净化。
             </p>
-            <div className="w-full h-40 bg-white/5 rounded-lg flex items-center justify-center text-gray-600 text-xs mt-4">
-              [商品实拍图展示区域]
-            </div>
           </div>
         </div>
       </div>
@@ -171,7 +161,6 @@ const ProductDetail: React.FC = () => {
             立即购买
           </button>
         </div>
-      </div>
       </div>
     </MobileContainer>
   );

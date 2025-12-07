@@ -21,15 +21,23 @@ const DivinationPage: React.FC = () => {
     <MobileContainer 
       hideHeader 
       hideFooter 
-      className="bg-[#161622] relative overflow-hidden"
+      className="bg-[#020617] relative overflow-hidden"
     >
-      {/* Starry Background Effect (Simple CSS) */}
-      <div className="absolute inset-0 opacity-30 pointer-events-none" 
+      {/* Global Effects */}
+      <div className="scanlines" />
+      <div className="vignette" />
+      
+      {/* Starry Background Effect */}
+      <div className="absolute inset-0 opacity-80 pointer-events-none" 
            style={{
              backgroundImage: 'radial-gradient(white 1px, transparent 1px)',
-             backgroundSize: '50px 50px'
+             backgroundSize: '50px 50px',
+             animation: 'move 100s linear infinite'
            }} 
       />
+      <style>{`
+        @keyframes move { from {background-position: 0 0;} to {background-position: 0 1000px;} }
+      `}</style>
 
       {/* Exit Button */}
       <button 

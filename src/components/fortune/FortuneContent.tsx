@@ -23,36 +23,32 @@ export const FortuneContent: React.FC<Props> = ({ texts }) => {
   };
 
   const sections: FortuneSection[] = [
-    { title: '今日运势', ...parseText(texts.overall) },
-    { title: '爱情运势', ...parseText(texts.love) },
-    { title: '事业运势', ...parseText(texts.career) },
-    { title: '财运指数', ...parseText(texts.wealth) },
-    { title: '其他运势', ...parseText(texts.others) },
+    { title: '🔮 今日指引', ...parseText(texts.overall) },
+    { title: '❤️ 爱情运势', ...parseText(texts.love) },
+    { title: '💼 事业运势', ...parseText(texts.career) },
+    { title: '💰 财富密码', ...parseText(texts.wealth) },
+    { title: '✨ 其他运势', ...parseText(texts.others) },
   ];
 
   return (
-    <div className="flex flex-col gap-3 pb-24">
+    <div className="flex flex-col pb-24">
       {sections.map((section) => (
-        <SectionCard key={section.title} section={section} />
+        <SectionItem key={section.title} section={section} />
       ))}
     </div>
   );
 };
 
-const SectionCard = ({ section }: { section: FortuneSection }) => (
-  <div className="bg-white/5 border border-white/10 rounded-xl p-4 backdrop-blur-sm">
-    <h3 className="text-pixel-gold text-sm font-bold mb-2 font-pixel">{section.title}</h3>
-    <p className="text-white text-sm mb-3 leading-relaxed font-medium">
-      {section.summary}
-    </p>
-    
-    {section.detail && (
-      <>
-        <div className="border-t border-dashed border-white/10 my-3" />
-        <p className="text-gray-400 text-xs leading-relaxed">
-          {section.detail}
-        </p>
-      </>
-    )}
+const SectionItem = ({ section }: { section: FortuneSection }) => (
+  <div className="mb-4">
+    <div className="text-pixel-gold text-lg mb-2 font-pixel uppercase tracking-wider">
+      {section.title}
+    </div>
+    <div className="bg-white/5 border-l-2 border-pixel-gold p-3 text-sm leading-relaxed text-slate-300">
+      <p className="font-medium text-white mb-1">{section.summary}</p>
+      {section.detail && (
+        <p className="text-slate-400 text-xs mt-2">{section.detail}</p>
+      )}
+    </div>
   </div>
 );

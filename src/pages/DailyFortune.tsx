@@ -35,6 +35,8 @@ export const DailyFortune: React.FC = () => {
 
   return (
     <div className="pt-6 px-4 min-h-full relative">
+      <div className="scanlines" />
+      <div className="vignette" />
       {/* Header Section */}
       <UserInfoCard />
       
@@ -79,13 +81,13 @@ const TabItem = ({ label, isActive, onClick }: { label: string; isActive: boolea
   <button 
     onClick={onClick}
     className={`
-      pb-2 text-sm font-pixel transition-all relative
-      ${isActive ? 'text-pixel-gold' : 'text-gray-500 hover:text-gray-300'}
+      pb-2 text-lg font-pixel transition-all relative
+      ${isActive ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'text-gray-500 hover:text-gray-300'}
     `}
   >
     {label}
     {isActive && (
-      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-0.5 bg-pixel-gold rounded-full" />
+      <span className="absolute bottom-0 left-0 w-full h-0.5 bg-pixel-gold shadow-[0_0_10px_#fbbf24]" />
     )}
   </button>
 );
