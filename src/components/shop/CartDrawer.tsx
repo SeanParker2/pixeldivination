@@ -62,13 +62,13 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed top-0 right-0 bottom-0 w-full max-w-xs bg-[#1E1E2E] border-l border-white/10 z-[70] flex flex-col shadow-2xl"
+            className="fixed top-0 right-0 bottom-0 w-full max-w-xs bg-[#09090b] border-l border-white/10 z-[70] flex flex-col shadow-2xl"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-white/10">
               <div className="flex items-center gap-2">
-                <ShoppingBag className="text-pixel-gold" size={20} />
-                <h2 className="text-white font-bold text-lg">购物车</h2>
+                <ShoppingBag className="text-[#fbbf24]" size={20} />
+                <h2 className="text-white font-bold text-lg font-pixel">购物车</h2>
               </div>
               <button 
                 onClick={onClose}

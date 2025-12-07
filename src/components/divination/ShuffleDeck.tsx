@@ -17,6 +17,9 @@ export const ShuffleDeck: React.FC = () => {
     };
   }, [setStep]);
 
+  // Use state to hold random values to keep them stable across renders but random on mount
+  const [randomValues] = React.useState<number[]>(() => [...Array(5)].map(() => Math.random() * 10 - 5));
+
   return (
     <div className="flex items-center justify-center h-full">
       <div className="relative w-48 h-72">
@@ -27,7 +30,7 @@ export const ShuffleDeck: React.FC = () => {
             initial={{ rotate: 0, y: 0 }}
             animate={{
               y: [0, -20, 0],
-              rotate: [0, Math.random() * 10 - 5, 0],
+              rotate: [0, randomValues[index] || 0, 0],
               zIndex: [index, 5, index]
             }}
             transition={{

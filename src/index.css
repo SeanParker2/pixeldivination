@@ -9,6 +9,14 @@
   line-height: 1.5;
   font-weight: 400;
   
+  /* Color Palette from homedemo.html */
+  --bg-dark: #09090b;
+  --bg-card: rgba(30, 41, 59, 0.7);
+  --border-glow: rgba(139, 92, 246, 0.5);
+  --text-gold: #fbbf24;
+  --text-neon: #e2e8f0;
+  --accent-purple: #8b5cf6;
+
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: none;
@@ -26,9 +34,35 @@ body {
   justify-content: center;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #2C2C2C; /* Dark background outside the phone container */
-  color: #1A1A1A;
+  background-color: var(--bg-dark);
+  color: var(--text-neon);
   overflow-x: hidden;
+}
+
+/* Glass Card Utility */
+.glass-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+.glass-card:active { transform: scale(0.98); }
+
+@keyframes text-flicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+      text-shadow: 0 0 5px rgba(251, 191, 36, 0.6), 2px 2px 0px #000;
+      opacity: 1;
+  }
+  20%, 24%, 55% {
+      text-shadow: none;
+      opacity: 0.5;
+  }
+}
+
+.animate-text-flicker {
+  animation: text-flicker 3s infinite;
 }
 
 /* Pixel Art Specifics */
@@ -90,6 +124,42 @@ html {
   .pt-safe {
     padding-top: env(safe-area-inset-top);
   }
+
+  .scanlines {
+    background: linear-gradient(
+      to bottom,
+      rgba(255,255,255,0),
+      rgba(255,255,255,0) 50%,
+      rgba(0,0,0,0.2) 50%,
+      rgba(0,0,0,0.2)
+    );
+    background-size: 100% 4px;
+    pointer-events: none;
+  }
+  
+  .vignette {
+    background: radial-gradient(
+      circle,
+      rgba(0,0,0,0) 60%,
+      rgba(0,0,0,0.6) 100%
+    );
+    pointer-events: none;
+  }
+}
+
+@keyframes flicker {
+  0% { opacity: 0.97; }
+  5% { opacity: 0.95; }
+  10% { opacity: 0.9; }
+  15% { opacity: 0.95; }
+  20% { opacity: 0.98; }
+  50% { opacity: 0.95; }
+  80% { opacity: 0.9; }
+  100% { opacity: 0.97; }
+}
+
+.animate-flicker {
+  animation: flicker 0.15s infinite;
 }
 
 /* Animation Utilities */

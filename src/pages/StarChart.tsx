@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Markdown from 'react-markdown';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Loader2, Heart, X, Compass, MoonStar, Share2, Download } from 'lucide-react';
+import { Sparkles, Heart, X, Compass, MoonStar, Share2, Download } from 'lucide-react';
 import { ChartHeader } from '../components/starchart/ChartHeader';
 import { ChartInfoPanel } from '../components/starchart/ChartInfoPanel';
 import { AstrologyWheel } from '../components/starchart/AstrologyWheel';
@@ -58,7 +58,19 @@ export const StarChart: React.FC = () => {
     }
   };
 
-  const handleGenerateReport = async () => {
+  const handleDownload = () => {
+      alert('图片保存功能即将上线');
+  };
+
+  const handleMainAction = async () => {
+    if (activeTab === '合盘') {
+        await handleSynastryReport();
+    } else {
+        await handleNatalReport();
+    }
+  };
+
+  const handleNatalReport = async () => {
     if (activeTab !== "本命盘") setActiveTab("本命盘");
     if (report && activeTab === "本命盘") return;
 
@@ -72,7 +84,7 @@ export const StarChart: React.FC = () => {
     try {
       const city = typeof profile.birthLocation === 'string' 
         ? profile.birthLocation 
-        : (profile.birthLocation as any).city || '北京'; 
+        : profile.birthLocation.city || '北京'; 
       const coords = getLatLong(city);
       const date = new Date(profile.birthDate);
       const data = calculateChart(date, coords);
@@ -102,7 +114,7 @@ export const StarChart: React.FC = () => {
       
       setIsAnalyzing(true);
       try {
-          const userCity = typeof profile.birthLocation === 'string' ? profile.birthLocation : (profile.birthLocation as any).city || '北京';
+          const userCity = typeof profile.birthLocation === 'string' ? profile.birthLocation : profile.birthLocation.city || '北京';
           const userCoords = getLatLong(userCity);
           const userDate = new Date(profile.birthDate!);
           const userData = calculateChart(userDate, userCoords);
@@ -142,7 +154,7 @@ export const StarChart: React.FC = () => {
     setIsAnalyzing(true);
     try {
       // Natal
-      const city = typeof profile.birthLocation === 'string' ? profile.birthLocation : (profile.birthLocation as any).city || '北京';
+      const city = typeof profile.birthLocation === 'string' ? profile.birthLocation : profile.birthLocation.city || '北京';
       const coords = getLatLong(city);
       const birthDate = new Date(profile.birthDate);
       const natalData = calculateChart(birthDate, coords);
@@ -175,7 +187,7 @@ export const StarChart: React.FC = () => {
     setIsAnalyzing(true);
     try {
       // Sky (Now, Default Location or User Location)
-      const city = profile.birthLocation ? (typeof profile.birthLocation === 'string' ? profile.birthLocation : (profile.birthLocation as any).city) : '北京';
+      const city = profile.birthLocation ? (typeof profile.birthLocation === 'string' ? profile.birthLocation : profile.birthLocation.city) : '北京';
       const coords = getLatLong(city);
       const now = new Date();
       const skyData = calculateChart(now, coords);
@@ -234,6 +246,8 @@ export const StarChart: React.FC = () => {
         default: return 'prose-orange';
     }
   };
+
+  const ReportIcon = getReportIcon();
 
   return (
     <div className="min-h-full pb-24 px-4 pt-6 relative">
@@ -308,7 +322,7 @@ export const StarChart: React.FC = () => {
                 {/* Footer Actions */}
                 <ReportActions 
                     activeTab={activeTab}
-                    onGenerate={handleGenerateReport}
+                    onGenerate={handleMainAction}
                     isLoading={isAnalyzing}
                     onTransitReading={handleTransitReport}
                     onSkyReading={handleSkyReport}
@@ -318,69 +332,49 @@ export const StarChart: React.FC = () => {
 
         {/* Inline Report Section */}
         <AnimatePresence>
-            {(isAnalyzing || report) && (
+            {report && !isAnalyzing && (
                 <motion.div 
-                    initial={{ opacity: 0, height: 0, y: 20 }}
-                    animate={{ opacity: 1, height: 'auto', y: 0 }}
-                    exit={{ opacity: 0, height: 0, y: 20 }}
-                    className="px-4 mt-6 mb-8"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 20 }}
+                    className={`w-full mt-5 bg-black/60 border rounded-lg p-5 shadow-[0_0_20px_rgba(0,0,0,0.3)] relative ${activeTab === '合盘' ? 'border-pink-500/30' : activeTab === '行运盘' ? 'border-blue-500/30' : activeTab === '天象盘' ? 'border-indigo-500/30' : 'border-[#fbbf24]/30'}`}
                 >
-                    <div className="bg-black/50 rounded-2xl p-6 border border-white/10 shadow-xl backdrop-blur-sm">
-                        <div className="flex items-center justify-between mb-6 border-b border-white/10 pb-4">
-                             <div className="flex items-center gap-2">
-                                {React.createElement(getReportIcon(), { 
-                                    className: getReportColor(),
-                                    size: 20 
-                                })}
-                                <h3 className="text-white font-bold text-lg">
-                                    {getReportTitle()}
-                                </h3>
-                                {report && !isAnalyzing && (
-                                  <button 
-                                    onClick={handleShare}
-                                    className="ml-2 text-pixel-gold hover:text-white transition-colors"
-                                    aria-label="分享解读"
-                                  >
-                                    <Share2 size={18} />
-                                  </button>
-                                )}
-                             </div>
-                             {report && !isAnalyzing && (
-                                <button 
-                                    onClick={() => {
-                                        if (confirm('确定要重新生成解读吗？这将消耗新的点数。')) {
-                                            setReport(null);
-                                            if (activeTab === '本命盘') localStorage.removeItem('natal_chart_report');
-                                            
-                                            if (activeTab === '合盘') handleSynastryReport();
-                                            else if (activeTab === '行运盘') handleTransitReport();
-                                            else if (activeTab === '天象盘') handleSkyReport();
-                                            else handleGenerateReport();
-                                        }
-                                    }}
-                                    className="text-xs text-gray-500 hover:text-white transition-colors"
-                                >
-                                    重新解读
-                                </button>
-                             )}
-                        </div>
+                    {/* AI Badge */}
+                    <div className="absolute -top-2.5 left-5 bg-[#09090b] px-2 flex items-center gap-2">
+                        <ReportIcon size={14} className={getReportColor()} />
+                        <span className={`text-xs tracking-[2px] ${getReportColor()}`}>
+                            {getReportTitle()}
+                        </span>
+                    </div>
 
-                        {isAnalyzing ? (
-                            <div className="flex flex-col items-center justify-center py-12 gap-4 text-gray-400">
-                                <Loader2 className="animate-spin text-orange-500" size={32} />
-                                <p className="animate-pulse text-sm">正在连接星象数据库...</p>
-                                <p className="text-xs text-gray-600">
-                                    {activeTab === '合盘' ? '分析双方行星相位与能量交互...' : 
-                                     activeTab === '行运盘' ? '推演当前星象对本命盘的影响...' :
-                                     activeTab === '天象盘' ? '解读当下宇宙能量场...' :
-                                     '分析行星相位与宫位能量...'}
-                                </p>
-                            </div>
-                        ) : (
-                            <div className={`prose prose-invert max-w-none text-sm leading-relaxed ${getProseColor()}`}>
-                                <Markdown>{report}</Markdown>
-                            </div>
-                        )}
+                    {/* Content */}
+                    <div className={`prose prose-invert max-w-none text-sm leading-relaxed ${getProseColor()}`}>
+                        <Markdown>{report}</Markdown>
+                        <span className={`inline-block w-1.5 h-3.5 animate-pulse ml-1 align-middle ${activeTab === '合盘' ? 'bg-pink-500' : activeTab === '行运盘' ? 'bg-blue-500' : activeTab === '天象盘' ? 'bg-indigo-500' : 'bg-[#fbbf24]'}`}></span>
+                    </div>
+                    
+                    {/* Divider */}
+                    <div className="h-px bg-white/10 my-4"></div>
+                    
+                    {/* Footer info */}
+                    <p className="text-xs text-[#64748b] mb-4">[DeepSeek v3.0 Analysis Complete]</p>
+
+                    {/* Actions */}
+                    <div className="flex justify-end gap-2">
+                        <button 
+                            onClick={handleShare}
+                            className="flex items-center gap-1 text-xs text-[#94a3b8] hover:text-white px-3 py-1.5 rounded border border-white/10 transition-colors"
+                        >
+                            <Share2 size={14} />
+                            分享报告
+                        </button>
+                        <button 
+                            onClick={handleDownload}
+                            className="flex items-center gap-1 text-xs text-[#94a3b8] hover:text-white px-3 py-1.5 rounded border border-white/10 transition-colors"
+                        >
+                            <Download size={14} />
+                            保存图片
+                        </button>
                     </div>
                 </motion.div>
             )}

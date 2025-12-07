@@ -136,14 +136,14 @@ export const calculateChart = (date: Date, location: { lat: number, lng: number 
   // x = cos(ramcRad) * cos(eps)
   // (Wait, checking reference... yes, tan(lambda) = tan(alpha) / cos(epsilon))
   const mcRad = Math.atan2(Math.sin(ramcRad), Math.cos(ramcRad) * Math.cos(eps));
-  let mc = normalizeAngle(mcRad * (180 / Math.PI));
+  const mc = normalizeAngle(mcRad * (180 / Math.PI));
 
   // ASC Calculation
   // tan(ASC) = -cos(RAMC) / (sin(RAMC) * cos(eps) + tan(lat) * sin(eps))
   const top = -Math.cos(ramcRad);
   const bottom = Math.sin(ramcRad) * Math.cos(eps) + Math.tan(latRad) * Math.sin(eps);
   const ascRad = Math.atan2(top, bottom);
-  let asc = normalizeAngle(ascRad * (180 / Math.PI));
+  const asc = normalizeAngle(ascRad * (180 / Math.PI));
 
   // Houses - Porphyry System (Simplified Quadrant System)
   // Trisect the arc between Angles.

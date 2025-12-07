@@ -1,39 +1,72 @@
 import React from 'react';
-import { FileText, Inbox, ChevronRight, Clock } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 
-interface ProfileMenuProps {
-  onHistoryClick?: () => void;
+interface MenuSectionProps {
+  title: string;
+  children: React.ReactNode;
+  className?: string;
 }
 
-export const ProfileMenu: React.FC<ProfileMenuProps> = ({ onHistoryClick }) => {
+export const MenuSection: React.FC<MenuSectionProps> = ({ title, children, className = '' }) => {
   return (
-    <div className="flex flex-col px-6 gap-2">
-      <MenuItem icon={FileText} label="我的订单" />
-      <MenuItem icon={Clock} label="占卜历史" onClick={onHistoryClick} />
-      <MenuItem icon={Inbox} label="我的档案" onClick={onHistoryClick} />
+    <div className={`px-5 py-5 flex flex-col gap-3 ${className}`}>
+      <div className="text-sm text-[#64748b] mb-1 pl-1 uppercase tracking-[2px] font-pixel">
+        {title}
+      </div>
+      {children}
     </div>
   );
 };
 
 interface MenuItemProps {
-  icon: React.ElementType;
+  icon: React.ReactNode;
   label: string;
+  subLabel?: string; // For persona or extra info
   onClick?: () => void;
+  variant?: 'default' | 'persona';
+  rightElement?: React.ReactNode;
 }
 
-const MenuItem: React.FC<MenuItemProps> = ({ icon: Icon, label, onClick }) => {
+export const MenuItem: React.FC<MenuItemProps> = ({ 
+  icon, 
+  label, 
+  subLabel, 
+  onClick, 
+  variant = 'default',
+  rightElement 
+}) => {
+  const isPersona = variant === 'persona';
+  
+  const baseStyles = "flex items-center justify-between p-4 rounded-xl cursor-pointer transition-all border border-transparent";
+  const defaultStyles = "bg-white/[0.03] hover:bg-white/[0.08] hover:border-white/10";
+  const personaStyles = "bg-gradient-to-r from-violet-600/20 to-pink-500/20 border-violet-500/30 hover:border-violet-500/50";
+
   return (
-    <button 
+    <div 
       onClick={onClick}
-      className="flex items-center w-full py-4 text-left group hover:bg-white/5 rounded-lg transition-colors px-2 -mx-2"
+      className={`${baseStyles} ${isPersona ? personaStyles : defaultStyles}`}
     >
-      <div className="text-white/80 group-hover:text-white mr-4">
-        <Icon size={22} />
+      <div className="flex items-center gap-3">
+        {/* Icon Box */}
+        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isPersona ? 'text-[#d8b4fe] bg-black/20' : 'text-[#fbbf24] bg-black/30'}`}>
+          {icon}
+        </div>
+        
+        {/* Text */}
+        <div>
+          <div className="text-white text-lg font-pixel flex items-center gap-2">
+            {label}
+            {isPersona && rightElement}
+          </div>
+          {subLabel && (
+             <div className="text-xs text-white/50 font-pixel mt-0.5">
+               {subLabel}
+             </div>
+          )}
+        </div>
       </div>
-      <span className="text-white text-base font-medium flex-1 group-hover:text-pixel-gold transition-colors">
-        {label}
-      </span>
-      <ChevronRight size={18} className="text-gray-500 group-hover:text-white transition-colors" />
-    </button>
+
+      <ChevronRight size={20} className="text-[#475569]" />
+    </div>
   );
 };

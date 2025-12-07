@@ -33,24 +33,19 @@ export const QuickNavGrid: React.FC = () => {
 
   return (
     <>
-      <div className="flex justify-between px-4 mt-6 pb-20">
+      <div className="grid grid-cols-3 gap-3 px-0 mt-5 pb-20">
         {NAV_ITEMS.map((item) => (
           <div 
             key={item.id} 
             onClick={() => handleItemClick(item.id)}
-            className="flex flex-col items-center gap-1 group cursor-pointer w-[100px]"
+            className="flex flex-col items-center gap-2 group cursor-pointer"
           >
-            <div className="w-full h-[100px] flex items-center justify-center transition-transform group-hover:scale-105">
-              <img 
-                  src={item.img} 
-                  alt={item.label} 
-                  className="w-full h-full object-contain"
-                  onError={(e) => {
-                      (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cmVjdCB4PSIzIiB5PSIzIiB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHJ4PSIyIiByeT0iMiI+PC9yZWN0Pjwvc3ZnPg==';
-                  }}
-              />
+            <div className="w-[60px] h-[60px] bg-white/5 border border-white/10 rounded-xl flex items-center justify-center text-2xl transition-all duration-300 group-hover:bg-[#fbbf24]/10 group-hover:border-[#fbbf24] group-hover:shadow-[0_0_10px_rgba(251,191,36,0.3)] group-hover:-translate-y-0.5">
+              {item.id === 'rider' && '🃏'}
+              {item.id === 'dice' && '🎲'}
+              {item.id === 'fengshui' && '☯️'}
             </div>
-            <span className="text-[#e4ded7] text-sm font-medium font-sans mt-1">{item.label}</span>
+            <span className="text-[#e2e8f0] text-[14px] font-sans">{item.label}</span>
           </div>
         ))}
       </div>

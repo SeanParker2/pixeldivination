@@ -41,23 +41,28 @@ const polarToCartesian = (centerX: number, centerY: number, radius: number, angl
 
 export const FengShuiModal: React.FC<FengShuiModalProps> = ({ isOpen, onClose }) => {
   const { profile } = useUserStore();
-  const [result, setResult] = useState<FengShuiResult | null>(null);
-  const [isSaved, setIsSaved] = useState(false);
-
-  useEffect(() => {
-    if (isOpen) {
-      // Get year from profile or default to 2000
-      const birthYear = profile.birthDate ? new Date(profile.birthDate).getFullYear() : 2000;
-      // Get gender, map 'other' to 'female' or handle as fallback
-      const gender = profile.gender === 'male' ? 'male' : 'female';
-      
-      const res = calculateKua(birthYear, gender);
-      setResult(res);
-      setIsSaved(false);
-    }
+  
+  // Use useMemo for result to avoid state in useEffect
+  const result = React.useMemo(() => {
+    if (!isOpen) return null;
+    const birthYear = profile.birthDate ? new Date(profile.birthDate).getFullYear() : 2000;
+    const gender = profile.gender === 'male' ? 'male' : 'female';
+    return calculateKua(birthYear, gender);
   }, [isOpen, profile]);
 
-  if (!result) return null;
+  const [isSaved, setIsSaved] = useState(false);
+
+  // Reset isSaved when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      const timer = setTimeout(() => {
+        setIsSaved(false);
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  if (!result || !isOpen) return null;
 
   // Auspicious types
   const isAuspicious = (type: FengShuiType) => ['生气', '延年', '天医', '伏位'].includes(type);

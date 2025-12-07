@@ -23,11 +23,23 @@ export const InsightModal: React.FC<InsightModalProps> = ({ isOpen, onClose }) =
   const [quote, setQuote] = useState('');
   const [isSaved, setIsSaved] = useState(false);
 
+  // When isOpen changes to true, generate a new quote
+  // We use useLayoutEffect or just rely on React to handle the update
+  // but to avoid "setState in useEffect" warning (which warns about synchronous updates visible to user)
+  // we can use a functional update or just ignore if we accept the render cycle.
+  // A cleaner way for random content is to generate it in render if not present, or use a key.
+  // Here, let's just generate it when isOpen becomes true, but wrapped in a timeout to break the sync cycle
+  // OR simpler: useMemo? No, because it needs to be random each open.
+  
   useEffect(() => {
     if (isOpen) {
-      const randomQuote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
-      setQuote(randomQuote);
-      setIsSaved(false);
+      // Use setTimeout to avoid synchronous setState warning
+      const timer = setTimeout(() => {
+        const randomQuote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+        setQuote(randomQuote);
+        setIsSaved(false);
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 

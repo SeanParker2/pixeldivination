@@ -17,13 +17,13 @@ export const Shop: React.FC = () => {
       <ShopHeader onCartClick={() => setIsCartOpen(true)} />
 
       {/* Main Scrollable Content */}
-      <div className="flex flex-col pb-32 px-4 space-y-6">
+      <div className="flex flex-col pb-32">
         <ShopBanner />
         
         <FilterBar />
 
         {/* Product List */}
-        <div className="flex flex-col w-full space-y-4">
+        <div className="flex flex-col w-full px-2.5 gap-2.5 mt-2">
           {PRODUCTS.map(product => (
             <div key={product.id} onClick={() => navigate(`/shop/${product.id}`)} className="cursor-pointer">
               <ProductCard
@@ -32,6 +32,7 @@ export const Shop: React.FC = () => {
                 buff={product.buff}
                 price={product.price}
                 imageUrl={product.image}
+                hasAudio={product.category === '音频'}
               />
             </div>
           ))}

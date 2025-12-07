@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 
 // Define LucideIcon type locally since it might not be exported as type in all versions
-type LucideIcon = React.ComponentType<any>;
+type LucideIcon = React.ComponentType<React.SVGProps<SVGSVGElement>>;
 
 export interface LenormandCardData {
   id: number;

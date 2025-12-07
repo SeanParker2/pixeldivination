@@ -1,14 +1,21 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { BottomNav } from './BottomNav';
-import { cn } from '../../lib/utils';
+import { StarBackground } from '../ui/StarBackground';
 
 export const MainLayout: React.FC = () => {
   return (
     <div className="min-h-screen w-full bg-pixel-dark flex justify-center items-start font-pixel relative overflow-hidden">
-      {/* Desktop Background Pattern */}
+      {/* CRT Effects */}
+      <div className="fixed inset-0 pointer-events-none z-[100] scanlines opacity-30" />
+      <div className="fixed inset-0 pointer-events-none z-[100] vignette" />
+      
+      {/* Dynamic Star Background */}
+      <StarBackground />
+
+      {/* Desktop Background Pattern (Optional overlay for texture) */}
       <div 
-        className="absolute inset-0 opacity-10 pointer-events-none z-0"
+        className="absolute inset-0 opacity-5 pointer-events-none z-0"
         style={{
             backgroundImage: 'radial-gradient(#577348 1px, transparent 1px)',
             backgroundSize: '20px 20px'

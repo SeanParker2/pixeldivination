@@ -23,20 +23,17 @@ export const BottomNav: React.FC<BottomNavProps> = ({ className }) => {
   const activeTab = getActiveTab(pathname);
 
   return (
-    <div className={cn("w-full max-w-md bg-pixel-midnight border-t border-pixel-border h-20 px-6 flex items-center justify-between z-50", className)}>
+    <div className={cn("w-full h-[70px] bg-[#0f172a] border-t border-[#334155] flex justify-around items-center pb-2.5 z-[200]", className)}>
       <NavItem icon={Disc} label="首页" active={activeTab === 'home'} onClick={() => navigate('/')} />
       <NavItem icon={Aperture} label="星盘" active={activeTab === 'chart'} onClick={() => navigate('/starchart')} />
       
-      {/* Center Plus Button */}
-      <div className="relative -top-8">
+      {/* Center Floating Button */}
+      <div className="relative -top-[25px]">
         <button 
           onClick={() => navigate('/divination')}
-          className="w-16 h-16 rounded-full border-4 border-[#1E1E2E] flex items-center justify-center shadow-lg transform hover:scale-105 transition-transform"
-          style={{
-            background: 'linear-gradient(180deg, #E8CDA8 0%, #F4E6CF 100%)'
-          }}
+          className="w-[64px] h-[64px] rounded-full bg-[#fbbf24] flex items-center justify-center text-[#000] border-[6px] border-[#09090b] shadow-[0_0_20px_rgba(251,191,36,0.4)] hover:scale-105 transition-transform"
         >
-          <Plus size={32} className="text-[#1E1E2E]" strokeWidth={3} />
+          <Plus size={32} strokeWidth={3} />
         </button>
       </div>
 
@@ -57,19 +54,13 @@ const NavItem = ({
     active?: boolean,
     onClick?: () => void
 }) => (
-  <button onClick={onClick} className="flex flex-col items-center gap-1 group flex-1">
+  <button onClick={onClick} className={cn("flex flex-col items-center gap-1", active ? "text-white" : "text-[#64748b]")}>
     <Icon 
-        size={24} 
-        className={cn(
-            "transition-colors",
-            active ? "text-[#E8CDA8]" : "text-[#494c52] group-hover:text-[#E8CDA8]"
-        )} 
+        size={20} 
+        className={cn("transition-all", active && "drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]")} 
         strokeWidth={active ? 2.5 : 2}
     />
-    <span className={cn(
-        "text-[10px] font-medium",
-        active ? "text-[#E8CDA8]" : "text-[#494c52] group-hover:text-[#E8CDA8]"
-    )}>
+    <span className="text-[10px] font-sans">
         {label}
     </span>
   </button>

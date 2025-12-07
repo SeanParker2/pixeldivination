@@ -5,6 +5,7 @@ import type { PersonaType } from '../types/ai';
 export interface UserProfile {
   nickname: string;
   gender: 'male' | 'female' | 'other';
+  avatar?: string;
   birthDate: string; // ISO String
   birthLocation: { province: string; city: string; district: string };
   currentLocation: { province: string; city: string; district: string };

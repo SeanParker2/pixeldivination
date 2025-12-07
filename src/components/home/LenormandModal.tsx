@@ -17,8 +17,12 @@ export const LenormandModal: React.FC<LenormandModalProps> = ({ isOpen, onClose 
   // Reset on open
   useEffect(() => {
     if (isOpen) {
-      setStep('start');
-      setDrawnCards([]);
+      // Use setTimeout to avoid synchronous setState warning
+      const timer = setTimeout(() => {
+        setStep('start');
+        setDrawnCards([]);
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 

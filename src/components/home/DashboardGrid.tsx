@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Star, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useFortuneStore } from '../../stores/useFortuneStore';
 import { useUserStore } from '../../stores/useUserStore';
@@ -18,16 +18,16 @@ export const DashboardGrid: React.FC = () => {
   }, [checkAndFetch, profile.birthDate]);
 
   const displayScores: FortuneScores = fortune?.scores || {
-    love: 0,
-    career: 0,
-    wealth: 0,
-    health: 0,
+    love: 85,
+    career: 70,
+    wealth: 92,
+    health: 80,
     academic: 0,
     social: 0
   };
 
   return (
-    <div className="grid grid-cols-[1.7fr_1fr] gap-3 px-4">
+    <div className="grid grid-cols-2 gap-3 px-0">
       <DailyFortuneCard scores={displayScores} isLoading={isLoading} />
       <TarotEntryCard />
     </div>
@@ -44,34 +44,24 @@ const DailyFortuneCard = ({ scores, isLoading }: { scores: FortuneScores; isLoad
         triggerHaptic('light');
         navigate('/daily-fortune');
       }}
-      className="bg-[#1E1E2E]/80 backdrop-blur-md border border-pixel-border rounded-lg p-4 flex flex-col gap-4 cursor-pointer hover:border-pixel-gold/50 transition-colors group h-[148px] relative"
+      className="glass-card flex flex-col gap-2 cursor-pointer hover:border-[#fbbf24]/50 transition-colors h-[160px] p-4 m-0"
     >
-      {/* Header with Stars */}
-      <div className="flex items-center gap-2">
-        <span className="text-[#e4ded7] text-sm font-medium whitespace-nowrap group-hover:text-pixel-gold transition-colors">今日运势</span>
-        <div className="flex gap-1">
-          {[1, 2, 3].map((i) => (
-            <img key={i} src="/images/icons/star_filled.png" alt="star" className="w-3 h-3 opacity-90" 
-              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-          ))}
-          {/* Fallback stars if image fails, but usually we use icons. Let's use Lucide stars but styled to match */}
-          <div className="hidden">
-             <Star size={12} className="fill-[#A78BFA] text-[#A78BFA]" />
-          </div>
-        </div>
+      {/* Header */}
+      <div className="flex justify-between items-center mb-1">
+        <span className="font-bold text-white text-[16px]">今日运势</span>
+        <span className="text-[#fbbf24] tracking-widest text-sm">★★★★☆</span>
       </div>
 
       {/* Progress Bars */}
       {isLoading ? (
         <div className="flex-1 flex items-center justify-center">
-          <Loader2 className="animate-spin text-pixel-gold w-6 h-6" />
+          <Loader2 className="animate-spin text-[#fbbf24] w-6 h-6" />
         </div>
       ) : (
-        <div className="flex flex-col justify-between flex-1 py-1">
-          <ProgressBar label="爱情运势" value={scores.love} />
-          <ProgressBar label="事业运势" value={scores.career} />
-          <ProgressBar label="财运指数" value={scores.wealth} />
-          <ProgressBar label="健康指数" value={scores.health} />
+        <div className="flex flex-col justify-between flex-1">
+          <ProgressBar label="爱情" value={scores.love} />
+          <ProgressBar label="财运" value={scores.wealth} />
+          <ProgressBar label="事业" value={scores.career} />
         </div>
       )}
     </div>
@@ -79,34 +69,48 @@ const DailyFortuneCard = ({ scores, isLoading }: { scores: FortuneScores; isLoad
 };
 
 const ProgressBar = ({ label, value }: { label: string; value: number }) => (
-  <div className="flex items-center gap-2">
-    <span className="text-[10px] text-[#e4ded7] whitespace-nowrap w-12 font-sans">{label}</span>
-    <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
+  <div className="flex flex-col gap-1">
+    <div className="flex justify-between text-[12px] text-[#e2e8f0]">
+      <span>{label}</span>
+      <span>{value}%</span>
+    </div>
+    <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
       <div 
-        className="h-full bg-[#A78BFA] rounded-full" 
-        style={{ width: `${value}%` }} 
+        className="h-full rounded-full" 
+        style={{ 
+            width: `${value}%`,
+            background: 'linear-gradient(90deg, #8b5cf6, #d8b4fe)',
+            boxShadow: '0 0 8px rgba(139, 92, 246, 0.6)'
+        }} 
       />
     </div>
-    <span className="text-[10px] text-[#e4ded7] w-6 text-right font-sans">{value}%</span>
   </div>
 );
 
 const TarotEntryCard = () => {
   return (
-    <div className="bg-[#1E1E2E]/80 backdrop-blur-md border border-pixel-border rounded-lg p-0 flex flex-col relative overflow-hidden h-[148px]">
-      <div className="px-2 pt-2 pb-0 z-10">
-        <h3 className="text-[#e4ded7] text-sm font-medium">塔罗占卜</h3>
-        <p className="text-[10px] text-[#e4ded7] mt-0.5 opacity-80">专业解读 + AI 分析</p>
+    <div className="glass-card relative overflow-hidden flex flex-col p-4 m-0 h-[160px]"
+         style={{
+             borderColor: 'var(--border-glow)',
+             boxShadow: '0 0 15px rgba(139, 92, 246, 0.2)'
+         }}>
+      {/* Radial Gradient Overlay */}
+      <div className="absolute inset-0 z-0" 
+           style={{ background: 'radial-gradient(circle at center, rgba(139, 92, 246, 0.2), transparent)' }} />
+      
+      <div className="z-10 relative">
+        <h3 className="text-white text-[18px] font-medium leading-tight">塔罗占卜</h3>
+        <p className="text-[#cbd5e1] text-[12px] mt-1">AI 深度解析</p>
       </div>
       
-      <div className="mt-auto flex justify-center items-end w-full z-0">
+      <div className="mt-auto flex justify-center z-10 h-[80px]">
+        {/* Using a background image style as per homedemo or an img tag. 
+            homedemo uses a div with background-image. I will use img tag for better accessibility and sizing control in React. */}
         <img 
-            src="/images/home/tarot_banner.png" 
-            alt="Tarot" 
-            className="w-[69px] h-[81px] object-contain mb-2"
-            onError={(e) => {
-                 (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM4YjVjZjYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cmVjdCB4PSIyIiB5PSI3IiB3aWR0aD0iMjAiIGhlaWdodD0iMTQiIHJ4PSIyIiByeT0iMiI+PC9yZWN0PjxwYXRoIGQ9Ik0xNiAyMXYtMiI+PC9wYXRoPjxwYXRoIGQ9Ik04IDIxdi0yIj48L3BhdGg+PHBhdGggZD0iTTEyIDIxdi0yIj48L3BhdGg+PC9zdmc+';
-            }}
+            src="https://upload.wikimedia.org/wikipedia/commons/9/90/RWS_Tarot_00_Fool.jpg" 
+            alt="The Fool" 
+            className="h-full object-contain opacity-80"
+            style={{ filter: 'grayscale(0.5) contrast(1.2)' }}
         />
       </div>
     </div>

@@ -6,6 +6,7 @@ export interface HistoryItem {
   type: 'tarot' | 'natal-chart' | 'starchart' | 'daily-fortune' | 'lenormand' | 'dice' | 'synastry' | 'transit' | 'sky' | 'insight' | 'fengshui';
   date: string; // ISO string as requested or keep timestamp? User example said "date: string". I'll use string.
   summary: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   details: any;
 }
 

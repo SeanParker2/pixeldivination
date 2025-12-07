@@ -10,6 +10,19 @@ const ZODIAC_SIGNS = [
 const RADIUS = 160;
 const CENTER = 200;
 
+const PLANET_COLORS: Record<string, string> = {
+  '太阳': '#fbbf24', // Gold
+  '月亮': '#e2e8f0', // Silver
+  '火星': '#ef4444', // Red
+  '金星': '#f472b6', // Pink
+  '水星': '#a8a29e', // Mercury (Grayish)
+  '木星': '#fbbf24', // Gold
+  '土星': '#fbbf24', // Gold
+  '天王星': '#38bdf8', // Sky Blue
+  '海王星': '#818cf8', // Indigo
+  '冥王星': '#94a3b8', // Slate
+};
+
 interface AstrologyWheelProps {
   date?: Date;
   location?: string;
@@ -23,7 +36,7 @@ export const AstrologyWheel: React.FC<AstrologyWheelProps> = ({ date: propDate, 
     
     const targetLocation = propLocation || (
       profile?.birthLocation 
-        ? (typeof profile.birthLocation === 'string' ? profile.birthLocation : (profile.birthLocation as any).city)
+        ? (typeof profile.birthLocation === 'string' ? profile.birthLocation : profile.birthLocation.city)
         : null
     );
 
@@ -37,21 +50,18 @@ export const AstrologyWheel: React.FC<AstrologyWheelProps> = ({ date: propDate, 
 
   if (!chartData) {
     return (
-        <div className="w-full aspect-square flex items-center justify-center text-pixel-gold font-pixel animate-pulse">
+        <div className="w-full aspect-square flex items-center justify-center text-[#fbbf24] font-pixel animate-pulse">
             CALCULATING...
         </div>
     );
   }
 
   // Rotation to place ASC at 180 degrees (Left)
-  // SVG Angle for Longitude L is -L (to make it CCW)
-  // We want -ASC + Rotation = 180
-  // Rotation = 180 + ASC
+  // This sets the initial orientation
   const rotation = 180 + chartData.ascendant;
 
   // Helper to get coordinates for a given longitude
   const getPos = (longitude: number, r: number) => {
-    // SVG Angle = -Longitude (CCW)
     const rad = (-longitude * Math.PI) / 180;
     return {
       x: CENTER + r * Math.cos(rad),
@@ -60,36 +70,38 @@ export const AstrologyWheel: React.FC<AstrologyWheelProps> = ({ date: propDate, 
   };
 
   return (
-    <div className="w-full aspect-square relative">
-      <svg 
+    <div className="w-full aspect-square relative flex items-center justify-center mb-5">
+      <motion.svg 
         viewBox="0 0 400 400" 
-        className="w-full h-full"
+        className="w-[90%] h-[90%]"
         style={{ overflow: 'visible' }}
+        animate={{ rotate: 360 }}
+        transition={{ duration: 120, repeat: Infinity, ease: "linear" }}
       >
-        {/* Decorative Background Circles */}
-        <circle cx={CENTER} cy={CENTER} r={RADIUS} stroke="#2D2D3A" strokeWidth="1" fill="none" />
-        <circle cx={CENTER} cy={CENTER} r={RADIUS * 0.85} stroke="#2D2D3A" strokeWidth="1" fill="none" opacity="0.5" />
-        <circle cx={CENTER} cy={CENTER} r={RADIUS * 0.4} stroke="#2D2D3A" strokeWidth="1" fill="none" opacity="0.3" />
+        {/* Decorative Background Circles - Matching Demo */}
+        <circle cx={CENTER} cy={CENTER} r={RADIUS + 30} stroke="#8b5cf6" strokeWidth="1" fill="none" opacity="0.5" />
+        <circle cx={CENTER} cy={CENTER} r={RADIUS + 25} stroke="#8b5cf6" strokeWidth="4" fill="none" opacity="0.2" strokeDasharray="10 5" />
 
-        {/* Rotating Group */}
-        <motion.g
-            initial={{ rotate: rotation - 30, opacity: 0 }}
-            animate={{ rotate: rotation, opacity: 1 }}
-            transition={{ duration: 1.5, ease: "easeOut" }}
-            style={{ originX: "200px", originY: "200px" }}
-        >
+        {/* Cross Lines - Matching Demo */}
+        <line x1={CENTER} y1={CENTER} x2={CENTER} y2="10" stroke="rgba(255,255,255,0.2)" />
+        <line x1={CENTER} y1={CENTER} x2="390" y2={CENTER} stroke="rgba(255,255,255,0.2)" />
+        <line x1={CENTER} y1={CENTER} x2={CENTER} y2="390" stroke="rgba(255,255,255,0.2)" />
+        {/* The line pointing to Left (ASC direction in visualizer) */}
+        <line x1={CENTER} y1={CENTER} x2="10" y2={CENTER} stroke="rgba(255,255,255,0.5)" strokeWidth="2" />
+
+        {/* Chart Data Group - Rotated to align ASC to Left initially */}
+        <g style={{ transform: `rotate(${rotation}deg)`, transformOrigin: 'center' }}>
             {/* Zodiac Ring */}
             {ZODIAC_SIGNS.map((sign, index) => {
                 const startAngle = index * 30;
                 
-                // Label Position (middle of sign)
+                // Label Position
                 const midAngle = startAngle + 15;
                 const labelPos = getPos(midAngle, RADIUS + 20);
                 const linePos = getPos(startAngle, RADIUS);
 
                 return (
                     <g key={sign}>
-                        {/* Divider Line */}
                         <line 
                             x1={CENTER} y1={CENTER} 
                             x2={linePos.x} y2={linePos.y} 
@@ -97,16 +109,10 @@ export const AstrologyWheel: React.FC<AstrologyWheelProps> = ({ date: propDate, 
                             strokeWidth="1" 
                             opacity="0.3"
                         />
-                        {/* Sign Label */}
-                        {/* We need to counter-rotate text so it stays upright? Or let it rotate?
-                            Usually chart text rotates with the chart or is upright.
-                            For MVP, let it rotate with the wheel is easier, but upright is readable.
-                            To make it upright: rotate text by -rotation around its own center.
-                        */}
                         <text
                             x={labelPos.x}
                             y={labelPos.y}
-                            fill="#A1A1AA"
+                            fill="#94a3b8"
                             fontSize="20"
                             textAnchor="middle"
                             dominantBaseline="middle"
@@ -140,28 +146,29 @@ export const AstrologyWheel: React.FC<AstrologyWheelProps> = ({ date: propDate, 
 
             {/* Planets */}
             {chartData.planets.map((planet, i) => {
-                // Simple collision avoidance (very basic): just push radius out if crowded?
-                // For now, standard radius.
                 const r = RADIUS * 0.7 + (i % 2) * 15; // Stagger slightly
                 const pos = getPos(planet.longitude, r);
+                const color = PLANET_COLORS[planet.name] || '#fbbf24';
                 
                 return (
                     <g key={planet.name}>
                         <line 
                             x1={CENTER} y1={CENTER} 
                             x2={pos.x} y2={pos.y} 
-                            stroke="#FFD700" 
+                            stroke={color} 
                             strokeWidth="1" 
-                            opacity="0.1" 
+                            opacity="0.3" 
                         />
-                        <circle cx={pos.x} cy={pos.y} r="12" fill="#1E1E2E" stroke="#FFD700" strokeWidth="1" />
+                        <circle cx={pos.x} cy={pos.y} r="8" fill={color} />
                         <text
                             x={pos.x}
                             y={pos.y}
-                            fill="#FFD700"
-                            fontSize="14"
+                            fill="#000"
+                            fontSize="10"
+                            fontWeight="bold"
                             textAnchor="middle"
                             dominantBaseline="middle"
+                            dy="1"
                             style={{ 
                                 transform: `rotate(${-rotation}deg)`, 
                                 transformBox: 'fill-box', 
@@ -173,16 +180,13 @@ export const AstrologyWheel: React.FC<AstrologyWheelProps> = ({ date: propDate, 
                     </g>
                 );
             })}
-        </motion.g>
+        </g>
+      </motion.svg>
 
-        {/* Static Overlay (optional, e.g., center point) */}
-        <circle cx={CENTER} cy={CENTER} r="4" fill="#FFFFFF" />
-        
-        {/* ASC/MC Markers (Static relative to screen? No, they are specific degrees on the wheel) */}
-        {/* Since we rotated the wheel so ASC is at 180 (Left), we can draw a static marker at Left to indicate ASC */}
-        <text x="20" y={CENTER} fill="#FFFFFF" fontSize="12" fontWeight="bold" dominantBaseline="middle">ASC</text>
-        
-      </svg>
+      {/* Static ASC Marker */}
+      <div className="absolute left-0 top-1/2 -translate-y-1/2 text-xs text-white drop-shadow-[0_0_5px_rgba(255,255,255,1)]">
+         ASC
+      </div>
     </div>
   );
 };

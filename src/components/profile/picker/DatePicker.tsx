@@ -34,14 +34,18 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   // Sync internal state when initialDate changes
   useEffect(() => {
     if (isOpen) {
-      const d = new Date(initialDate);
-      setSelected({
-        year: d.getFullYear(),
-        month: d.getMonth() + 1,
-        day: d.getDate(),
-        hour: d.getHours(),
-        minute: d.getMinutes(),
-      });
+      // Use setTimeout to avoid synchronous setState warning
+      const timer = setTimeout(() => {
+        const d = new Date(initialDate);
+        setSelected({
+          year: d.getFullYear(),
+          month: d.getMonth() + 1,
+          day: d.getDate(),
+          hour: d.getHours(),
+          minute: d.getMinutes(),
+        });
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [isOpen, initialDate]);
 
@@ -108,12 +112,14 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   );
 };
 
-const PickerColumn = ({ items, value, onChange }: {
-  items: number[] | string[];
-  value: number | string;
-  onChange: (val: any) => void;
-  label?: string; // Optional but unused in render
-}) => {
+interface PickerColumnProps {
+  items: number[];
+  value: number;
+  onChange: (val: number) => void;
+  label: string;
+}
+
+const PickerColumn: React.FC<PickerColumnProps> = ({ items, value, onChange, label }) => {
   return (
     <div className="flex-1 overflow-y-auto scrollbar-hide snap-y snap-mandatory py-20 text-center relative group">
       {items.map(item => (
@@ -121,11 +127,12 @@ const PickerColumn = ({ items, value, onChange }: {
           key={item}
           onClick={() => onChange(item)}
           className={`
-            h-10 leading-10 snap-center cursor-pointer transition-all
-            ${item === value ? 'text-white font-bold text-lg' : 'text-gray-600 text-sm'}
+            h-10 leading-10 snap-center cursor-pointer transition-all truncate px-1 flex items-center justify-center gap-1
+            ${item === value ? 'text-white font-bold text-base' : 'text-gray-600 text-sm'}
           `}
         >
-          {item}
+          <span>{item}</span>
+          <span className={`text-xs ${item === value ? 'text-white/50' : 'text-transparent group-hover:text-gray-600/50'}`}>{label}</span>
         </div>
       ))}
     </div>

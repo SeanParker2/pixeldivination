@@ -7,34 +7,29 @@ export const ServiceBanner: React.FC = () => {
   return (
     <div 
       onClick={() => navigate('/shop')}
-      className="px-4 mt-4 cursor-pointer"
+      className="glass-card flex items-center relative overflow-hidden h-[100px] px-5 mt-4 cursor-pointer"
+      style={{
+          background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)',
+          border: '1px solid rgba(139, 92, 246, 0.5)'
+      }}
     >
-      <div 
-        className="w-full h-[138px] relative rounded-lg overflow-hidden flex items-center"
-      >
-        {/* Text Content */}
-        <div className="absolute left-0 top-[44px] z-10 pl-0">
-           <h3 className="text-[#e4ded7] text-lg font-medium leading-7 font-sans">
-            占卜歌者<span className="text-[#e4ded7]">100%的</span><br />
-            灵魂传递
-          </h3>
-        </div>
-
-        {/* Image */}
-        <div className="absolute right-0 top-0 h-full w-[165px]">
-           <img 
-            src="/images/home/banner_wizards.png" 
-            alt="Wizards Banner" 
-            className="w-full h-full object-cover"
-            onError={(e) => {
-                (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZkNzAwIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTUgMTJoMTRNMTIgNXYxNCI+PC9wYXRoPjwvc3ZnPg==';
-            }}
-          />
-        </div>
-        
-        {/* Background (if needed, or handled by image?) */}
-        {/* home.html doesn't explicitly show a background color rect, maybe it's transparent or part of the container? */}
+      <div className="z-10 relative">
+        <h3 className="text-white text-[24px] font-medium leading-[1.1] m-0 font-sans">
+          占卜歌者<br/>
+          <span className="text-[#fbbf24]">100% 灵魂传递</span>
+        </h3>
       </div>
+      
+      {/* Banner Glow */}
+      <div 
+        className="absolute -right-5 w-[100px] h-[100px] bg-[#fbbf24] opacity-30 blur-[50px]"
+      />
+      
+      <img 
+        src="https://api.dicebear.com/7.x/pixel-art/svg?seed=Wizard" 
+        alt="Wizard" 
+        className="absolute right-2.5 h-[80px] drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]"
+      />
     </div>
   );
 };

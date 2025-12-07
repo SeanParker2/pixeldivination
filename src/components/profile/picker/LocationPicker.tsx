@@ -52,20 +52,27 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
   // Sync state on open
   useEffect(() => {
     if (isOpen) {
-      setProvince(initialLocation.province);
-      setCity(initialLocation.city);
-      setDistrict(initialLocation.district);
+      if (province !== initialLocation.province) setProvince(initialLocation.province);
+      if (city !== initialLocation.city) setCity(initialLocation.city);
+      if (district !== initialLocation.district) setDistrict(initialLocation.district);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, initialLocation]);
 
-  // Auto-select first child when parent changes
-  useEffect(() => {
-    if (!cities.includes(city) && cities.length > 0) setCity(cities[0]);
-  }, [province, cities, city]);
+  const handleProvinceChange = (newProvince: string) => {
+    setProvince(newProvince);
+    const newCities = LOCATIONS[newProvince] ? Object.keys(LOCATIONS[newProvince]) : [];
+    const newCity = newCities[0] || '';
+    setCity(newCity);
+    const newDistricts = (LOCATIONS[newProvince] && LOCATIONS[newProvince][newCity]) ? LOCATIONS[newProvince][newCity] : [];
+    setDistrict(newDistricts[0] || '');
+  };
 
-  useEffect(() => {
-    if (!districts.includes(district) && districts.length > 0) setDistrict(districts[0]);
-  }, [city, districts, district]);
+  const handleCityChange = (newCity: string) => {
+    setCity(newCity);
+    const newDistricts = (LOCATIONS[province] && LOCATIONS[province][newCity]) ? LOCATIONS[province][newCity] : [];
+    setDistrict(newDistricts[0] || '');
+  };
 
   const handleConfirm = () => {
     onConfirm({ province, city, district });
@@ -85,12 +92,12 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
         <StringPickerColumn 
           items={provinces} 
           value={province} 
-          onChange={setProvince} 
+          onChange={handleProvinceChange} 
         />
         <StringPickerColumn 
           items={cities} 
           value={city} 
-          onChange={setCity} 
+          onChange={handleCityChange} 
         />
         <StringPickerColumn 
           items={districts} 

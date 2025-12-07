@@ -56,7 +56,14 @@ export const GenderPicker: React.FC<GenderPickerProps> = ({
   );
 };
 
-const GenderOption = ({ label, selected, onClick }: any) => (
+interface GenderOptionProps {
+  label: string;
+  value?: string;
+  selected: boolean;
+  onClick: () => void;
+}
+
+const GenderOption: React.FC<GenderOptionProps> = ({ label, selected, onClick }) => (
   <button
     onClick={onClick}
     className={`
