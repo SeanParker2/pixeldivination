@@ -37,7 +37,7 @@ export const ProfileHeader: React.FC = () => {
         <div className="w-[100px] h-[100px] rounded-full border-4 border-[#09090b] shadow-[0_0_20px_rgba(139,92,246,0.5)] bg-[#1e1b4b] relative overflow-hidden">
             <img 
                 src={profile.avatar || "https://api.dicebear.com/7.x/pixel-art/svg?seed=Felix"} 
-                alt="Avatar" 
+                alt="User Avatar" 
                 className="w-full h-full object-cover"
             />
             {/* Equip Badge */}

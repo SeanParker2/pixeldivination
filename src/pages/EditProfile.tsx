@@ -11,7 +11,7 @@ import { formatDate } from '../lib/dateUtils';
 
 export const EditProfile: React.FC = () => {
   const navigate = useNavigate();
-  const { profile, updateProfile } = useUserStore();
+  const { profile, updateProfile, markProfileSet } = useUserStore();
   const addToast = useToastStore(state => state.addToast);
   
   // Local state for pickers visibility
@@ -25,6 +25,7 @@ export const EditProfile: React.FC = () => {
 
   const handleSave = () => {
     updateProfile({ nickname });
+    markProfileSet();
     addToast('档案保存成功', 'success');
     setTimeout(() => {
       navigate('/');

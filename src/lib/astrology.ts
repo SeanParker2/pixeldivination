@@ -1,4 +1,5 @@
 import * as Astronomy from 'astronomy-engine';
+import { CITIES } from './cityData';
 
 export interface PlanetPosition {
   name: string;
@@ -19,29 +20,18 @@ export interface AstrologyData {
   midheaven: number;
 }
 
-// Common Chinese cities coordinates
-const CITIES: Record<string, {lat: number, lng: number}> = {
-  '北京': { lat: 39.9042, lng: 116.4074 },
-  '上海': { lat: 31.2304, lng: 121.4737 },
-  '广州': { lat: 23.1291, lng: 113.2644 },
-  '深圳': { lat: 22.5431, lng: 114.0579 },
-  '成都': { lat: 30.5728, lng: 104.0668 },
-  '杭州': { lat: 30.2741, lng: 120.1551 },
-  '武汉': { lat: 30.5928, lng: 114.3055 },
-  '西安': { lat: 34.3416, lng: 108.9398 },
-  '重庆': { lat: 29.4316, lng: 106.9123 },
-  '南京': { lat: 32.0603, lng: 118.7969 },
-  '天津': { lat: 39.0842, lng: 117.2009 },
-  '沈阳': { lat: 41.8057, lng: 123.4315 },
-  '长沙': { lat: 28.2282, lng: 112.9388 },
-  '昆明': { lat: 24.8801, lng: 102.8329 },
-  '香港': { lat: 22.3193, lng: 114.1694 },
-  '台北': { lat: 25.0330, lng: 121.5654 },
-};
-
 export const getLatLong = (city: string) => {
   if (!city) return CITIES['北京'];
-  const key = Object.keys(CITIES).find(c => city.includes(c));
+  // Clean up city name (remove '市' suffix if present for matching)
+  const cleanCity = city.replace(/市$/, '');
+  
+  // Try direct match first
+  if (CITIES[cleanCity]) {
+      return CITIES[cleanCity];
+  }
+
+  // Try finding a key that is included in the input city string or vice versa
+  const key = Object.keys(CITIES).find(c => city.includes(c) || c.includes(city));
   return key ? CITIES[key] : CITIES['北京'];
 };
 

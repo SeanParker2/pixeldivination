@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BottomSheet } from './BottomSheet';
+import { CITY_DATA } from '../../../lib/cityData';
 
 export interface Location {
   province: string;
@@ -15,23 +16,8 @@ interface LocationPickerProps {
   title?: string;
 }
 
-// Simplified Mock Data
-const LOCATIONS: Record<string, Record<string, string[]>> = {
-  '广东省': {
-    '深圳市': ['南山区', '福田区', '罗湖区', '宝安区'],
-    '广州市': ['天河区', '越秀区', '海珠区', '白云区'],
-  },
-  '北京市': {
-    '北京市': ['朝阳区', '海淀区', '东城区', '西城区'],
-  },
-  '上海市': {
-    '上海市': ['浦东新区', '黄浦区', '徐汇区', '静安区'],
-  },
-  '浙江省': {
-    '杭州市': ['西湖区', '上城区', '拱墅区'],
-    '宁波市': ['海曙区', '江北区'],
-  }
-};
+// Using expanded dataset from cityData.ts
+const LOCATIONS = CITY_DATA;
 
 export const LocationPicker: React.FC<LocationPickerProps> = ({
   isOpen,

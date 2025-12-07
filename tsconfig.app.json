@@ -23,5 +23,5 @@
     "noFallthroughCasesInSwitch": true,
     "composite": true
   },
-  "include": ["src", "src/lucide.d.ts"]
+  "include": ["src/**/*", "src/lucide.d.ts"]
 }

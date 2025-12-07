@@ -18,6 +18,7 @@ interface UserState {
   updateProfile: (data: Partial<UserProfile>) => void;
   setPersona: (type: PersonaType) => void;
   resetProfile: () => void;
+  markProfileSet: () => void;
 }
 
 const DEFAULT_PROFILE: UserProfile = {
@@ -36,7 +37,11 @@ export const useUserStore = create<UserState>()(
       activePersona: 'neon',
       updateProfile: (data) =>
         set((state) => ({
-          profile: { ...state.profile, ...data, isProfileSet: true },
+          profile: { ...state.profile, ...data },
+        })),
+      markProfileSet: () =>
+        set((state) => ({
+          profile: { ...state.profile, isProfileSet: true },
         })),
       setPersona: (type) => set({ activePersona: type }),
       resetProfile: () => set({ profile: DEFAULT_PROFILE, activePersona: 'neon' }),
