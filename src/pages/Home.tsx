@@ -3,6 +3,7 @@ import { HomeHeader } from '../components/home/HomeHeader';
 import { UserInfoCard } from '../components/home/UserInfoCard';
 import { DashboardGrid } from '../components/home/DashboardGrid';
 import { ServiceBanner } from '../components/home/ServiceBanner';
+import { InsightCard } from '../components/home/InsightCard';
 import { InsightModal } from '../components/home/InsightModal';
 import { QuickNavGrid } from '../components/home/QuickNavGrid';
 
@@ -10,30 +11,27 @@ export default function Home() {
   const [showInsight, setShowInsight] = useState(false);
 
   return (
-    <div className="flex flex-col relative pb-24 bg-[#1E1E2E] min-h-screen">
-      {/* Header Section */}
+    <div className="mobile-container">
       <HomeHeader />
       
-      {/* Main Content */}
-      <div className="flex flex-col">
-          <UserInfoCard />
-          <div className="mt-2">
-            <DashboardGrid />
-          </div>
-          <ServiceBanner />
-          {/* InsightCard commented out to match homedemo.html layout
-          <div onClick={() => setShowInsight(true)} className="cursor-pointer active:scale-[0.98] transition-transform">
-            <InsightCard />
-          </div> 
-          */}
-          <QuickNavGrid />
-      </div>
+      <UserInfoCard />
+      
+      <DashboardGrid />
+      
+      <ServiceBanner />
+      
+      {/* InsightCard was not in the main flow of homedemo.html as a separate block, 
+          but referenced in code. The user request says "Visual presentation must be 100% consistent".
+          homedemo.html structure: Header -> UserCard -> DashboardGrid -> Banner -> QuickNav.
+          It does NOT show an InsightCard separately.
+          However, the DashboardGrid in homedemo.html contains a "Tarot Entry" which looks like the InsightCard.
+          I need to check DashboardGrid.tsx to see if it includes the Tarot card.
+      */}
+      
+      <QuickNavGrid />
 
       {/* Modals */}
-      <InsightModal 
-        isOpen={showInsight} 
-        onClose={() => setShowInsight(false)} 
-      />
+      <InsightModal isOpen={showInsight} onClose={() => setShowInsight(false)} />
     </div>
   );
 }

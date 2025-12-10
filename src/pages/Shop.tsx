@@ -12,31 +12,29 @@ export const Shop: React.FC = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
 
   return (
-    <div className="flex flex-col h-full relative">
+    <div className="w-full max-w-md mx-auto pt-4 pb-32 px-4 flex flex-col gap-4">
       {/* Header */}
       <ShopHeader onCartClick={() => setIsCartOpen(true)} />
 
-      {/* Main Scrollable Content */}
-      <div className="flex flex-col pb-32">
-        <ShopBanner />
-        
-        <FilterBar />
+      {/* Main Content */}
+      <ShopBanner />
+      
+      <FilterBar />
 
-        {/* Product List */}
-        <div className="flex flex-col w-full px-2.5 gap-2.5 mt-2">
-          {PRODUCTS.map(product => (
-            <div key={product.id} onClick={() => navigate(`/shop/${product.id}`)} className="cursor-pointer">
-              <ProductCard
-                title={product.title}
-                category={product.category}
-                buff={product.buff}
-                price={product.price}
-                imageUrl={product.image}
-                hasAudio={product.category === '音频'}
-              />
-            </div>
-          ))}
-        </div>
+      {/* Product List */}
+      <div className="flex flex-col w-full gap-2.5 mt-2">
+        {PRODUCTS.map(product => (
+          <div key={product.id} onClick={() => navigate(`/shop/${product.id}`)} className="cursor-pointer">
+            <ProductCard
+              title={product.title}
+              category={product.category}
+              buff={product.buff}
+              price={product.price}
+              imageUrl={product.image}
+              hasAudio={product.category === '音频'}
+            />
+          </div>
+        ))}
       </div>
 
       {/* Cart Drawer */}

@@ -37,7 +37,7 @@ const ProductDetail: React.FC = () => {
 
   if (!product) {
     return (
-      <MobileContainer hideHeader hideFooter>
+      <div className="w-full max-w-md mx-auto pt-20 px-4 text-center">
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <p className="mb-4 text-white">未找到商品</p>
@@ -49,15 +49,13 @@ const ProductDetail: React.FC = () => {
             </button>
           </div>
         </div>
-      </MobileContainer>
+      </div>
     );
   }
 
   return (
-    <MobileContainer hideHeader hideFooter className="bg-pixel-midnight">
-      <div className="min-h-full text-white font-pixel pb-24 relative">
-        <div className="scanlines" />
-        <div className="vignette" />
+    <div className="w-full max-w-md mx-auto pt-0 pb-32 relative min-h-screen">
+      <div className="min-h-full text-white font-pixel relative">
         
         {/* Navbar */}
         <div className="absolute top-4 left-4 z-50">
@@ -128,7 +126,7 @@ const ProductDetail: React.FC = () => {
       </div>
 
       {/* Bottom Action Bar */}
-      <div className="fixed bottom-0 left-0 right-0 h-16 bg-[#1E1E2E] border-t border-white/10 flex items-center px-2 z-50 pb-safe">
+      <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto h-16 bg-[#1E1E2E] border-t border-white/10 flex items-center px-2 z-50 pb-safe">
         {/* Left Icons */}
         <div className="flex items-center mr-2">
           <button className="flex flex-col items-center justify-center w-12 h-full gap-1 text-gray-400 hover:text-white">
@@ -162,7 +160,7 @@ const ProductDetail: React.FC = () => {
           </button>
         </div>
       </div>
-    </MobileContainer>
+    </div>
   );
 };
 

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Daily Fortune UI</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #09090b;
+            --bg-card: rgba(30, 41, 59, 0.6);
+            --text-gold: #fbbf24;
+            --text-neon: #e2e8f0;
+            --accent-purple: #8b5cf6;
+            --accent-pink: #ec4899;
+            --border-dim: rgba(255, 255, 255, 0.1);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            margin: 0;
+            background-color: var(--bg-dark);
+            font-family: 'VT323', monospace;
+            color: var(--text-neon);
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        /* === 特效层 === */
+        .stars {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000 url('http://www.script-tutorials.com/demos/360/images/stars.png') repeat top center;
+            z-index: -2; opacity: 0.5; animation: move-stars 200s linear infinite;
+        }
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+            background-size: 100% 4px; pointer-events: none; z-index: 100;
+        }
+        .vignette {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, transparent 60%, rgba(0,0,0,0.9) 100%);
+            pointer-events: none; z-index: 99;
+        }
+
+        .mobile-container {
+            width: 100%; max-width: 420px;
+            background: linear-gradient(180deg, rgba(15,23,42,0) 0%, rgba(88,28,135,0.1) 100%);
+            padding: 20px; padding-bottom: 100px;
+            position: relative;
+            display: flex; flex-direction: column;
+        }
+
+        /* === Header & Tabs === */
+        .page-header {
+            display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px;
+        }
+        
+        .user-mini {
+            display: flex; align-items: center; gap: 12px;
+        }
+        .avatar {
+            width: 48px; height: 48px; border-radius: 50%;
+            border: 2px solid var(--text-gold);
+            background: #1e1b4b; overflow: hidden;
+            box-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
+        }
+        .user-info h2 { margin: 0; font-size: 20px; color: #fff; letter-spacing: 1px; }
+        .user-info p { margin: 0; font-size: 14px; color: #64748b; }
+
+        .neon-tabs {
+            display: flex; border-bottom: 1px solid var(--border-dim);
+        }
+        .tab-item {
+            flex: 1; text-align: center; padding: 12px 0;
+            font-size: 18px; color: #64748b; cursor: pointer;
+            position: relative; transition: all 0.3s;
+        }
+        .tab-item.active {
+            color: #fff; text-shadow: 0 0 8px rgba(255,255,255,0.5);
+        }
+        .tab-item.active::after {
+            content: ''; position: absolute; bottom: -1px; left: 25%; width: 50%; height: 2px;
+            background: var(--text-gold);
+            box-shadow: 0 0 10px var(--text-gold);
+        }
+
+        /* === Stats Card (The Radar) === */
+        .glass-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-dim);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            position: relative; overflow: hidden;
+        }
+        
+        .stats-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 16px;
+        }
+        .stats-title { font-size: 20px; color: #fff; font-weight: bold; }
+        .stats-stars { color: #a78bfa; letter-spacing: 2px; text-shadow: 0 0 5px #a78bfa; }
+
+        .stats-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px 16px;
+        }
+        
+        /* Progress Bar Style */
+        .stat-item { display: flex; flex-direction: column; gap: 4px; }
+        .stat-meta { display: flex; justify-content: space-between; font-size: 14px; color: #cbd5e1; }
+        .progress-track {
+            height: 6px; width: 100%;
+            background: rgba(0,0,0,0.4); border-radius: 3px;
+            overflow: hidden; border: 1px solid rgba(255,255,255,0.05);
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-pink));
+            box-shadow: 0 0 8px var(--accent-purple);
+            border-radius: 3px;
+            position: relative;
+        }
+        /* 增加一个流光动画 */
+        .progress-fill::after {
+            content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transform: translateX(-100%);
+            animation: shimmer 2s infinite;
+        }
+
+        /* === Readings List === */
+        .reading-section { display: flex; flex-direction: column; gap: 16px; }
+        
+        .reading-card {
+            background: rgba(255,255,255,0.03);
+            border-left: 3px solid var(--text-gold);
+            padding: 16px; border-radius: 0 12px 12px 0;
+            position: relative;
+        }
+        .reading-title {
+            color: var(--text-gold); font-size: 18px; margin-bottom: 8px;
+            text-transform: uppercase; letter-spacing: 1px;
+            text-shadow: 0 0 5px rgba(251, 191, 36, 0.3);
+        }
+        .reading-text {
+            font-size: 15px; line-height: 1.6; color: #e2e8f0;
+            text-align: justify;
+        }
+        .reading-divider {
+            height: 1px; background: repeating-linear-gradient(90deg, #64748b 0 4px, transparent 4px 8px);
+            margin: 12px 0; opacity: 0.3;
+        }
+        .reading-sub { font-size: 13px; color: #94a3b8; }
+
+        /* Animations */
+        @keyframes move-stars { from {background-position:0 0;} to {background-position:0 10000px;} }
+        @keyframes shimmer { 100% { transform: translateX(100%); } }
+
+        /* Bottom Nav (Placeholder) */
+        .bottom-bar {
+            position: fixed; bottom: 0; width: 100%; max-width: 420px;
+            height: 70px; background: #0f172a; border-top: 1px solid #334155;
+            display: flex; justify-content: space-around; align-items: center; z-index: 200;
+        }
+        .plus-btn {
+            width: 64px; height: 64px; background: var(--text-gold);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 32px; color: #000; position: relative; top: -25px;
+            border: 6px solid var(--bg-dark); box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+        }
+
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="scanlines"></div>
+    <div class="vignette"></div>
+
+    <div class="mobile-container">
+        <div class="page-header">
+            <div class="user-mini">
+                <div class="avatar">
+                    <img src="https://api.dicebear.com/7.x/pixel-art/svg?seed=Felix" width="100%">
+                </div>
+                <div class="user-info">
+                    <h2>白羊座</h2>
+                    <p>2000-04-15 (阳历)</p>
+                </div>
+            </div>
+            
+            <div class="neon-tabs">
+                <div class="tab-item active">今日</div>
+                <div class="tab-item">本月</div>
+                <div class="tab-item">本年</div>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <div class="stats-header">
+                <span class="stats-title">今日运势指数</span>
+                <span class="stats-stars">★★★★☆</span>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-meta"><span>健康</span><span>85%</span></div>
+                    <div class="progress-track"><div class="progress-fill" style="width:85%"></div></div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-meta"><span>爱情</span><span>92%</span></div>
+                    <div class="progress-track"><div class="progress-fill" style="width:92%"></div></div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-meta"><span>事业</span><span>70%</span></div>
+                    <div class="progress-track"><div class="progress-fill" style="width:70%"></div></div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-meta"><span>财运</span><span>65%</span></div>
+                    <div class="progress-track"><div class="progress-fill" style="width:65%"></div></div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-meta"><span>学业</span><span>88%</span></div>
+                    <div class="progress-track"><div class="progress-fill" style="width:88%"></div></div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-meta"><span>社交</span><span>75%</span></div>
+                    <div class="progress-track"><div class="progress-fill" style="width:75%"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="reading-section">
+            
+            <div class="reading-card">
+                <div class="reading-title">🔮 综合运势</div>
+                <div class="reading-text">
+                    不要贸然出击，你心仪的TA可能并未心动。今日宜静不宜动，保持内心的平静是关键。
+                </div>
+                <div class="reading-divider"></div>
+                <div class="reading-sub">建议：穿着白色衣物可增强磁场。</div>
+            </div>
+
+            <div class="reading-card" style="border-color: #ec4899;">
+                <div class="reading-title" style="color: #ec4899;">❤️ 恋爱指引</div>
+                <div class="reading-text">
+                    TA对你的态度可能一直都并不清晰，你很难感觉到TA待你与旁人明显的不同。如果你们之间一直靠你辛苦维持，不妨暂停一下。
+                </div>
+            </div>
+
+            <div class="reading-card" style="border-color: #8b5cf6;">
+                <div class="reading-title" style="color: #8b5cf6;">💼 事业前瞻</div>
+                <div class="reading-text">
+                    工作黑锅我不背，领导念经我不听。今日职场可能会有小人作祟，保持低调，做好份内之事即可。
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="bottom-bar">
+        <div style="font-size:20px; color:#64748b">⦿</div>
+        <div style="font-size:20px; color:#64748b">✛</div>
+        <div class="plus-btn">+</div>
+        <div style="font-size:20px; color:#64748b">⛺</div>
+        <div style="font-size:20px; color:#64748b">☺</div>
+    </div>
+
+</body>
+</html>

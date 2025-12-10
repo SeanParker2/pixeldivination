@@ -1,22 +1,28 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { BottomNav } from './BottomNav';
 
 export const MainLayout: React.FC = () => {
-  return (
-    <div className="min-h-screen bg-[#09090b] text-[#e2e8f0] font-pixel relative overflow-hidden">
-      {/* Background Effects */}
-      <div className="stars-bg" />
-      <div className="scanlines" />
-      <div className="vignette" />
+  const location = useLocation();
+  // Hide BottomNav on Product Detail pages (/shop/:id)
+  const shouldHideBottomNav = /^\/shop\/\d+$/.test(location.pathname);
 
-      {/* Main Content */}
-      <main className="w-full relative z-10">
-          <Outlet />
-      </main>
+  return (
+    <div className="min-h-screen bg-[#09090b] font-pixel relative flex justify-center">
+      {/* Backgrounds (Fixed) */}
+      <div className="stars-bg fixed inset-0 z-0" />
+      <div className="scanlines fixed inset-0 z-50 pointer-events-none" />
+      <div className="vignette fixed inset-0 z-40 pointer-events-none" />
       
-      {/* Bottom Nav */}
-      <BottomNav className="left-0 right-0 mx-auto z-50" />
+      {/* Scrollable Content Wrapper */}
+      <div className="relative z-10 w-full flex justify-center">
+          <Outlet />
+      </div>
+
+      {/* Bottom Nav (Fixed on top of everything) */}
+      {!shouldHideBottomNav && (
+        <BottomNav className="fixed bottom-0 left-0 right-0 mx-auto z-[100]" />
+      )}
     </div>
   );
 };

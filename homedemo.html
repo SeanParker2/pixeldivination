@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pixel Divination - Ultimate UI</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #09090b;
+            --bg-card: rgba(30, 41, 59, 0.7);
+            --border-glow: rgba(139, 92, 246, 0.5);
+            --text-gold: #fbbf24;
+            --text-neon: #e2e8f0;
+            --accent-purple: #8b5cf6;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            margin: 0;
+            background-color: var(--bg-dark);
+            font-family: 'VT323', monospace;
+            color: var(--text-neon);
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        /* === 核心特效层 === */
+        /* 1. 动态星空背景 */
+        .stars {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000 url('http://www.script-tutorials.com/demos/360/images/stars.png') repeat top center;
+            z-index: -2;
+            opacity: 0.5;
+            animation: move-stars 200s linear infinite;
+        }
+
+        /* 2. CRT 扫描线滤镜 */
+        .scanlines {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        /* 3. 暗角氛围 */
+        .vignette {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, transparent 50%, rgba(0,0,0,0.8) 100%);
+            pointer-events: none;
+            z-index: 99;
+        }
+
+        /* === 容器布局 === */
+        .mobile-container {
+            width: 100%;
+            max-width: 420px;
+            background: linear-gradient(180deg, rgba(15,23,42,0) 0%, rgba(88,28,135,0.1) 100%);
+            padding: 20px;
+            padding-bottom: 100px;
+            position: relative;
+        }
+
+        /* === 组件样式 === */
+        
+        /* Header */
+        .header {
+            text-align: center;
+            margin: 20px 0 30px;
+            position: relative;
+        }
+        .logo-text {
+            font-size: 32px;
+            letter-spacing: 4px;
+            color: var(--text-gold);
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(251, 191, 36, 0.6), 2px 2px 0px #000;
+            animation: text-flicker 3s infinite;
+        }
+
+        /* Glass Card 通用样式 */
+        .glass-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        .glass-card:active { transform: scale(0.98); }
+
+        /* User Info */
+        .user-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: 2px solid var(--text-gold);
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.4);
+            background: #333; /* 占位 */
+            overflow: hidden;
+        }
+        .user-info h2 { margin: 0; font-size: 20px; color: #fff; }
+        .user-info p { margin: 4px 0 0; font-size: 14px; color: #94a3b8; }
+        .tag {
+            background: rgba(251, 191, 36, 0.1);
+            color: var(--text-gold);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        /* 进度条样式 */
+        .progress-item { margin-bottom: 8px; }
+        .progress-label { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 2px; }
+        .progress-track {
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8b5cf6, #d8b4fe);
+            box-shadow: 0 0 8px rgba(139, 92, 246, 0.6);
+            width: 85%;
+        }
+
+        /* Tarot Entry */
+        .tarot-card {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border-glow);
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
+        }
+        .tarot-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(139, 92, 246, 0.2), transparent);
+        }
+        .tarot-title { font-size: 18px; color: #fff; position: relative; z-index: 1; }
+        .tarot-sub { font-size: 12px; color: #cbd5e1; position: relative; z-index: 1; margin-top: 4px; }
+        .tarot-visual {
+            margin-top: 10px;
+            height: 80px;
+            background: url('https://upload.wikimedia.org/wikipedia/commons/9/90/RWS_Tarot_00_Fool.jpg') no-repeat center;
+            background-size: contain;
+            opacity: 0.8;
+            filter: grayscale(0.5) contrast(1.2);
+        }
+
+        /* Banner */
+        .banner {
+            height: 100px;
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .banner h3 { font-size: 24px; line-height: 1.1; margin: 0; color: #fff; z-index: 2; }
+        .banner span { color: var(--text-gold); }
+        .banner-glow {
+            position: absolute;
+            right: -20px;
+            width: 100px;
+            height: 100px;
+            background: var(--text-gold);
+            filter: blur(50px);
+            opacity: 0.3;
+        }
+
+        /* Quick Nav (Icons) */
+        .quick-nav {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .nav-icon-box {
+            width: 60px;
+            height: 60px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: all 0.3s;
+        }
+        .nav-item:hover .nav-icon-box {
+            background: rgba(251, 191, 36, 0.1);
+            border-color: var(--text-gold);
+            box-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        /* Bottom Bar */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 420px;
+            height: 70px;
+            background: #0f172a;
+            border-top: 1px solid #334155;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 200;
+            padding-bottom: 10px; /* Safe area */
+        }
+        .tab-icon { font-size: 20px; color: #64748b; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .tab-icon.active { color: #fff; text-shadow: 0 0 8px rgba(255,255,255,0.5); }
+        .tab-label { font-size: 10px; }
+        
+        /* Center Floating Button */
+        .plus-btn {
+            width: 64px;
+            height: 64px;
+            background: var(--text-gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: #000;
+            position: relative;
+            top: -25px;
+            border: 6px solid var(--bg-dark); /* 伪装镂空 */
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+        }
+
+        /* Animations */
+        @keyframes text-flicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+                text-shadow: 0 0 5px rgba(251, 191, 36, 0.6), 2px 2px 0px #000;
+                opacity: 1;
+            }
+            20%, 24%, 55% {
+                text-shadow: none;
+                opacity: 0.5;
+            }
+        }
+        @keyframes move-stars {
+            from {background-position:0 0;}
+            to {background-position:0 10000px;}
+        }
+
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="scanlines"></div>
+    <div class="vignette"></div>
+
+    <div class="mobile-container">
+        <header class="header">
+            <div class="logo-text">Magic Lightning</div>
+        </header>
+
+        <div class="glass-card user-card">
+            <div class="avatar">
+                <img src="https://api.dicebear.com/7.x/pixel-art/svg?seed=Felix" width="100%" height="100%" />
+            </div>
+            <div class="user-info">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <h2>白羊座</h2>
+                    <span class="tag">LV.9</span>
+                </div>
+                <p>2000-04-15 | 运势加载中...</p>
+            </div>
+            <div style="margin-left:auto; font-size:20px; color:#64748b;">⋮</div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="glass-card" style="margin:0;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                    <span style="font-weight:bold;">今日运势</span>
+                    <span style="color:var(--text-gold);">★★★★☆</span>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-label"><span>爱情</span><span>85%</span></div>
+                    <div class="progress-track"><div class="progress-fill" style="width:85%"></div></div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-label"><span>财运</span><span>92%</span></div>
+                    <div class="progress-track"><div class="progress-fill" style="width:92%"></div></div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-label"><span>事业</span><span>70%</span></div>
+                    <div class="progress-track"><div class="progress-fill" style="width:70%"></div></div>
+                </div>
+            </div>
+
+            <div class="glass-card tarot-card" style="margin:0;">
+                <div class="tarot-title">塔罗占卜</div>
+                <div class="tarot-sub">AI 深度解析</div>
+                <div class="tarot-visual"></div>
+            </div>
+        </div>
+
+        <div class="glass-card banner" style="margin-top:16px;">
+            <div>
+                <h3>占卜歌者<br><span>100% 灵魂传递</span></h3>
+            </div>
+            <div class="banner-glow"></div>
+            <img src="https://api.dicebear.com/7.x/pixel-art/svg?seed=Wizard" style="position:absolute; right:10px; height:80px; filter:drop-shadow(0 0 10px rgba(255,255,255,0.5));">
+        </div>
+
+        <div class="quick-nav">
+            <div class="nav-item">
+                <div class="nav-icon-box">🃏</div>
+                <span style="font-size:14px;">雷诺曼</span>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon-box">🎲</div>
+                <span style="font-size:14px;">骰子</span>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon-box">☯️</div>
+                <span style="font-size:14px;">风水</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-bar">
+        <div class="tab-icon active">
+            <span>⦿</span>
+            <span class="tab-label">首页</span>
+        </div>
+        <div class="tab-icon">
+            <span>✛</span>
+            <span class="tab-label">星盘</span>
+        </div>
+        <div class="plus-btn">+</div>
+        <div class="tab-icon">
+            <span>⛺</span>
+            <span class="tab-label">商店</span>
+        </div>
+        <div class="tab-icon">
+            <span>☺</span>
+            <span class="tab-label">我的</span>
+        </div>
+    </div>
+</body>
+</html>

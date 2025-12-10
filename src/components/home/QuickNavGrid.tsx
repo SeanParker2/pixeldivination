@@ -6,9 +6,9 @@ import { playSound } from '../../lib/audio';
 import { triggerHaptic } from '../../lib/haptics';
 
 const NAV_ITEMS = [
-  { id: 'rider', label: '雷诺曼牌', icon: '🃏' },
-  { id: 'dice', label: '星座骰子', icon: '🎲' },
-  { id: 'fengshui', label: '办公风水', icon: '☯️' },
+  { id: 'rider', label: '雷诺曼', icon: '🃏' },
+  { id: 'dice', label: '骰子', icon: '🎲' },
+  { id: 'fengshui', label: '风水', icon: '☯️' },
 ];
 
 export const QuickNavGrid: React.FC = () => {
@@ -32,17 +32,17 @@ export const QuickNavGrid: React.FC = () => {
 
   return (
     <>
-      <div className="grid grid-cols-3 gap-3 px-4 mt-6 pb-24">
+      <div className="quick-nav">
         {NAV_ITEMS.map((item) => (
           <div 
             key={item.id} 
+            className="nav-item"
             onClick={() => handleItemClick(item.id)}
-            className="flex flex-col items-center gap-2 group cursor-pointer"
           >
-            <div className="w-16 h-16 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center text-3xl transition-all duration-300 group-hover:border-pixel-gold group-hover:bg-pixel-gold/10 group-hover:shadow-[0_0_15px_rgba(251,191,36,0.3)]">
+            <div className="nav-icon-box">
               {item.icon}
             </div>
-            <span className="text-[#e2e8f0] text-sm font-sans">{item.label}</span>
+            <span style={{ fontSize: '14px' }}>{item.label}</span>
           </div>
         ))}
       </div>
