@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useDivinationStore, TAROT_DECK, SPREAD_CONFIGS } from '../../stores/useDivinationStore';
 import { playSound } from '../../lib/audio';
 import { triggerHaptic } from '../../lib/haptics';
-import type { TarotCard } from '../../stores/useDivinationStore';
+import type { TarotCard, SelectedTarotCard } from '../../stores/useDivinationStore';
 
 export const CardSpread: React.FC = () => {
   const { selectedCards, selectCard, setStep, selectedSpread } = useDivinationStore();

@@ -2,12 +2,31 @@ import { create } from 'zustand';
 import { divinationService, type SpreadType, type DrawnCard } from '../services/divinationService';
 import { useUserStore } from './useUserStore';
 
+// Card meanings for display (upright/reversed per area)
+interface CardMeaning {
+  keywords: string[];
+  meaning: string;
+  love: string;
+  career: string;
+  finance: string;
+  health: string;
+}
+
 export interface TarotCard {
   id: number;
   name: string;
   nameEn: string;
-  meaning: string;
+  meaning: string; // primary meaning for quick display
   image: string;
+  arcana: 'major' | 'minor';
+  suit?: string;
+  upright: CardMeaning;
+  reversed: CardMeaning;
+}
+
+export interface SelectedTarotCard extends TarotCard {
+  orientation: '正位' | '逆位';
+  position?: string;
 }
 
 export interface SpreadConfig {
@@ -27,76 +46,64 @@ export const SPREAD_CONFIGS: SpreadConfig[] = [
   { id: 'monthly', name: '月相牌阵', count: 5, description: '每月运势', positions: ['月初', '月中', '月末', '挑战', '收获'] },
 ];
 
-// Helper arrays
-const SUITS = ['wands', 'cups', 'swords', 'coins'];
-const RANKS = ['ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'page', 'knight', 'queen', 'king'];
-const SUIT_NAMES: Record<string, string> = { wands: '权杖', cups: '圣杯', swords: '宝剑', coins: '星币' };
+// Generate image path from card nameEn
+const getImagePath = (nameEn: string, arcana: string): string => {
+  if (arcana === 'major') {
+    // Map major arcana names to file names
+    const majorFiles: Record<string, string> = {
+      'The Fool': 'the_fool', 'The Magician': 'the_magician', 'The High Priestess': 'the_priestess',
+      'The Empress': 'the_empress', 'The Emperor': 'the_emperor', 'The Hierophant': 'the_hierophant',
+      'The Lovers': 'the_lovers', 'The Chariot': 'the_chariot', 'Strength': 'strength',
+      'The Hermit': 'the_hermit', 'Wheel of Fortune': 'wheel_of_fortune', 'Justice': 'justice',
+      'The Hanged Man': 'the_hanged_man', 'Death': 'death', 'Temperance': 'temperance',
+      'The Devil': 'the_devil', 'The Tower': 'the_tower', 'The Star': 'the_star',
+      'The Moon': 'the_moon', 'The Sun': 'the_sun', 'Judgement': 'judgement', 'The World': 'the_universe',
+    };
+    return `/images/tarot/${majorFiles[nameEn] || 'back'}.webp`;
+  }
+  // Minor arcana: "2 of Wands" -> "2_of_wands.webp"
+  const parts = nameEn.toLowerCase().replace(' of ', '_of_');
+  return `/images/tarot/${parts}.webp`;
+};
 
-// Major Arcana Mapping
-const MAJOR_ARCANA = [
-  { id: 0, name: '愚者', nameEn: 'The Fool', file: 'the_fool.webp', meaning: '新的开始，冒险' },
-  { id: 1, name: '魔术师', nameEn: 'The Magician', file: 'the_magician.webp', meaning: '创造力，显化' },
-  { id: 2, name: '女祭司', nameEn: 'The High Priestess', file: 'the_priestess.webp', meaning: '直觉，潜意识' },
-  { id: 3, name: '女皇', nameEn: 'The Empress', file: 'the_empress.webp', meaning: '丰饶，自然' },
-  { id: 4, name: '皇帝', nameEn: 'The Emperor', file: 'the_emperor.webp', meaning: '权威，结构' },
-  { id: 5, name: '教皇', nameEn: 'The Hierophant', file: 'the_hierophant.webp', meaning: '传统，指引' },
-  { id: 6, name: '恋人', nameEn: 'The Lovers', file: 'the_lovers.webp', meaning: '爱，选择' },
-  { id: 7, name: '战车', nameEn: 'The Chariot', file: 'the_chariot.webp', meaning: '意志，胜利' },
-  { id: 8, name: '力量', nameEn: 'Strength', file: 'strength.webp', meaning: '勇气，耐心' },
-  { id: 9, name: '隐士', nameEn: 'The Hermit', file: 'the_hermit.webp', meaning: '内省，孤独' },
-  { id: 10, name: '命运之轮', nameEn: 'Wheel of Fortune', file: 'wheel_of_fortune.webp', meaning: '周期，命运' },
-  { id: 11, name: '正义', nameEn: 'Justice', file: 'justice.webp', meaning: '公平，真理' },
-  { id: 12, name: '倒吊人', nameEn: 'The Hanged Man', file: 'the_hanged_man.webp', meaning: '牺牲，新视角' },
-  { id: 13, name: '死神', nameEn: 'Death', file: 'death.webp', meaning: '结束，重生' },
-  { id: 14, name: '节制', nameEn: 'Temperance', file: 'temperance.webp', meaning: '平衡，适度' },
-  { id: 15, name: '恶魔', nameEn: 'The Devil', file: 'the_devil.webp', meaning: '束缚，欲望' },
-  { id: 16, name: '高塔', nameEn: 'The Tower', file: 'the_tower.webp', meaning: '突变，启示' },
-  { id: 17, name: '星星', nameEn: 'The Star', file: 'the_star.webp', meaning: '希望，灵感' },
-  { id: 18, name: '月亮', nameEn: 'The Moon', file: 'the_moon.webp', meaning: '幻觉，潜意识' },
-  { id: 19, name: '太阳', nameEn: 'The Sun', file: 'the_sun.webp', meaning: '快乐，成功' },
-  { id: 20, name: '审判', nameEn: 'Judgement', file: 'judgement.webp', meaning: '觉醒，号召' },
-  { id: 21, name: '世界', nameEn: 'The World', file: 'the_universe.webp', meaning: '完成，整合' },
-];
+// Default meaning for cards without detailed data
+const DEFAULT_MEANING: CardMeaning = {
+  keywords: ['指引', '启示'],
+  meaning: '请关注这张牌带给你的信息。',
+  love: '感情方面有重要的信息。',
+  career: '事业方面值得关注。',
+  finance: '财务方面需要留意。',
+  health: '健康方面保持关注。',
+};
 
-const generateDeck = () => {
-  const deck: TarotCard[] = [];
-  
-  // Majors
-  MAJOR_ARCANA.forEach(c => {
-    deck.push({
-      id: c.id,
-      name: c.name,
-      nameEn: c.nameEn,
-      meaning: c.meaning,
-      image: `/images/tarot/${c.file}`
-    });
-  });
-
-  // Minors
-  let idCounter = 22;
-  SUITS.forEach(suit => {
-    RANKS.forEach(rank => {
-      deck.push({
-        id: idCounter++,
-        name: `${SUIT_NAMES[suit]} ${rank}`,
-        nameEn: `${rank} of ${suit}`,
-        meaning: '小阿卡纳指引',
-        image: `/images/tarot/${rank}_of_${suit}.webp`
-      });
-    });
-  });
+// Build full deck from shared package data at runtime
+const buildFullDeck = (): TarotCard[] => {
+  // We import the shared data statically via the import below
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const shared = require('../../../packages/shared/data/tarot-deck');
+  const deck: TarotCard[] = shared.TAROT_DECK.map((card: { id: number; name: string; nameEn: string; arcana: 'major' | 'minor'; suit?: string; upright?: CardMeaning; reversed?: CardMeaning }) => ({
+    id: card.id,
+    name: card.name,
+    nameEn: card.nameEn,
+    meaning: card.upright?.keywords?.join('、') || '指引',
+    image: getImagePath(card.nameEn, card.arcana),
+    arcana: card.arcana,
+    suit: card.suit,
+    upright: card.upright || DEFAULT_MEANING,
+    reversed: card.reversed || DEFAULT_MEANING,
+  }));
   return deck;
 };
 
-export const TAROT_DECK = generateDeck();
+export const TAROT_DECK: TarotCard[] = buildFullDeck();
 
 interface DivinationState {
   step: 'intro' | 'shuffle' | 'draw' | 'reading';
   selectedSpread: SpreadType;
-  selectedCards: TarotCard[];
+  selectedCards: SelectedTarotCard[];
   drawnCards: DrawnCard[];
   isShuffling: boolean;
-  
+
   // AI State
   readingResult: string | null;
   spreadName: string | null;
@@ -123,7 +130,7 @@ export const useDivinationStore = create<DivinationState>((set, get) => ({
   error: null,
 
   setStep: (step) => set({ step }),
-  
+
   setSpread: (spread) => set({ selectedSpread: spread }),
 
   startDivination: () => {
@@ -137,11 +144,22 @@ export const useDivinationStore = create<DivinationState>((set, get) => ({
     const { selectedCards, selectedSpread } = get();
     const spreadConfig = SPREAD_CONFIGS.find(s => s.id === selectedSpread);
     const maxCards = spreadConfig?.count || 3;
-    
+
     if (selectedCards.length < maxCards) {
-      const newSelection = [...selectedCards, card];
+      // Randomly assign orientation (正位/逆位)
+      const isReversed = Math.random() > 0.5;
+      const orientation = isReversed ? '逆位' : '正位';
+      const position = spreadConfig?.positions[selectedCards.length] || `位置${selectedCards.length + 1}`;
+
+      const selectedCard: SelectedTarotCard = {
+        ...card,
+        orientation,
+        position,
+      };
+
+      const newSelection = [...selectedCards, selectedCard];
       set({ selectedCards: newSelection });
-      
+
       if (newSelection.length === maxCards) {
         setTimeout(() => {
           set({ step: 'reading' });
@@ -151,18 +169,18 @@ export const useDivinationStore = create<DivinationState>((set, get) => ({
   },
 
   resetDivination: () => {
-    set({ 
-      step: 'intro', 
-      selectedCards: [], 
+    set({
+      step: 'intro',
+      selectedCards: [],
       drawnCards: [],
       readingResult: null,
       spreadName: null,
-      error: null 
+      error: null,
     });
   },
 
   generateReading: async (question) => {
-    const { selectedSpread } = get();
+    const { selectedCards, selectedSpread } = get();
 
     set({ isLoadingAI: true, error: null });
 
@@ -174,9 +192,25 @@ export const useDivinationStore = create<DivinationState>((set, get) => ({
         persona: activePersona,
       });
 
+      // Merge backend drawnCards with frontend card data for rich display
+      const enrichedCards = result.cards?.map((dc: DrawnCard, i: number) => {
+        const frontendCard = selectedCards[i];
+        return {
+          ...dc,
+          cardName: dc.cardName || frontendCard?.name,
+          cardNameEn: dc.cardNameEn || frontendCard?.nameEn,
+          orientation: dc.orientation || frontendCard?.orientation,
+          position: dc.position || frontendCard?.position,
+          keywords: dc.keywords || (frontendCard?.orientation === '逆位' ? frontendCard?.reversed?.keywords : frontendCard?.upright?.keywords),
+          meaning: dc.meaning || (frontendCard?.orientation === '逆位' ? frontendCard?.reversed?.meaning : frontendCard?.upright?.meaning),
+          love: dc.love || (frontendCard?.orientation === '逆位' ? frontendCard?.reversed?.love : frontendCard?.upright?.love),
+          career: dc.career || (frontendCard?.orientation === '逆位' ? frontendCard?.reversed?.career : frontendCard?.upright?.career),
+        };
+      }) || [];
+
       set({
         readingResult: result.reading,
-        drawnCards: result.cards as DrawnCard[] || [],
+        drawnCards: enrichedCards,
         spreadName: result.spreadName || null,
       });
     } catch (err: unknown) {
@@ -189,5 +223,5 @@ export const useDivinationStore = create<DivinationState>((set, get) => ({
     } finally {
       set({ isLoadingAI: false });
     }
-  }
+  },
 }));

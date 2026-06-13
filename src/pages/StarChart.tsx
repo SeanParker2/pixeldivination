@@ -10,6 +10,7 @@ import { PartnerInputForm, type PartnerData } from '../components/starchart/Part
 import { useUserStore } from '../stores/useUserStore';
 import { calculateChart, getLatLong } from '../lib/astrology';
 import { chartService } from '../services/chartService';
+import { fetchTransitReading, fetchSkyReading } from '../services/aiService';
 import { useHistoryStore } from '../stores/useHistoryStore';
 import { ShareCard } from '../components/share/ShareCard';
 
@@ -18,6 +19,11 @@ export const StarChart: React.FC = () => {
   const [activeTab, setActiveTab] = useState("本命盘");
   const [report, setReport] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [chartData, setChartData] = useState<{
+    planets: { name: string; symbol: string; longitude: number }[];
+    ascendant: number;
+    midheaven: number;
+  } | null>(null);
   
   const [partnerData, setPartnerData] = useState<PartnerData | null>(null);
   const [showPartnerModal, setShowPartnerModal] = useState(false);
@@ -26,16 +32,33 @@ export const StarChart: React.FC = () => {
   const [shareImage, setShareImage] = useState<string | null>(null);
   const shareCardRef = useRef<HTMLDivElement>(null);
 
-  // Load cached report
+  // Load cached report and compute chart data
   useEffect(() => {
     if (activeTab === "本命盘") {
         const cached = localStorage.getItem('natal_chart_report');
         if (cached) setReport(cached);
         else setReport(null);
     } else {
-        setReport(null); 
+        setReport(null);
     }
-  }, [activeTab]);
+
+    // Compute chart data for info panel
+    if (profile.birthDate) {
+      try {
+        const city = typeof profile.birthLocation === 'string'
+          ? profile.birthLocation
+          : profile.birthLocation?.city || '北京';
+        const coords = getLatLong(city);
+        const date = activeTab === '行运盘' || activeTab === '天象盘'
+          ? new Date()
+          : new Date(profile.birthDate);
+        const data = calculateChart(date, coords);
+        setChartData(data);
+      } catch (e) {
+        console.error('Chart calculation failed:', e);
+      }
+    }
+  }, [activeTab, profile.birthDate, profile.birthLocation]);
 
   const handleShare = async () => {
     if (!shareCardRef.current) return;
@@ -59,8 +82,23 @@ export const StarChart: React.FC = () => {
     }
   };
 
-  const handleDownload = () => {
-      alert('图片保存功能即将上线');
+  const handleDownload = async () => {
+    if (!shareCardRef.current) return;
+    try {
+      const html2canvas = (await import('html2canvas')).default;
+      const canvas = await html2canvas(shareCardRef.current, {
+        backgroundColor: '#18181b',
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+      });
+      const link = document.createElement('a');
+      link.download = `pixel-starchart-${new Date().getTime()}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch (error) {
+      console.error('Failed to download:', error);
+    }
   };
 
   const handleMainAction = async () => {
@@ -89,9 +127,14 @@ export const StarChart: React.FC = () => {
         : profile.birthLocation.city || '北京'; 
       const coords = getLatLong(city);
 
+      // Extract birth time from profile (birthDate is ISO string like '2000-04-15T14:30:00')
+      const birthTimeStr = profile.birthDate.includes('T')
+        ? profile.birthDate.split('T')[1].slice(0, 5)
+        : '12:00';
+
       const chart = await chartService.createNatal({
         birthDate: profile.birthDate,
-        birthTime: '12:00',
+        birthTime: birthTimeStr,
         birthCity: city,
         birthLat: coords.lat,
         birthLng: coords.lng,
@@ -130,9 +173,13 @@ export const StarChart: React.FC = () => {
 
           const partnerCoords = getLatLong(data.birthCity);
 
+          const userBirthTime = profile.birthDate!.includes('T')
+            ? profile.birthDate!.split('T')[1].slice(0, 5)
+            : '12:00';
+
           const chart = await chartService.createSynastry({
             birthDateA: profile.birthDate!,
-            birthTimeA: '12:00',
+            birthTimeA: userBirthTime,
             birthCityA: userCity,
             birthLatA: userCoords.lat,
             birthLngA: userCoords.lng,
@@ -275,7 +322,12 @@ export const StarChart: React.FC = () => {
       <div className="space-y-6">
         
         {/* Info Panel */}
-        <ChartInfoPanel />
+        <ChartInfoPanel
+          planets={chartData?.planets}
+          ascendant={chartData?.ascendant}
+          midheaven={chartData?.midheaven}
+          activeTab={activeTab}
+        />
 
                 {/* Visualizer */}
                 <div className="flex-1 flex items-center justify-center my-4 relative">

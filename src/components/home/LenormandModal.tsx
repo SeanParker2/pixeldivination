@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Shuffle, Sparkles } from 'lucide-react';
+import { X, Shuffle, Sparkles, Loader2, AlertCircle } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import { LENORMAND_DECK, type LenormandCardData } from '../../data/lenormand';
 import { LenormandCard } from './LenormandCard';
 import { useHistoryStore } from '../../stores/useHistoryStore';
+import { divinationService } from '../../services/divinationService';
+import { useUserStore } from '../../stores/useUserStore';
 
 interface LenormandModalProps {
   isOpen: boolean;
@@ -11,50 +14,62 @@ interface LenormandModalProps {
 }
 
 export const LenormandModal: React.FC<LenormandModalProps> = ({ isOpen, onClose }) => {
-  const [step, setStep] = useState<'start' | 'shuffling' | 'result'>('start');
+  const [step, setStep] = useState<'start' | 'shuffling' | 'loading' | 'result'>('start');
   const [drawnCards, setDrawnCards] = useState<LenormandCardData[]>([]);
+  const [reading, setReading] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const activePersona = useUserStore(s => s.activePersona);
 
   // Reset on open
   useEffect(() => {
     if (isOpen) {
-      // Use setTimeout to avoid synchronous setState warning
       const timer = setTimeout(() => {
         setStep('start');
         setDrawnCards([]);
+        setReading(null);
+        setError(null);
       }, 0);
       return () => clearTimeout(timer);
     }
   }, [isOpen]);
 
-  // Interpretation generation (Mock)
-  const getInterpretation = (cards: LenormandCardData[]) => {
-    if (cards.length < 2) return "";
-    const c1 = cards[0];
-    const c2 = cards[1];
-    return `核心议题是关于【${c1.name}】（${c1.keywords[0]}），建议你采取【${c2.name}】（${c2.keywords[1]}）的态度。${c1.meaning.split('，')[0]}，而${c2.meaning}`;
-  };
-
   const handleShuffle = () => {
     setStep('shuffling');
-    // Simulate shuffle delay
     setTimeout(() => {
       // Draw 2 unique cards
       const shuffled = [...LENORMAND_DECK].sort(() => 0.5 - Math.random());
       const cards = [shuffled[0], shuffled[1]];
       setDrawnCards(cards);
+      setStep('loading');
+      fetchReading(cards);
+    }, 1500);
+  };
+
+  const fetchReading = async (cards: LenormandCardData[]) => {
+    try {
+      const cardNames = cards.map(c => c.name);
+      const res = await divinationService.drawLenormand({
+        question: '请解读今日雷诺曼牌阵',
+        spreadType: 'three_card',
+        persona: activePersona,
+      });
+      setReading(res.reading);
       setStep('result');
-      
-      // Save to history
-      const interpretation = getInterpretation(cards);
+
       useHistoryStore.getState().addEntry({
         type: 'lenormand',
         summary: '今日雷诺曼指引',
-        details: {
-          result: interpretation,
-          cards
-        }
+        details: { result: res.reading, cards },
       });
-    }, 1500);
+    } catch (err: unknown) {
+      const axiosError = err as { isRateLimit?: boolean; userMessage?: string };
+      // Fallback to local interpretation if AI fails
+      const c1 = cards[0];
+      const c2 = cards[1];
+      const fallback = `**${c1.name}**（${c1.keywords.join('、')}）与 **${c2.name}**（${c2.keywords.join('、')}）\n\n${c1.meaning}，而${c2.meaning}`;
+      setReading(fallback);
+      setStep('result');
+    }
   };
 
   return (
@@ -121,19 +136,41 @@ export const LenormandModal: React.FC<LenormandModalProps> = ({ isOpen, onClose 
                  </div>
              )}
 
-             {step === 'result' && (
+             {step === 'loading' && (
                  <div className="w-full h-full flex flex-col flex-1">
                      <h3 className="text-center text-white font-pixel mb-6 mt-2">今日指引</h3>
-                     
                      <div className="flex gap-4 justify-center mb-6">
-                         {/* Card 1 */}
                          <div className="flex flex-col items-center gap-2">
                              <span className="text-xs text-gray-400 font-mono">THEME</span>
                              <div className="w-28">
                                 <LenormandCard card={drawnCards[0]} isFlipped={true} />
                              </div>
                          </div>
-                         {/* Card 2 */}
+                         <div className="flex flex-col items-center gap-2">
+                             <span className="text-xs text-gray-400 font-mono">ADVICE</span>
+                             <div className="w-28">
+                                <LenormandCard card={drawnCards[1]} isFlipped={true} />
+                             </div>
+                         </div>
+                     </div>
+                     <div className="flex-1 flex flex-col items-center justify-center gap-3">
+                         <Loader2 className="animate-spin text-pixel-gold" size={28} />
+                         <p className="text-sm text-gray-400 animate-pulse">AI 解读中...</p>
+                     </div>
+                 </div>
+             )}
+
+             {step === 'result' && (
+                 <div className="w-full h-full flex flex-col flex-1">
+                     <h3 className="text-center text-white font-pixel mb-6 mt-2">今日指引</h3>
+
+                     <div className="flex gap-4 justify-center mb-6">
+                         <div className="flex flex-col items-center gap-2">
+                             <span className="text-xs text-gray-400 font-mono">THEME</span>
+                             <div className="w-28">
+                                <LenormandCard card={drawnCards[0]} isFlipped={true} />
+                             </div>
+                         </div>
                          <div className="flex flex-col items-center gap-2">
                              <span className="text-xs text-gray-400 font-mono">ADVICE</span>
                              <div className="w-28">
@@ -143,13 +180,13 @@ export const LenormandModal: React.FC<LenormandModalProps> = ({ isOpen, onClose 
                      </div>
 
                      <div className="bg-white/5 rounded-xl p-4 border border-white/5 flex-1 overflow-y-auto">
-                        <p className="text-white/90 text-sm leading-relaxed font-serif">
-                            {getInterpretation(drawnCards)}
-                        </p>
+                        <div className="prose prose-invert prose-sm max-w-none text-gray-200 leading-relaxed">
+                            <ReactMarkdown>{reading || '解读生成中...'}</ReactMarkdown>
+                        </div>
                      </div>
-                     
-                     <button 
-                        onClick={() => setStep('start')} 
+
+                     <button
+                        onClick={() => setStep('start')}
                         className="mt-4 text-xs text-gray-500 hover:text-white underline text-center"
                      >
                         重新抽取

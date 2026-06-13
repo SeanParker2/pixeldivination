@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { Loader2, Share2, X, Download, RotateCcw, AlertCircle, Sparkles } from 'lucide-react';
 import html2canvas from 'html2canvas';
-import { useDivinationStore, SPREAD_CONFIGS } from '../../stores/useDivinationStore';
+import { useDivinationStore, SPREAD_CONFIGS, type SelectedTarotCard } from '../../stores/useDivinationStore';
 import { useHistoryStore } from '../../stores/useHistoryStore';
 import { useUserStore } from '../../stores/useUserStore';
 import { playSound } from '../../lib/audio';
@@ -107,8 +107,10 @@ export const ReadingView: React.FC = () => {
       {/* Cards Display */}
       <div className="w-full max-w-md space-y-4 flex-shrink-0">
         {selectedCards.map((card, index) => {
-          const position = getPositionLabel(index);
-          
+          const position = card.position || getPositionLabel(index);
+          const isReversed = card.orientation === '逆位';
+          const cardMeaning = isReversed ? card.reversed : card.upright;
+
           return (
             <motion.div
               key={card.id}
@@ -120,21 +122,24 @@ export const ReadingView: React.FC = () => {
               {/* Position Label */}
               <div className="flex flex-col items-center justify-center w-16 flex-shrink-0">
                 <span className="text-[10px] text-pixel-gold font-medium">{position}</span>
+                <span className={`text-[9px] mt-1 px-1.5 py-0.5 rounded ${isReversed ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
+                  {card.orientation}
+                </span>
               </div>
 
               {/* Card Visual */}
               <motion.div
                 initial={{ rotateY: 180 }}
-                animate={{ rotateY: 0 }}
+                animate={{ rotateY: isReversed ? 180 : 0 }}
                 transition={{ delay: index * 0.3 + 0.2, duration: 0.6 }}
                 onAnimationStart={() => playSound('flip')}
                 className="w-20 h-32 flex-shrink-0 rounded-lg shadow-lg overflow-hidden border border-pixel-gold/50"
                 style={{ backfaceVisibility: 'hidden' }}
               >
-                <img 
-                  src={card.image} 
-                  alt={card.name} 
-                  className="w-full h-full object-cover"
+                <img
+                  src={card.image}
+                  alt={card.name}
+                  className={`w-full h-full object-cover ${isReversed ? 'rotate-180' : ''}`}
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = '/images/tarot/back.webp';
                   }}
@@ -150,7 +155,14 @@ export const ReadingView: React.FC = () => {
               >
                 <h3 className="text-lg text-pixel-gold font-bold neon-text-gold truncate">{card.nameEn}</h3>
                 <p className="text-white text-sm">{card.name}</p>
-                <p className="text-gray-400 text-xs mt-1 line-clamp-2">{card.meaning}</p>
+                <p className="text-gray-400 text-xs mt-1 line-clamp-2">{cardMeaning?.meaning || card.meaning}</p>
+                {cardMeaning?.keywords && (
+                  <div className="flex flex-wrap gap-1 mt-1.5">
+                    {cardMeaning.keywords.slice(0, 3).map((kw, i) => (
+                      <span key={i} className="text-[9px] px-1.5 py-0.5 rounded bg-white/5 text-gray-500">{kw}</span>
+                    ))}
+                  </div>
+                )}
               </motion.div>
             </motion.div>
           );
