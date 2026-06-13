@@ -10,7 +10,7 @@ import { PartnerInputForm, type PartnerData } from '../components/starchart/Part
 import { useUserStore } from '../stores/useUserStore';
 import { calculateChart, getLatLong } from '../lib/astrology';
 import { chartService } from '../services/chartService';
-import { generateNatalInterpretation, generateTransitInterpretation, generateSkyInterpretation } from '../lib/chartInterpreter';
+import { generateNatalInterpretation, generateTransitInterpretation, generateSkyInterpretation, generateSynastryInterpretation } from '../lib/chartInterpreter';
 import { useHistoryStore } from '../stores/useHistoryStore';
 import { ShareCard } from '../components/share/ShareCard';
 
@@ -192,13 +192,24 @@ export const StarChart: React.FC = () => {
       setPartnerData(data);
       setShowPartnerModal(false);
       setIsAnalyzing(true);
-      
+
       try {
           const userCity = typeof profile.birthLocation === 'string' ? profile.birthLocation : profile.birthLocation.city || '北京';
           const userCoords = getLatLong(userCity);
-
           const partnerCoords = getLatLong(data.birthCity);
 
+          // 先生成客户端静态解读
+          const userBirthDate = new Date(profile.birthDate!);
+          const partnerBirthDate = new Date(data.birthDate);
+          const natalA = calculateChart(userBirthDate, userCoords);
+          const natalB = calculateChart(partnerBirthDate, partnerCoords);
+
+          const userName = profile.nickname || '我';
+          const staticReading = generateSynastryInterpretation(natalA.planets, natalB.planets, userName, data.name);
+          setReport(staticReading);
+          setHasAiReading(false);
+
+          // 后台保存到后端
           const userBirthTime = profile.birthDate!.includes('T')
             ? profile.birthDate!.split('T')[1].slice(0, 5)
             : '12:00';
@@ -218,14 +229,13 @@ export const StarChart: React.FC = () => {
             name: `与${data.name}的合盘`,
           });
 
-          const result = await chartService.generateReading(chart.id, activePersona);
-          setReport(result);
-          
+          localStorage.setItem('synastry_chart_id', chart.id);
+
           useHistoryStore.getState().addEntry({
               type: 'synastry',
               summary: `与 ${data.name} 的合盘分析`,
               details: {
-                  result,
+                  result: staticReading,
                   chartId: chart.id,
               }
           });

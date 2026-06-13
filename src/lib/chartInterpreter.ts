@@ -116,6 +116,105 @@ export function generateNatalInterpretation(planets: PlanetPosition[]): string {
 }
 
 /**
+ * 生成合盘静态解读
+ */
+export function generateSynastryInterpretation(
+  planetsA: PlanetPosition[],
+  planetsB: PlanetPosition[],
+  nameA: string = '你',
+  nameB: string = '对方'
+): string {
+  let reading = `# 合盘解读：${nameA} × ${nameB}\n\n`;
+
+  const sunA = planetsA.find(p => p.name === '太阳');
+  const sunB = planetsB.find(p => p.name === '太阳');
+  const moonA = planetsA.find(p => p.name === '月亮');
+  const moonB = planetsB.find(p => p.name === '月亮');
+  const venusA = planetsA.find(p => p.name === '金星');
+  const venusB = planetsB.find(p => p.name === '金星');
+  const marsA = planetsA.find(p => p.name === '火星');
+  const marsB = planetsB.find(p => p.name === '火星');
+
+  // 太阳配对分析
+  reading += `## ☀️ 核心配对\n\n`;
+  if (sunA && sunB) {
+    const signA = getZodiacFromLongitude(sunA.longitude);
+    const signB = getZodiacFromLongitude(sunB.longitude);
+    const elementA = getSignElement(signA);
+    const elementB = getSignElement(signB);
+
+    reading += `**${nameA}**：太阳${signA}（${elementA}）\n`;
+    reading += `**${nameB}**：太阳${signB}（${elementB}）\n\n`;
+
+    if (elementA === elementB) {
+      reading += `你们同属${elementA}元素，有着相似的能量频率。这是一段天然和谐的关系，彼此容易理解对方的需求和动机。\n\n`;
+    } else if (
+      (elementA === '火' && elementB === '风') ||
+      (elementA === '风' && elementB === '火') ||
+      (elementA === '土' && elementB === '水') ||
+      (elementA === '水' && elementB === '土')
+    ) {
+      reading += `${elementA}与${elementB}是互补的元素组合。你们的能量相互滋养，能够激发彼此最好的一面。\n\n`;
+    } else if (
+      (elementA === '火' && elementB === '水') ||
+      (elementA === '水' && elementB === '火') ||
+      (elementA === '土' && elementB === '风') ||
+      (elementA === '风' && elementB === '土')
+    ) {
+      reading += `${elementA}与${elementB}是挑战性的元素组合。这种差异可能带来摩擦，但也是成长的机会。学会欣赏彼此的不同是关键。\n\n`;
+    } else {
+      reading += `${elementA}与${elementB}的组合有着独特的化学反应。你们的关系充满了探索和发现的乐趣。\n\n`;
+    }
+  }
+
+  // 月亮配对分析
+  reading += `## 🌙 情感配对\n\n`;
+  if (moonA && moonB) {
+    const signA = getZodiacFromLongitude(moonA.longitude);
+    const signB = getZodiacFromLongitude(moonB.longitude);
+
+    reading += `**${nameA}的月亮在${signA}**，**${nameB}的月亮在${signB}**\n\n`;
+
+    const diff = Math.abs(moonA.longitude - moonB.longitude);
+    if (diff < 10 || diff > 350) {
+      reading += `月亮合相：你们在情感层面有着天然的默契，能够深刻理解彼此的情绪和需求。\n\n`;
+    } else if (diff > 80 && diff < 100) {
+      reading += `月亮四分：你们的情感表达方式可能不同，需要更多的沟通和理解。\n\n`;
+    } else if (diff > 170 && diff < 190) {
+      reading += `月亮对冲：你们的情感需求可能相反，但这也能形成互补。学会平衡是关键。\n\n`;
+    } else {
+      reading += `你们的情感频率有着独特的互动模式，需要在相处中逐渐磨合。\n\n`;
+    }
+  }
+
+  // 金星-火星配对（吸引力分析）
+  reading += `## 💕 吸引力分析\n\n`;
+  if (venusA && marsB) {
+    const diff = Math.abs(venusA.longitude - marsB.longitude);
+    if (diff < 10 || diff > 350) {
+      reading += `${nameA}的金星与${nameB}的火星合相：强烈的吸引力！你们之间有着天然的化学反应。\n\n`;
+    } else if (diff > 55 && diff < 65) {
+      reading += `${nameA}的金星与${nameB}的火星六合：和谐的吸引力，相处自然舒适。\n\n`;
+    } else if (diff > 115 && diff < 125) {
+      reading += `${nameA}的金星与${nameB}的火星三合：充满激情的吸引力，彼此欣赏。\n\n`;
+    }
+  }
+  if (venusB && marsA) {
+    const diff = Math.abs(venusB.longitude - marsA.longitude);
+    if (diff < 10 || diff > 350) {
+      reading += `${nameB}的金星与${nameA}的火星合相：${nameB}对${nameA}有着强烈的吸引力。\n\n`;
+    }
+  }
+
+  // 综合建议
+  reading += `## 💫 综合建议\n\n`;
+  reading += `合盘分析揭示了你们之间的能量互动模式。记住，星盘只是指引，真正的关系需要双方共同经营。\n\n`;
+  reading += `> 💡 如需更深入的合盘分析，可以使用 AI 深度解读功能。`;
+
+  return reading;
+}
+
+/**
  * 生成行运盘静态解读
  */
 export function generateTransitInterpretation(natalPlanets: PlanetPosition[], transitPlanets: PlanetPosition[]): string {
