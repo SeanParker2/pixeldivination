@@ -1,0 +1,145 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  phone         String?   @unique
+  email         String?   @unique
+  nickname      String
+  avatarUrl     String?   @map("avatar_url")
+  gender        String?
+  birthDate     String?   @map("birth_date")
+  birthTime     String?   @map("birth_time")
+  birthCity     String?   @map("birth_city")
+  birthLat      Float?    @map("birth_lat")
+  birthLng      Float?    @map("birth_lng")
+  zodiacSign    String?   @map("zodiac_sign")
+  kuaNumber     Int?      @map("kua_number")
+  timezone      String    @default("Asia/Shanghai")
+  isPremium     Boolean   @default(false) @map("is_premium")
+  premiumUntil  String?   @map("premium_until")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  charts        Chart[]
+  divinations   Divination[]
+  fortunes      Fortune[]
+  subscriptions Subscription[]
+  orders        Order[]
+
+  @@map("users")
+}
+
+model Chart {
+  id                String    @id @default(uuid())
+  userId            String    @map("user_id")
+  name              String?
+  chartType         String    @map("chart_type")
+  birthDate         String    @map("birth_date")
+  birthTime         String?   @map("birth_time")
+  birthCity         String?   @map("birth_city")
+  birthLat          Float?    @map("birth_lat")
+  birthLng          Float?    @map("birth_lng")
+  partnerBirthDate  String?   @map("partner_birth_date")
+  partnerBirthTime  String?   @map("partner_birth_time")
+  partnerBirthCity  String?   @map("partner_birth_city")
+  planets           String    @map("planets")
+  houses            String    @map("houses")
+  aspects           String    @map("aspects")
+  ascendant         Float?    @map("ascendant")
+  midheaven         Float?    @map("midheaven")
+  aiReading         String?   @map("ai_reading")
+  aiReadingAt       String?   @map("ai_reading_at")
+  isPublic          Boolean   @default(false) @map("is_public")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([chartType])
+  @@map("charts")
+}
+
+model Divination {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  divType     String   @map("div_type")
+  deckType    String?  @map("deck_type")
+  spreadType  String?  @map("spread_type")
+  cards       String?
+  baziData    String?  @map("bazi_data")
+  question    String?
+  aiReading   String?  @map("ai_reading")
+  aiPersona   String?  @map("ai_persona")
+  isFree      Boolean  @default(true) @map("is_free")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([divType])
+  @@index([createdAt])
+  @@map("divinations")
+}
+
+model Fortune {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  zodiacSign  String   @map("zodiac_sign")
+  fortuneDate DateTime @map("fortune_date")
+  fortuneType String   @default("daily") @map("fortune_type")
+  scores      String   @map("scores")
+  texts       String   @map("texts")
+  aiPersona   String?  @map("ai_persona")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, fortuneDate, fortuneType])
+  @@index([userId, fortuneDate])
+  @@map("fortunes")
+}
+
+model Subscription {
+  id             String   @id @default(uuid())
+  userId         String   @map("user_id")
+  planType       String   @map("plan_type")
+  status         String   @default("active")
+  startDate      DateTime @map("start_date")
+  endDate        DateTime @map("end_date")
+  paymentId      String?  @map("payment_id")
+  paymentAmount  Float?   @map("payment_amount")
+  paymentMethod  String?  @map("payment_method")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@map("subscriptions")
+}
+
+model Order {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  orderType     String    @map("order_type")
+  productId     String?   @map("product_id")
+  productName   String?   @map("product_name")
+  amount        Float     @map("amount")
+  status        String    @default("pending")
+  paymentId     String?   @map("payment_id")
+  paymentMethod String?   @map("payment_method")
+  paidAt        String?   @map("paid_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("orders")
+}
