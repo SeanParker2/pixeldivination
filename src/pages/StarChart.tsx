@@ -11,6 +11,7 @@ import { useUserStore } from '../stores/useUserStore';
 import { calculateChart, getLatLong } from '../lib/astrology';
 import { chartService } from '../services/chartService';
 import { fetchTransitReading, fetchSkyReading } from '../services/aiService';
+import { generateNatalInterpretation, generateSkyInterpretation } from '../lib/chartInterpreter';
 import { useHistoryStore } from '../stores/useHistoryStore';
 import { ShareCard } from '../components/share/ShareCard';
 
@@ -19,6 +20,7 @@ export const StarChart: React.FC = () => {
   const [activeTab, setActiveTab] = useState("本命盘");
   const [report, setReport] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [hasAiReading, setHasAiReading] = useState(false);
   const [chartData, setChartData] = useState<{
     planets: { name: string; symbol: string; longitude: number }[];
     ascendant: number;
@@ -122,16 +124,23 @@ export const StarChart: React.FC = () => {
     setIsAnalyzing(true);
 
     try {
-      const city = typeof profile.birthLocation === 'string' 
-        ? profile.birthLocation 
-        : profile.birthLocation.city || '北京'; 
+      const city = typeof profile.birthLocation === 'string'
+        ? profile.birthLocation
+        : profile.birthLocation.city || '北京';
       const coords = getLatLong(city);
 
-      // Extract birth time from profile (birthDate is ISO string like '2000-04-15T14:30:00')
       const birthTimeStr = profile.birthDate.includes('T')
         ? profile.birthDate.split('T')[1].slice(0, 5)
         : '12:00';
 
+      // 先生成客户端静态解读（即时显示）
+      const birthDate = new Date(profile.birthDate);
+      const chartData = calculateChart(birthDate, coords);
+      const staticReading = generateNatalInterpretation(chartData.planets);
+      setReport(staticReading);
+      setHasAiReading(false);
+
+      // 保存星盘到后端（后台）
       const chart = await chartService.createNatal({
         birthDate: profile.birthDate,
         birthTime: birthTimeStr,
@@ -141,15 +150,15 @@ export const StarChart: React.FC = () => {
         name: '我的本命盘',
       });
 
-      const result = await chartService.generateReading(chart.id, activePersona);
-      setReport(result);
-      localStorage.setItem('natal_chart_report', result);
+      // 保存 chartId 供 AI 升级使用
+      localStorage.setItem('natal_chart_id', chart.id);
+      localStorage.setItem('natal_chart_report', staticReading);
 
       useHistoryStore.getState().addEntry({
         type: 'natal-chart',
-        summary: '本命盘深度解读',
+        summary: '本命盘解读',
         details: {
-          report: result,
+          report: staticReading,
           planets: chart.planets,
           chartId: chart.id,
         }
@@ -157,6 +166,24 @@ export const StarChart: React.FC = () => {
     } catch (error) {
       console.error(error);
       setReport('解读生成失败，请稍后再试。');
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  // AI 深度解读
+  const handleAiReading = async () => {
+    const chartId = localStorage.getItem('natal_chart_id');
+    if (!chartId) return;
+
+    setIsAnalyzing(true);
+    try {
+      const result = await chartService.generateReading(chartId, activePersona);
+      setReport(result);
+      setHasAiReading(true);
+      localStorage.setItem('natal_chart_report', result);
+    } catch (error) {
+      console.error('AI reading failed:', error);
     } finally {
       setIsAnalyzing(false);
     }
@@ -414,7 +441,21 @@ export const StarChart: React.FC = () => {
                     <div className="h-px bg-white/10 my-4"></div>
                     
                     {/* Footer info */}
-                    <p className="text-xs text-[#64748b] mb-4">[DeepSeek v3.0 Analysis Complete]</p>
+                    <div className="flex items-center justify-between mb-4">
+                        <p className="text-xs text-[#64748b]">
+                            {hasAiReading ? '[AI 深度解读]' : '[专业解读]'}
+                        </p>
+                        {!hasAiReading && activeTab === '本命盘' && (
+                            <button
+                                onClick={handleAiReading}
+                                disabled={isAnalyzing}
+                                className="flex items-center gap-1.5 text-xs text-pixel-gold hover:text-pixel-gold/80 transition-colors disabled:opacity-50"
+                            >
+                                <Sparkles size={12} />
+                                {isAnalyzing ? 'AI 解读中...' : 'AI 深度解读'}
+                            </button>
+                        )}
+                    </div>
 
                     {/* Actions */}
                     <div className="flex justify-end gap-2">

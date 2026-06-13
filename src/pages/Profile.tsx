@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ProfileHeader } from '../components/profile/ProfileHeader';
 import { StatsGrid } from '../components/profile/StatsGrid';
 import { MenuSection, MenuItem } from '../components/profile/ProfileMenu';
@@ -9,6 +10,7 @@ import { useUserStore } from '../stores/useUserStore';
 import { PERSONAS } from '../types/ai';
 
 export const Profile: React.FC = () => {
+  const navigate = useNavigate();
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isPersonaOpen, setIsPersonaOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -37,24 +39,24 @@ export const Profile: React.FC = () => {
               onClick={() => setIsPersonaOpen(true)}
           />
           
-          <MenuItem 
+          <MenuItem
               icon="🎒"
               label="我的装备 (灵性道具)"
-              onClick={() => {}}
+              onClick={() => navigate('/shop')}
           />
       </MenuSection>
 
       <MenuSection title="系统" className="pt-0">
-          <MenuItem 
+          <MenuItem
               icon="📦"
               label="我的订单"
-              onClick={() => {}} 
+              onClick={() => navigate('/orders')}
           />
-          
-          <MenuItem 
+
+          <MenuItem
               icon="💳"
               label="能量币充值"
-              onClick={() => {}}
+              onClick={() => navigate('/shop')}
           />
       </MenuSection>
 

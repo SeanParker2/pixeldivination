@@ -10,6 +10,8 @@ const NAV_ITEMS = [
   { id: 'rider', label: '雷诺曼', icon: '🃏' },
   { id: 'bazi', label: '八字', icon: '📜' },
   { id: 'numerology', label: '数字命理', icon: '🔢' },
+  { id: 'match', label: '配对', icon: '💕' },
+  { id: 'community', label: '星座圈', icon: '💬' },
   { id: 'dice', label: '骰子', icon: '🎲' },
   { id: 'fengshui', label: '风水', icon: '☯️' },
 ];
@@ -33,6 +35,10 @@ export const QuickNavGrid: React.FC = () => {
       navigate('/bazi');
     } else if (id === 'numerology') {
       navigate('/numerology');
+    } else if (id === 'match') {
+      navigate('/match');
+    } else if (id === 'community') {
+      navigate('/community');
     }
   };
 

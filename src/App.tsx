@@ -15,6 +15,8 @@ import FortuneCalendar from './pages/FortuneCalendar';
 import Orders from './pages/Orders';
 import BaZi from './pages/BaZi';
 import NumerologyPage from './pages/Numerology';
+import MatchPage from './pages/Match';
+import CommunityPage from './pages/Community';
 import { MainLayout } from './components/layout/MainLayout';
 import { ToastContainer } from './components/ui/Toast';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
@@ -84,6 +86,8 @@ function App() {
             <Route path="/divination" element={<DivinationPage />} />
             <Route path="/bazi" element={<BaZi />} />
             <Route path="/numerology" element={<NumerologyPage />} />
+            <Route path="/match" element={<MatchPage />} />
+            <Route path="/community" element={<CommunityPage />} />
             <Route path="/fengshui" element={<FengShui />} />
             <Route path="/fortune-calendar" element={<FortuneCalendar />} />
             <Route path="/orders" element={<Orders />} />

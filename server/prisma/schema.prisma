@@ -32,6 +32,9 @@ model User {
   fortunes      Fortune[]
   subscriptions Subscription[]
   orders        Order[]
+  posts         Post[]
+  postLikes     PostLike[]
+  postComments  PostComment[]
 
   @@map("users")
 }
@@ -142,4 +145,53 @@ model Order {
 
   @@index([userId, createdAt])
   @@map("orders")
+}
+
+model Post {
+  id             String    @id @default(uuid())
+  userId         String    @map("user_id")
+  content        String
+  postType       String    @default("general") @map("post_type")
+  imageUrl       String?   @map("image_url")
+  divinationId   String?   @map("divination_id")
+  userNickname   String    @map("user_nickname")
+  userZodiac     String?   @map("user_zodiac")
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  likes          PostLike[]
+  comments       PostComment[]
+
+  @@index([userId])
+  @@index([postType])
+  @@index([createdAt])
+  @@map("posts")
+}
+
+model PostLike {
+  id        String   @id @default(uuid())
+  postId    String   @map("post_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@map("post_likes")
+}
+
+model PostComment {
+  id           String   @id @default(uuid())
+  postId       String   @map("post_id")
+  userId       String   @map("user_id")
+  content      String
+  userNickname String   @map("user_nickname")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  post         Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@map("post_comments")
 }
