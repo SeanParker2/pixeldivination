@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ShoppingCart, ScrollText, Heart } from 'lucide-react';
+import { ShoppingCart, ScrollText, Sparkles } from 'lucide-react';
 import { useHistoryStore } from '../../stores/useHistoryStore';
 import { useCartStore } from '../../stores/useCartStore';
 
@@ -15,26 +15,26 @@ export const StatsGrid: React.FC<StatsGridProps> = ({ onCartClick, onHistoryClic
 
   return (
     <div className="grid grid-cols-3 gap-3 px-5 mt-5">
-      <StatCard 
-        icon={ShoppingCart} 
-        label="购物车" 
-        value={cartItemsCount} 
+      <StatCard
+        icon={ShoppingCart}
+        label="购物车"
+        value={cartItemsCount}
         color="#fbbf24"
-        onClick={onCartClick} 
+        onClick={onCartClick}
         delay={0}
       />
-      <StatCard 
-        icon={ScrollText} 
-        label="历史档案" 
-        value={stats.total} 
+      <StatCard
+        icon={ScrollText}
+        label="历史档案"
+        value={stats.total}
         color="#8b5cf6"
-        onClick={onHistoryClick} 
+        onClick={onHistoryClick}
         delay={0.1}
       />
-      <StatCard 
-        icon={Heart} 
-        label="收藏夹" 
-        value={8} 
+      <StatCard
+        icon={Sparkles}
+        label="占卜次数"
+        value={stats.tarot + stats.natalChart + stats.daily}
         color="#ec4899"
         delay={0.2}
       />
