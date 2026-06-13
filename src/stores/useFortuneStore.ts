@@ -21,7 +21,8 @@ interface FortuneState {
 
 // 从模板生成离线运势
 function generateOfflineFortune(zodiac: string, date: string): FortuneData {
-  const template = (ZODIAC_FORTUNE_TEMPLATES as any)[zodiac] || (ZODIAC_FORTUNE_TEMPLATES as any)['白羊座'];
+  const templates = ZODIAC_FORTUNE_TEMPLATES as Record<string, { today: { overall: string; love: string; career: string; wealth: string; health: string } }>;
+  const template = templates[zodiac] || templates['白羊座'];
   const baseScores: FortuneScores = {
     health: 70 + Math.floor(Math.random() * 20),
     love: 70 + Math.floor(Math.random() * 20),

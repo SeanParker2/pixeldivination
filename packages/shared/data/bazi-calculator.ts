@@ -330,7 +330,6 @@ const TEN_GODS_DETAIL: Record<string, {
 export function calculateDaYun(birthDate: Date, gender: 'male' | 'female' = 'male') {
   const year = birthDate.getFullYear();
   const month = birthDate.getMonth() + 1;
-  const day = birthDate.getDate();
 
   const yearPillar = getYearPillar(year);
   const monthPillar = getMonthPillar(year, month);

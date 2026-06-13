@@ -149,7 +149,6 @@ function getChallengeNumbers(birthDate: string): { first: number; second: number
 
 // 计算巅峰数字（Pinnacles）
 function getPinnacles(birthDate: string): { first: number; second: number; third: number; fourth: number } {
-  const lifePath = getLifePathNumber(birthDate);
   const parts = birthDate.split('-');
   const month = parseInt(parts[1]);
   const day = parseInt(parts[2]);

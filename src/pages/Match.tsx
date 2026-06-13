@@ -78,7 +78,7 @@ const MatchPage: React.FC = () => {
       });
       setResult(res);
       addHistory({
-        type: 'match' as any,
+        type: 'match',
         summary: `${myZodiac} × ${targetZodiac} 配对分析`,
         details: { zodiacA: myZodiac, zodiacB: targetZodiac, result: res },
       });
