@@ -175,7 +175,7 @@ export const ReadingView: React.FC = () => {
             </div>
           </motion.div>
         ) : error ? (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="glass-card p-6 border-red-500/30"
@@ -184,13 +184,23 @@ export const ReadingView: React.FC = () => {
               <AlertCircle size={16} />
               <span className="text-sm">{error}</span>
             </div>
-            <button 
-              onClick={handleRetry}
-              className="flex items-center gap-2 text-pixel-gold hover:text-pixel-gold/80 text-sm"
-            >
-              <RotateCcw size={14} />
-              重新解读
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleRetry}
+                className="flex items-center gap-2 text-pixel-gold hover:text-pixel-gold/80 text-sm"
+              >
+                <RotateCcw size={14} />
+                重新解读
+              </button>
+              {error.includes('Pro') && (
+                <button
+                  onClick={() => navigate('/shop')}
+                  className="flex items-center gap-2 bg-pixel-gold/20 text-pixel-gold px-4 py-1.5 rounded-full text-sm hover:bg-pixel-gold/30 transition-colors"
+                >
+                  升级 Pro
+                </button>
+              )}
+            </div>
           </motion.div>
         ) : (
           readingResult && (

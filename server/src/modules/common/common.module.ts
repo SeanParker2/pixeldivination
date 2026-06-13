@@ -1,6 +1,7 @@
 import { Module, Global } from '@nestjs/common';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { ThrottleGuard } from './guards/throttle.guard';
+import { AiThrottleGuard } from './guards/ai-throttle.guard';
 import { PremiumGuard } from './guards/premium.guard';
 import { UsageInterceptor } from './interceptors/usage.interceptor';
 import { PrismaModule } from '../../prisma/prisma.module';
@@ -14,7 +15,7 @@ import { PrismaModule } from '../../prisma/prisma.module';
     }]),
     PrismaModule,
   ],
-  providers: [ThrottleGuard, PremiumGuard, UsageInterceptor],
-  exports: [ThrottleGuard, PremiumGuard, UsageInterceptor],
+  providers: [ThrottleGuard, AiThrottleGuard, PremiumGuard, UsageInterceptor],
+  exports: [ThrottleGuard, AiThrottleGuard, PremiumGuard, UsageInterceptor],
 })
 export class CommonModule {}

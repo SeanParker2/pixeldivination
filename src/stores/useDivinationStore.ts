@@ -163,7 +163,7 @@ export const useDivinationStore = create<DivinationState>((set, get) => ({
 
   generateReading: async (question) => {
     const { selectedSpread } = get();
-    
+
     set({ isLoadingAI: true, error: null });
 
     try {
@@ -173,14 +173,19 @@ export const useDivinationStore = create<DivinationState>((set, get) => ({
         spreadType: selectedSpread,
         persona: activePersona,
       });
-      
-      set({ 
+
+      set({
         readingResult: result.reading,
         drawnCards: result.cards as DrawnCard[] || [],
         spreadName: result.spreadName || null,
       });
-    } catch {
-      set({ error: '无法连接到宇宙信号，请稍后再试。' });
+    } catch (err: unknown) {
+      const axiosError = err as { isRateLimit?: boolean; userMessage?: string };
+      if (axiosError.isRateLimit) {
+        set({ error: axiosError.userMessage || '今日免费次数已用完，请升级 Pro 会员享受无限次数' });
+      } else {
+        set({ error: axiosError.userMessage || '无法连接到宇宙信号，请稍后再试。' });
+      }
     } finally {
       set({ isLoadingAI: false });
     }

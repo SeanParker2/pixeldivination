@@ -7,10 +7,10 @@ import {
   BaziDto,
   NumerologyDto,
 } from './dto/divination.dto';
-import { TAROT_DECK, drawCards } from '../../data/tarot-cards';
-import { LENORMAND_DECK, drawLenormandCards } from '../../data/lenormand-cards';
-import { calculateBazi, generateBaziReport } from '../../data/bazi-calculator';
-import { calculateNumerology, generateNumerologyReport } from '../../data/numerology-calculator';
+import { TAROT_DECK, drawCards } from '../../../packages/shared/data/tarot-deck';
+import { LENORMAND_DECK, drawLenormandCards } from '../../../packages/shared/data/lenormand-deck';
+import { calculateBazi, generateBaziReport } from '../../../packages/shared/data/bazi-calculator';
+import { calculateNumerology, generateNumerologyReport } from '../../../packages/shared/data/numerology-calculator';
 
 // 牌阵配置
 const SPREAD_CONFIGS: Record<string, { count: number; name: string; positions: string[] }> = {

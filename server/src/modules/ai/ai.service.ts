@@ -7,6 +7,7 @@ import {
   NatalReadingDto,
   SynastryReadingDto,
 } from './dto/ai.dto';
+import { AiCacheService } from './ai-cache.service';
 
 const PERSONAS = {
   neon: {
@@ -75,7 +76,10 @@ export class AiService {
   private clients: Map<string, OpenAI> = new Map();
   private activeProvider: string;
 
-  constructor(private config: ConfigService) {
+  constructor(
+    private config: ConfigService,
+    private cacheService: AiCacheService,
+  ) {
     // Initialize all providers
     for (const [key, provider] of Object.entries(AI_PROVIDERS)) {
       const apiKey = this.config.get(provider.envKey);
@@ -141,6 +145,11 @@ export class AiService {
     const persona = PERSONAS[dto.persona || 'neon'];
     const provider = dto.provider || this.activeProvider;
 
+    // Check cache
+    const cacheKey = { question: dto.question, cards: dto.cards, persona: dto.persona };
+    const cached = await this.cacheService.get('tarot', cacheKey);
+    if (cached) return cached;
+
     const systemPrompt = `
 ${persona.prompt}
 请根据用户的问题和抽出的牌面，进行深度解读。
@@ -162,7 +171,9 @@ ${persona.prompt}
         temperature: 1.2,
       });
 
-      return completion.choices[0].message.content || '解读生成失败';
+      const result = completion.choices[0].message.content || '解读生成失败';
+      await this.cacheService.set('tarot', cacheKey, result);
+      return result;
     } catch (error) {
       this.logger.error(`Tarot reading failed (provider: ${provider}):`, error);
       throw new Error('AI service unavailable');
@@ -172,6 +183,11 @@ ${persona.prompt}
   async natalReading(dto: NatalReadingDto): Promise<string> {
     const persona = PERSONAS[dto.persona || 'neon'];
     const provider = dto.provider || this.activeProvider;
+
+    // Check cache
+    const cacheKey = { chartData: dto.chartData, persona: dto.persona };
+    const cached = await this.cacheService.get('natal', cacheKey);
+    if (cached) return cached;
 
     const systemPrompt = `
 ${persona.prompt}
@@ -194,7 +210,9 @@ ${persona.prompt}
         temperature: 1.2,
       });
 
-      return completion.choices[0].message.content || '解读生成失败';
+      const result = completion.choices[0].message.content || '解读生成失败';
+      await this.cacheService.set('natal', cacheKey, result);
+      return result;
     } catch (error) {
       this.logger.error(`Natal reading failed (provider: ${provider}):`, error);
       throw new Error('AI service unavailable');
@@ -204,6 +222,11 @@ ${persona.prompt}
   async synastryReading(dto: SynastryReadingDto): Promise<string> {
     const persona = PERSONAS[dto.persona || 'neon'];
     const provider = dto.provider || this.activeProvider;
+
+    // Check cache
+    const cacheKey = { chartA: dto.chartA, chartB: dto.chartB, partnerName: dto.partnerName, persona: dto.persona };
+    const cached = await this.cacheService.get('synastry', cacheKey);
+    if (cached) return cached;
 
     const systemPrompt = `
 ${persona.prompt}
@@ -229,7 +252,9 @@ B的行星（伴侣/对方）：${JSON.stringify(dto.chartB)}
         temperature: 1.2,
       });
 
-      return completion.choices[0].message.content || '解读生成失败';
+      const result = completion.choices[0].message.content || '解读生成失败';
+      await this.cacheService.set('synastry', cacheKey, result);
+      return result;
     } catch (error) {
       this.logger.error(`Synastry reading failed (provider: ${provider}):`, error);
       throw new Error('AI service unavailable');
