@@ -228,7 +228,7 @@ export const Orders: React.FC = () => {
                                 onClick={async (e) => {
                                   e.stopPropagation();
                                   try {
-                                    await shopService.initiatePayment(order.id, 'mock');
+                                    await shopService.initiatePayment(order.id);
                                     // Refresh orders
                                     fetchOrders();
                                   } catch {

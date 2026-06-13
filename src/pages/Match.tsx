@@ -40,7 +40,30 @@ const MatchPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const myZodiac = profile.zodiacSign || '白羊座';
+  // 从出生日期推算星座
+  const getZodiacFromDate = (dateStr: string): string => {
+    if (!dateStr) return '白羊座';
+    const d = new Date(dateStr);
+    const month = d.getMonth() + 1;
+    const day = d.getDate();
+    const signs = [
+      { name: '摩羯座', end: [1, 19] }, { name: '水瓶座', end: [2, 18] },
+      { name: '双鱼座', end: [3, 20] }, { name: '白羊座', end: [4, 19] },
+      { name: '金牛座', end: [5, 20] }, { name: '双子座', end: [6, 21] },
+      { name: '巨蟹座', end: [7, 22] }, { name: '狮子座', end: [8, 22] },
+      { name: '处女座', end: [9, 22] }, { name: '天秤座', end: [10, 23] },
+      { name: '天蝎座', end: [11, 22] }, { name: '射手座', end: [12, 21] },
+      { name: '摩羯座', end: [12, 31] },
+    ];
+    for (const sign of signs) {
+      if (month < sign.end[0] || (month === sign.end[0] && day <= sign.end[1])) {
+        return sign.name;
+      }
+    }
+    return '白羊座';
+  };
+
+  const myZodiac = getZodiacFromDate(profile.birthDate);
 
   const handleMatch = async (targetZodiac: string) => {
     setSelectedZodiac(targetZodiac);

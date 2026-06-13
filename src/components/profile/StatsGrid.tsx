@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ShoppingCart, ScrollText, Heart, Sparkles } from 'lucide-react';
+import { ShoppingCart, ScrollText, Heart } from 'lucide-react';
 import { useHistoryStore } from '../../stores/useHistoryStore';
 import { useCartStore } from '../../stores/useCartStore';
 

@@ -2,15 +2,15 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 export interface CartItem {
-  productId: number;
+  productId: string;
   quantity: number;
 }
 
 interface CartState {
   items: CartItem[];
-  addItem: (productId: number) => void;
-  removeItem: (productId: number) => void;
-  decreaseItem: (productId: number) => void; // New method
+  addItem: (productId: string) => void;
+  removeItem: (productId: string) => void;
+  decreaseItem: (productId: string) => void;
   clearCart: () => void;
   getTotalItems: () => number;
 }

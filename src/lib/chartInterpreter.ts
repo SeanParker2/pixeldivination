@@ -204,7 +204,7 @@ export function generateTransitInterpretation(natalPlanets: PlanetPosition[], tr
  * 生成天象解读
  */
 export function generateSkyInterpretation(planets: PlanetPosition[]): string {
-  let reading = '# 今日天象解读\n\n`;
+  let reading = '# 今日天象解读\n\n';
 
   // 行星位置总览
   reading += `## 🌍 当前天象\n\n`;

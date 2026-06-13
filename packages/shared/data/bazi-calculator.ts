@@ -228,8 +228,8 @@ const ELEMENT_PERSONALITY: Record<string, { traits: string[]; strengths: string[
   },
 };
 
-// 十神性格分析
-const TEN_GODS_PERSONALITY: Record<string, { name: string; meaning: string; personality: string; career: string }> = {
+// 十神性格分析（用于报告生成）
+export const TEN_GODS_PERSONALITY: Record<string, { name: string; meaning: string; personality: string; career: string }> = {
   '比肩': { name: '比肩', meaning: '与日主相同的五行', personality: '独立自主，有竞争意识，喜欢与人合作但也有竞争心', career: '适合创业、合伙经营、竞争性行业' },
   '劫财': { name: '劫财', meaning: '与日主相同但阴阳相反', personality: '果断有魄力，但有时过于冲动，容易与人发生冲突', career: '适合销售、竞争性行业、需要魄力的工作' },
   '食神': { name: '食神', meaning: '日主所生的五行', personality: '聪明有才华，善于表达，有艺术天赋', career: '适合艺术、教育、餐饮、创意行业' },

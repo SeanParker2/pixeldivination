@@ -37,8 +37,8 @@ const POST_TYPES = [
 
 const CommunityPage: React.FC = () => {
   const navigate = useNavigate();
-  const { profile } = useUserStore();
-  const showToast = useToastStore(s => s.showToast);
+  useUserStore();
+  const showToast = useToastStore(s => s.addToast);
 
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);

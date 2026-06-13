@@ -13,7 +13,7 @@ export default function Login() {
 
   const { sendSms, login } = useAuth();
   const { syncWithBackend } = useUserStore();
-  const showToast = useToastStore(s => s.showToast);
+  const showToast = useToastStore(s => s.addToast);
   const navigate = useNavigate();
 
   const handleSendCode = async () => {

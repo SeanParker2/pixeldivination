@@ -10,7 +10,6 @@ import { PartnerInputForm, type PartnerData } from '../components/starchart/Part
 import { useUserStore } from '../stores/useUserStore';
 import { calculateChart, getLatLong } from '../lib/astrology';
 import { chartService } from '../services/chartService';
-import { fetchTransitReading, fetchSkyReading } from '../services/aiService';
 import { generateNatalInterpretation, generateTransitInterpretation, generateSkyInterpretation } from '../lib/chartInterpreter';
 import { useHistoryStore } from '../stores/useHistoryStore';
 import { ShareCard } from '../components/share/ShareCard';

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { divinationService, type SpreadType, type DrawnCard } from '../services/divinationService';
+import { divinationService, type SpreadType, type DrawnCard, type DrawnLenormandCard } from '../services/divinationService';
 import { useUserStore } from './useUserStore';
 import { TAROT_DECK as SHARED_TAROT_DECK } from '@shared/data/tarot-deck';
 import type { TarotCard as SharedTarotCard } from '@shared/data/tarot-deck';
@@ -100,7 +100,7 @@ interface DivinationState {
   step: 'intro' | 'shuffle' | 'draw' | 'reading';
   selectedSpread: SpreadType;
   selectedCards: SelectedTarotCard[];
-  drawnCards: DrawnCard[];
+  drawnCards: (DrawnCard | DrawnLenormandCard)[];
   isShuffling: boolean;
 
   // Reading State

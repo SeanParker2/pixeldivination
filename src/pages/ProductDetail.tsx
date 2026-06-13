@@ -51,11 +51,9 @@ const ProductDetail: React.FC = () => {
     if (!product) return;
     setIsLoading(true);
     try {
-      const order = await shopService.createOrder({
+      await shopService.createOrder({
         productId: product.id,
-        productName: product.name,
         amount: product.price,
-        orderType: 'product',
       });
       addToast('订单已创建！', 'success');
       navigate('/orders');

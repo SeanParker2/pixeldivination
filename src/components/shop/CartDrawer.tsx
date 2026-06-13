@@ -100,11 +100,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                     cartProducts.map(({ productId, quantity, product }) => (
                       <div key={productId} className="flex gap-3 bg-white/5 p-3 rounded-xl border border-white/5">
                         <div className="w-20 h-20 bg-black/20 rounded-lg overflow-hidden shrink-0">
-                          <img src={product!.image} alt={product!.title} className="w-full h-full object-cover" />
+                          <img src={product!.image} alt={product!.name} className="w-full h-full object-cover" />
                         </div>
                         <div className="flex-1 flex flex-col justify-between">
                           <div>
-                            <h3 className="text-white font-medium text-sm line-clamp-1">{product!.title}</h3>
+                            <h3 className="text-white font-medium text-sm line-clamp-1">{product!.name}</h3>
                             <p className="text-[#FF4D4F] font-bold text-sm mt-1">¥ {product!.price}</p>
                           </div>
                           <div className="flex items-center justify-between">

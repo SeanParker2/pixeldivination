@@ -9,9 +9,6 @@ export const MainLayout: React.FC = () => {
   // Hide BottomNav on Product Detail pages (/shop/:id)
   const shouldHideBottomNav = /^\/shop\/\d+$/.test(location.pathname);
   
-  // 判断是否是占卜页面（需要更暗的背景）
-  const isDivinationPage = location.pathname === '/divination';
-
   return (
     <div className="min-h-screen bg-[#09090b] font-pixel relative flex justify-center overflow-hidden">
       {/* 星空粒子背景 */}
