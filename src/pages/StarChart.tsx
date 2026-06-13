@@ -11,7 +11,7 @@ import { useUserStore } from '../stores/useUserStore';
 import { calculateChart, getLatLong } from '../lib/astrology';
 import { chartService } from '../services/chartService';
 import { fetchTransitReading, fetchSkyReading } from '../services/aiService';
-import { generateNatalInterpretation, generateSkyInterpretation } from '../lib/chartInterpreter';
+import { generateNatalInterpretation, generateTransitInterpretation, generateSkyInterpretation } from '../lib/chartInterpreter';
 import { useHistoryStore } from '../stores/useHistoryStore';
 import { ShareCard } from '../components/share/ShareCard';
 
@@ -240,29 +240,28 @@ export const StarChart: React.FC = () => {
 
   const handleTransitReport = async () => {
     if (!profile.birthDate) {
-      alert('请先在“我的”页面完善出生信息');
+      alert('请先在”我的”页面完善出生信息');
       return;
     }
     setIsAnalyzing(true);
     try {
-      // Natal
       const city = typeof profile.birthLocation === 'string' ? profile.birthLocation : profile.birthLocation.city || '北京';
       const coords = getLatLong(city);
       const birthDate = new Date(profile.birthDate);
       const natalData = calculateChart(birthDate, coords);
-
-      // Transit (Now)
       const now = new Date();
       const transitData = calculateChart(now, coords);
 
-      const result = await fetchTransitReading(natalData.planets, transitData.planets, activePersona);
-      setReport(result);
+      // 先生成客户端静态解读
+      const staticReading = generateTransitInterpretation(natalData.planets, transitData.planets);
+      setReport(staticReading);
+      setHasAiReading(false);
 
       useHistoryStore.getState().addEntry({
         type: 'transit',
         summary: '近期行运推演',
         details: {
-          result,
+          result: staticReading,
           planets: natalData.planets,
           transitPlanets: transitData.planets
         }
@@ -278,20 +277,21 @@ export const StarChart: React.FC = () => {
   const handleSkyReport = async () => {
     setIsAnalyzing(true);
     try {
-      // Sky (Now, Default Location or User Location)
       const city = profile.birthLocation ? (typeof profile.birthLocation === 'string' ? profile.birthLocation : profile.birthLocation.city) : '北京';
       const coords = getLatLong(city);
       const now = new Date();
       const skyData = calculateChart(now, coords);
 
-      const result = await fetchSkyReading(skyData.planets, activePersona);
-      setReport(result);
+      // 先生成客户端静态解读
+      const staticReading = generateSkyInterpretation(skyData.planets);
+      setReport(staticReading);
+      setHasAiReading(false);
 
       useHistoryStore.getState().addEntry({
         type: 'sky',
         summary: '今日天象解读',
         details: {
-          result,
+          result: staticReading,
           planets: skyData.planets
         }
       });
