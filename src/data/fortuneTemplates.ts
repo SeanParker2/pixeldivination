@@ -287,3 +287,228 @@ export function generateFortuneReport(
   
   return report;
 }
+
+// 每个星座的完整幸运数据
+export const ZODIAC_LUCKY_DATA: Record<string, {
+  luckyColors: { name: string; hex: string }[];
+  luckyNumbers: number[];
+  luckyDirections: string[];
+  luckyTimes: string[];
+  luckyGemstones: string[];
+  bestCompatibility: string[];
+  goodCompatibility: string[];
+  challengingCompatibility: string[];
+}> = {
+  '白羊座': {
+    luckyColors: [{ name: '红色', hex: '#ef4444' }, { name: '橙色', hex: '#f97316' }],
+    luckyNumbers: [1, 9, 18],
+    luckyDirections: ['南方', '东方'],
+    luckyTimes: ['上午 6-8 点', '下午 2-4 点'],
+    luckyGemstones: ['红宝石', '钻石'],
+    bestCompatibility: ['狮子座', '射手座'],
+    goodCompatibility: ['双子座', '水瓶座'],
+    challengingCompatibility: ['巨蟹座', '摩羯座'],
+  },
+  '金牛座': {
+    luckyColors: [{ name: '绿色', hex: '#22c55e' }, { name: '粉色', hex: '#ec4899' }],
+    luckyNumbers: [2, 6, 15],
+    luckyDirections: ['东南方', '中央'],
+    luckyTimes: ['上午 8-10 点', '下午 6-8 点'],
+    luckyGemstones: ['翡翠', '粉晶'],
+    bestCompatibility: ['处女座', '摩羯座'],
+    goodCompatibility: ['巨蟹座', '双鱼座'],
+    challengingCompatibility: ['狮子座', '水瓶座'],
+  },
+  '双子座': {
+    luckyColors: [{ name: '黄色', hex: '#eab308' }, { name: '浅蓝色', hex: '#38bdf8' }],
+    luckyNumbers: [3, 5, 12],
+    luckyDirections: ['西方', '西北方'],
+    luckyTimes: ['上午 10-12 点', '下午 4-6 点'],
+    luckyGemstones: ['黄水晶', '玛瑙'],
+    bestCompatibility: ['天秤座', '水瓶座'],
+    goodCompatibility: ['白羊座', '狮子座'],
+    challengingCompatibility: ['处女座', '双鱼座'],
+  },
+  '巨蟹座': {
+    luckyColors: [{ name: '银色', hex: '#c0c0c0' }, { name: '白色', hex: '#ffffff' }],
+    luckyNumbers: [2, 7, 11],
+    luckyDirections: ['北方', '西南方'],
+    luckyTimes: ['晚上 8-10 点', '凌晨 0-2 点'],
+    luckyGemstones: ['月光石', '珍珠'],
+    bestCompatibility: ['天蝎座', '双鱼座'],
+    goodCompatibility: ['金牛座', '处女座'],
+    challengingCompatibility: ['白羊座', '天秤座'],
+  },
+  '狮子座': {
+    luckyColors: [{ name: '金色', hex: '#ffd700' }, { name: '橙色', hex: '#f97316' }],
+    luckyNumbers: [1, 5, 19],
+    luckyDirections: ['东方', '南方'],
+    luckyTimes: ['中午 12-2 点', '下午 4-6 点'],
+    luckyGemstones: ['红宝石', '琥珀'],
+    bestCompatibility: ['白羊座', '射手座'],
+    goodCompatibility: ['双子座', '天秤座'],
+    challengingCompatibility: ['金牛座', '天蝎座'],
+  },
+  '处女座': {
+    luckyColors: [{ name: '深绿色', hex: '#166534' }, { name: '米色', hex: '#f5f5dc' }],
+    luckyNumbers: [5, 6, 14],
+    luckyDirections: ['西南方', '中央'],
+    luckyTimes: ['上午 6-8 点', '下午 2-4 点'],
+    luckyGemstones: ['蓝宝石', '翡翠'],
+    bestCompatibility: ['金牛座', '摩羯座'],
+    goodCompatibility: ['巨蟹座', '天蝎座'],
+    challengingCompatibility: ['双子座', '射手座'],
+  },
+  '天秤座': {
+    luckyColors: [{ name: '粉色', hex: '#ec4899' }, { name: '浅蓝色', hex: '#38bdf8' }],
+    luckyNumbers: [6, 9, 15],
+    luckyDirections: ['西方', '西北方'],
+    luckyTimes: ['下午 4-6 点', '晚上 8-10 点'],
+    luckyGemstones: ['蛋白石', '粉晶'],
+    bestCompatibility: ['双子座', '水瓶座'],
+    goodCompatibility: ['狮子座', '射手座'],
+    challengingCompatibility: ['巨蟹座', '摩羯座'],
+  },
+  '天蝎座': {
+    luckyColors: [{ name: '深红色', hex: '#991b1b' }, { name: '黑色', hex: '#000000' }],
+    luckyNumbers: [0, 4, 13],
+    luckyDirections: ['北方', '东方'],
+    luckyTimes: ['晚上 10-12 点', '凌晨 2-4 点'],
+    luckyGemstones: ['石榴石', '黑曜石'],
+    bestCompatibility: ['巨蟹座', '双鱼座'],
+    goodCompatibility: ['处女座', '摩羯座'],
+    challengingCompatibility: ['狮子座', '水瓶座'],
+  },
+  '射手座': {
+    luckyColors: [{ name: '紫色', hex: '#8b5cf6' }, { name: '蓝色', hex: '#3b82f6' }],
+    luckyNumbers: [3, 9, 21],
+    luckyDirections: ['南方', '东南方'],
+    luckyTimes: ['下午 2-4 点', '上午 10-12 点'],
+    luckyGemstones: ['紫水晶', '蓝宝石'],
+    bestCompatibility: ['白羊座', '狮子座'],
+    goodCompatibility: ['天秤座', '水瓶座'],
+    challengingCompatibility: ['处女座', '双鱼座'],
+  },
+  '摩羯座': {
+    luckyColors: [{ name: '深灰色', hex: '#374151' }, { name: '棕色', hex: '#92400e' }],
+    luckyNumbers: [1, 4, 8],
+    luckyDirections: ['东北方', '中央'],
+    luckyTimes: ['上午 8-10 点', '下午 6-8 点'],
+    luckyGemstones: ['石榴石', '黑玛瑙'],
+    bestCompatibility: ['金牛座', '处女座'],
+    goodCompatibility: ['天蝎座', '双鱼座'],
+    challengingCompatibility: ['白羊座', '天秤座'],
+  },
+  '水瓶座': {
+    luckyColors: [{ name: '蓝色', hex: '#3b82f6' }, { name: '银色', hex: '#c0c0c0' }],
+    luckyNumbers: [4, 7, 11],
+    luckyDirections: ['东方', '北方'],
+    luckyTimes: ['下午 4-6 点', '晚上 8-10 点'],
+    luckyGemstones: ['蓝宝石', '紫水晶'],
+    bestCompatibility: ['双子座', '天秤座'],
+    goodCompatibility: ['白羊座', '射手座'],
+    challengingCompatibility: ['金牛座', '天蝎座'],
+  },
+  '双鱼座': {
+    luckyColors: [{ name: '海蓝色', hex: '#0ea5e9' }, { name: '紫色', hex: '#8b5cf6' }],
+    luckyNumbers: [3, 7, 12],
+    luckyDirections: ['西南方', '西方'],
+    luckyTimes: ['晚上 10-12 点', '凌晨 0-2 点'],
+    luckyGemstones: ['海蓝宝', '月光石'],
+    bestCompatibility: ['巨蟹座', '天蝎座'],
+    goodCompatibility: ['金牛座', '摩羯座'],
+    challengingCompatibility: ['双子座', '射手座'],
+  },
+};
+
+// 宜忌数据（基于星座元素）
+export const ZODIAC_AUSPICIOUS: Record<string, {
+  suitable: string[];
+  unsuitable: string[];
+  auspiciousHours: string;
+  inauspiciousHours: string;
+}> = {
+  '白羊座': {
+    suitable: ['开始新项目', '运动健身', '主动表白', '商务谈判'],
+    unsuitable: ['冲动消费', '与人争吵', '拖延决策'],
+    auspiciousHours: '卯时 (5-7点)、午时 (11-13点)',
+    inauspiciousHours: '酉时 (17-19点)',
+  },
+  '金牛座': {
+    suitable: ['理财投资', '享受美食', '整理家居', '签订合同'],
+    unsuitable: ['冲动购物', '改变计划', '借贷'],
+    auspiciousHours: '辰时 (7-9点)、酉时 (17-19点)',
+    inauspiciousHours: '寅时 (3-5点)',
+  },
+  '双子座': {
+    suitable: ['社交聚会', '学习新知', '短途旅行', '写作创作'],
+    unsuitable: ['做重大决定', '独自工作', '久坐不动'],
+    auspiciousHours: '巳时 (9-11点)、申时 (15-17点)',
+    inauspiciousHours: '亥时 (21-23点)',
+  },
+  '巨蟹座': {
+    suitable: ['陪伴家人', '烹饪美食', '整理房间', '冥想放松'],
+    unsuitable: ['社交应酬', '加班熬夜', '情绪化消费'],
+    auspiciousHours: '酉时 (17-19点)、亥时 (21-23点)',
+    inauspiciousHours: '午时 (11-13点)',
+  },
+  '狮子座': {
+    suitable: ['展示才华', '约会聚会', '购买奢侈品', '公开演讲'],
+    unsuitable: ['独处', '节食', '借钱给人'],
+    auspiciousHours: '午时 (11-13点)、未时 (13-15点)',
+    inauspiciousHours: '子时 (23-1点)',
+  },
+  '处女座': {
+    suitable: ['整理文件', '体检就医', '学习技能', '制定计划'],
+    unsuitable: ['拖延', '过度批评', '熬夜'],
+    auspiciousHours: '辰时 (7-9点)、未时 (13-15点)',
+    inauspiciousHours: '戌时 (19-21点)',
+  },
+  '天秤座': {
+    suitable: ['约会恋爱', '购物打扮', '调解纠纷', '艺术创作'],
+    unsuitable: ['做选择', '独处', '争论'],
+    auspiciousHours: '酉时 (17-19点)、亥时 (21-23点)',
+    inauspiciousHours: '卯时 (5-7点)',
+  },
+  '天蝎座': {
+    suitable: ['深度思考', '调查研究', '投资理财', '修复关系'],
+    unsuitable: ['社交应酬', '轻信他人', '冲动消费'],
+    auspiciousHours: '亥时 (21-23点)、丑时 (1-3点)',
+    inauspiciousHours: '巳时 (9-11点)',
+  },
+  '射手座': {
+    suitable: ['旅行探险', '学习哲学', '运动健身', '社交聚会'],
+    unsuitable: ['宅在家里', '做细活', '借贷'],
+    auspiciousHours: '巳时 (9-11点)、未时 (13-15点)',
+    inauspiciousHours: '卯时 (5-7点)',
+  },
+  '摩羯座': {
+    suitable: ['工作规划', '理财投资', '拜访长辈', '签订合同'],
+    unsuitable: ['偷懒', '冲动辞职', '社交应酬'],
+    auspiciousHours: '丑时 (1-3点)、辰时 (7-9点)',
+    inauspiciousHours: '午时 (11-13点)',
+  },
+  '水瓶座': {
+    suitable: ['创意工作', '科技活动', '社交聚会', '公益活动'],
+    unsuitable: ['循规蹈矩', '独处', '情绪化'],
+    auspiciousHours: '申时 (15-17点)、戌时 (19-21点)',
+    inauspiciousHours: '巳时 (9-11点)',
+  },
+  '双鱼座': {
+    suitable: ['冥想灵修', '艺术创作', '陪伴宠物', '慈善公益'],
+    unsuitable: ['做重大决定', '饮酒', '熬夜'],
+    auspiciousHours: '亥时 (21-23点)、寅时 (3-5点)',
+    inauspiciousHours: '未时 (13-15点)',
+  },
+};
+
+// 根据分数生成运势等级
+export function getFortuneLevel(score: number): { label: string; color: string; emoji: string } {
+  if (score >= 90) return { label: '极佳', color: '#4ade80', emoji: '🌟' };
+  if (score >= 80) return { label: '很好', color: '#22c55e', emoji: '✨' };
+  if (score >= 70) return { label: '良好', color: '#84cc16', emoji: '☀️' };
+  if (score >= 60) return { label: '平稳', color: '#eab308', emoji: '🌤️' };
+  if (score >= 50) return { label: '一般', color: '#f97316', emoji: '⛅' };
+  if (score >= 40) return { label: '注意', color: '#ef4444', emoji: '🌧️' };
+  return { label: '谨慎', color: '#dc2626', emoji: '⚡' };
+}
