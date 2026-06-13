@@ -225,10 +225,15 @@ export const Orders: React.FC = () => {
                             {order.status === 'pending' && (
                               <button
                                 className="flex-1 py-2 bg-[#fbbf24] text-black rounded-lg font-medium text-sm hover:bg-[#facc15] transition-colors"
-                                onClick={(e) => {
+                                onClick={async (e) => {
                                   e.stopPropagation();
-                                  // TODO: Implement payment
-                                  alert('支付功能开发中');
+                                  try {
+                                    await shopService.initiatePayment(order.id, 'mock');
+                                    // Refresh orders
+                                    fetchOrders();
+                                  } catch {
+                                    // Silent fail
+                                  }
                                 }}
                               >
                                 立即支付
@@ -238,10 +243,10 @@ export const Orders: React.FC = () => {
                               className="flex-1 py-2 border border-white/10 text-white rounded-lg text-sm hover:bg-white/5 transition-colors"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                // TODO: View order detail
+                                setExpandedOrder(isExpanded ? null : order.id);
                               }}
                             >
-                              查看详情
+                              {isExpanded ? '收起' : '查看详情'}
                             </button>
                           </div>
                         </div>

@@ -17,6 +17,8 @@ export interface LenormandCard {
     timing: string;
     advice: string;
   };
+  playingCard?: string;
+  image?: string;
 }
 
 export const LENORMAND_DECK: LenormandCard[] = [

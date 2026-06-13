@@ -47,11 +47,22 @@ const ProductDetail: React.FC = () => {
     }
   };
 
-  const handleBuyNow = () => {
-    if (product) {
-      addItem(product.id);
-      addToast('正在跳转结算页面...', 'info');
-      // TODO: Navigate to Checkout
+  const handleBuyNow = async () => {
+    if (!product) return;
+    setIsLoading(true);
+    try {
+      const order = await shopService.createOrder({
+        productId: product.id,
+        productName: product.name,
+        amount: product.price,
+        orderType: 'product',
+      });
+      addToast('订单已创建！', 'success');
+      navigate('/orders');
+    } catch {
+      addToast('订单创建失败，请重试', 'error');
+    } finally {
+      setIsLoading(false);
     }
   };
 

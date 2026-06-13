@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 import type { FortuneData, FortuneScores } from '../types/fortune';
 import { fortuneService } from '../services/fortuneService';
 import { useUserStore } from './useUserStore';
+import { ZODIAC_FORTUNE_TEMPLATES } from '../data/fortuneTemplates';
 
 interface FortuneCalendarItem {
   date: string;
@@ -16,6 +17,31 @@ interface FortuneState {
   error: string | null;
   checkAndFetch: (zodiac: string) => Promise<void>;
   fetchCalendar: (zodiac: string, month: string) => Promise<void>;
+}
+
+// 从模板生成离线运势
+function generateOfflineFortune(zodiac: string, date: string): FortuneData {
+  const template = (ZODIAC_FORTUNE_TEMPLATES as any)[zodiac] || (ZODIAC_FORTUNE_TEMPLATES as any)['白羊座'];
+  const baseScores: FortuneScores = {
+    health: 70 + Math.floor(Math.random() * 20),
+    love: 70 + Math.floor(Math.random() * 20),
+    career: 70 + Math.floor(Math.random() * 20),
+    wealth: 70 + Math.floor(Math.random() * 20),
+    academic: 70 + Math.floor(Math.random() * 20),
+    social: 70 + Math.floor(Math.random() * 20),
+  };
+  return {
+    date,
+    zodiac,
+    scores: baseScores,
+    texts: {
+      overall: template.today.overall,
+      love: template.today.love,
+      career: template.today.career,
+      wealth: template.today.wealth,
+      others: template.today.health,
+    },
+  };
 }
 
 export const useFortuneStore = create<FortuneState>()(
@@ -32,8 +58,8 @@ export const useFortuneStore = create<FortuneState>()(
 
         // Cache hit: data exists, date matches, zodiac matches
         if (
-          currentFortune && 
-          currentFortune.date === today && 
+          currentFortune &&
+          currentFortune.date === today &&
           currentFortune.zodiac === zodiac
         ) {
           return;
@@ -45,11 +71,10 @@ export const useFortuneStore = create<FortuneState>()(
           const activePersona = useUserStore.getState().activePersona;
           const data = await fortuneService.getDailyFortune(zodiac, today, activePersona);
           set({ fortune: data, isLoading: false });
-        } catch (err) {
-          set({ 
-            error: err instanceof Error ? err.message : '未知错误', 
-            isLoading: false 
-          });
+        } catch {
+          // Backend unavailable, use offline templates
+          const offlineFortune = generateOfflineFortune(zodiac, today);
+          set({ fortune: offlineFortune, isLoading: false, error: null });
         }
       },
 
