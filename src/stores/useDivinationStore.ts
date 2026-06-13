@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { divinationService, type SpreadType, type DrawnCard } from '../services/divinationService';
 import { useUserStore } from './useUserStore';
+import { TAROT_DECK as SHARED_TAROT_DECK } from '@shared/data/tarot-deck';
+import type { TarotCard as SharedTarotCard } from '@shared/data/tarot-deck';
 
 // Card meanings for display (upright/reversed per area)
 interface CardMeaning {
@@ -49,7 +51,6 @@ export const SPREAD_CONFIGS: SpreadConfig[] = [
 // Generate image path from card nameEn
 const getImagePath = (nameEn: string, arcana: string): string => {
   if (arcana === 'major') {
-    // Map major arcana names to file names
     const majorFiles: Record<string, string> = {
       'The Fool': 'the_fool', 'The Magician': 'the_magician', 'The High Priestess': 'the_priestess',
       'The Empress': 'the_empress', 'The Emperor': 'the_emperor', 'The Hierophant': 'the_hierophant',
@@ -61,9 +62,11 @@ const getImagePath = (nameEn: string, arcana: string): string => {
     };
     return `/images/tarot/${majorFiles[nameEn] || 'back'}.webp`;
   }
-  // Minor arcana: "2 of Wands" -> "2_of_wands.webp"
+  // Minor arcana: "2 of Pentacles" -> "2_of_coins.webp" (pentacles = coins in images)
+  const suitMap: Record<string, string> = { pentacles: 'coins', wands: 'wands', cups: 'cups', swords: 'swords' };
   const parts = nameEn.toLowerCase().replace(' of ', '_of_');
-  return `/images/tarot/${parts}.webp`;
+  const mapped = Object.entries(suitMap).reduce((acc, [from, to]) => acc.replace(from, to), parts);
+  return `/images/tarot/${mapped}.webp`;
 };
 
 // Default meaning for cards without detailed data
@@ -76,12 +79,9 @@ const DEFAULT_MEANING: CardMeaning = {
   health: '健康方面保持关注。',
 };
 
-// Build full deck from shared package data at runtime
+// Build full deck from shared package data
 const buildFullDeck = (): TarotCard[] => {
-  // We import the shared data statically via the import below
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const shared = require('../../../packages/shared/data/tarot-deck');
-  const deck: TarotCard[] = shared.TAROT_DECK.map((card: { id: number; name: string; nameEn: string; arcana: 'major' | 'minor'; suit?: string; upright?: CardMeaning; reversed?: CardMeaning }) => ({
+  return SHARED_TAROT_DECK.map((card: SharedTarotCard) => ({
     id: card.id,
     name: card.name,
     nameEn: card.nameEn,
@@ -92,7 +92,6 @@ const buildFullDeck = (): TarotCard[] => {
     upright: card.upright || DEFAULT_MEANING,
     reversed: card.reversed || DEFAULT_MEANING,
   }));
-  return deck;
 };
 
 export const TAROT_DECK: TarotCard[] = buildFullDeck();
@@ -192,25 +191,9 @@ export const useDivinationStore = create<DivinationState>((set, get) => ({
         persona: activePersona,
       });
 
-      // Merge backend drawnCards with frontend card data for rich display
-      const enrichedCards = result.cards?.map((dc: DrawnCard, i: number) => {
-        const frontendCard = selectedCards[i];
-        return {
-          ...dc,
-          cardName: dc.cardName || frontendCard?.name,
-          cardNameEn: dc.cardNameEn || frontendCard?.nameEn,
-          orientation: dc.orientation || frontendCard?.orientation,
-          position: dc.position || frontendCard?.position,
-          keywords: dc.keywords || (frontendCard?.orientation === '逆位' ? frontendCard?.reversed?.keywords : frontendCard?.upright?.keywords),
-          meaning: dc.meaning || (frontendCard?.orientation === '逆位' ? frontendCard?.reversed?.meaning : frontendCard?.upright?.meaning),
-          love: dc.love || (frontendCard?.orientation === '逆位' ? frontendCard?.reversed?.love : frontendCard?.upright?.love),
-          career: dc.career || (frontendCard?.orientation === '逆位' ? frontendCard?.reversed?.career : frontendCard?.upright?.career),
-        };
-      }) || [];
-
       set({
         readingResult: result.reading,
-        drawnCards: enrichedCards,
+        drawnCards: result.cards || [],
         spreadName: result.spreadName || null,
       });
     } catch (err: unknown) {

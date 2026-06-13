@@ -12,20 +12,7 @@ export { LENORMAND_DECK, getLenormandCard, drawLenormandCards } from './data/len
 export type { LenormandCard } from './data/lenormand-deck';
 
 // 八字
-export {
-  HEAVENLY_STEMS, EARTHLY_BRANCHES, FIVE_ELEMENTS,
-  STEM_ELEMENTS, BRANCH_ELEMENTS, BRANCH_HIDDEN_STEMS,
-  getTenGod, calculateFourPillars, calculateFiveElements,
-  judgeStrongWeak, determineFavorableElements,
-  getBaziAnalysis, calculateBazi, generateBaziReport,
-} from './data/bazi-calculator';
-export type { HeavenlyStem, EarthlyBranch, FiveElement, TenGod, FourPillars, BaziData, BaziAnalysis } from './data/bazi-calculator';
+export { calculateBazi, generateBaziReport } from './data/bazi-calculator';
 
 // 数字命理
-export {
-  NUMBER_MEANINGS, getLifePathNumber, getTalentNumbers,
-  getSoulUrgeNumber, getPersonalityNumber, getDestinyNumber,
-  getBirthdayNumber, getChallengeNumbers, getCycles,
-  calculateNumerology, generateNumerologyReport,
-} from './data/numerology-calculator';
-export type { NumerologyProfile } from './data/numerology-calculator';
+export { calculateNumerology, generateNumerologyReport } from './data/numerology-calculator';

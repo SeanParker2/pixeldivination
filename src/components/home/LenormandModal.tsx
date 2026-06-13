@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Shuffle, Sparkles, Loader2, AlertCircle } from 'lucide-react';
+import { X, Shuffle, Sparkles, Loader2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { LENORMAND_DECK, type LenormandCardData } from '../../data/lenormand';
 import { LenormandCard } from './LenormandCard';
@@ -17,7 +17,6 @@ export const LenormandModal: React.FC<LenormandModalProps> = ({ isOpen, onClose 
   const [step, setStep] = useState<'start' | 'shuffling' | 'loading' | 'result'>('start');
   const [drawnCards, setDrawnCards] = useState<LenormandCardData[]>([]);
   const [reading, setReading] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const activePersona = useUserStore(s => s.activePersona);
 
   // Reset on open
@@ -27,7 +26,6 @@ export const LenormandModal: React.FC<LenormandModalProps> = ({ isOpen, onClose 
         setStep('start');
         setDrawnCards([]);
         setReading(null);
-        setError(null);
       }, 0);
       return () => clearTimeout(timer);
     }
@@ -47,7 +45,6 @@ export const LenormandModal: React.FC<LenormandModalProps> = ({ isOpen, onClose 
 
   const fetchReading = async (cards: LenormandCardData[]) => {
     try {
-      const cardNames = cards.map(c => c.name);
       const res = await divinationService.drawLenormand({
         question: '请解读今日雷诺曼牌阵',
         spreadType: 'three_card',
@@ -61,8 +58,7 @@ export const LenormandModal: React.FC<LenormandModalProps> = ({ isOpen, onClose 
         summary: '今日雷诺曼指引',
         details: { result: res.reading, cards },
       });
-    } catch (err: unknown) {
-      const axiosError = err as { isRateLimit?: boolean; userMessage?: string };
+    } catch {
       // Fallback to local interpretation if AI fails
       const c1 = cards[0];
       const c2 = cards[1];

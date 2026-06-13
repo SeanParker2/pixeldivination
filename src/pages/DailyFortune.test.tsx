@@ -105,6 +105,6 @@ describe('DailyFortune Page', () => {
 
     render(<DailyFortune />);
     
-    expect(screen.getByText(/DeepSeek 正在推演星象/)).toBeInTheDocument();
+    expect(screen.getByText(/正在推演星象/)).toBeInTheDocument();
   });
 });

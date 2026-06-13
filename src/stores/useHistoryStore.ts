@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 
 export interface HistoryItem {
   id: string;
-  type: 'tarot' | 'natal-chart' | 'starchart' | 'daily-fortune' | 'lenormand' | 'dice' | 'synastry' | 'transit' | 'sky' | 'insight' | 'fengshui';
+  type: 'tarot' | 'natal-chart' | 'starchart' | 'daily-fortune' | 'lenormand' | 'dice' | 'synastry' | 'transit' | 'sky' | 'insight' | 'fengshui' | 'bazi' | 'numerology';
   date: string; // ISO string as requested or keep timestamp? User example said "date: string". I'll use string.
   summary: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

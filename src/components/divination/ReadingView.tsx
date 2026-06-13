@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { Loader2, Share2, X, Download, RotateCcw, AlertCircle, Sparkles } from 'lucide-react';
 import html2canvas from 'html2canvas';
-import { useDivinationStore, SPREAD_CONFIGS, type SelectedTarotCard } from '../../stores/useDivinationStore';
+import { useDivinationStore, SPREAD_CONFIGS } from '../../stores/useDivinationStore';
 import { useHistoryStore } from '../../stores/useHistoryStore';
 import { useUserStore } from '../../stores/useUserStore';
 import { playSound } from '../../lib/audio';
