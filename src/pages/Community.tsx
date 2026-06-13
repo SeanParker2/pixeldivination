@@ -1,11 +1,18 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, MessageCircle, Send, Plus, Loader2 } from 'lucide-react';
+import { ArrowLeft, Heart, MessageCircle, Send, Plus, Loader2, X } from 'lucide-react';
 import { MobileContainer } from '../components/layout/MobileContainer';
 import api from '../lib/api';
 import { useUserStore } from '../stores/useUserStore';
 import { useToastStore } from '../stores/useToastStore';
+
+interface Comment {
+  id: string;
+  content: string;
+  userNickname: string;
+  createdAt: string;
+}
 
 interface Post {
   id: string;
@@ -19,6 +26,7 @@ interface Post {
   likeCount: number;
   commentCount: number;
   userLiked: boolean;
+  comments?: Comment[];
 }
 
 const ZODIAC_SYMBOLS: Record<string, string> = {
@@ -46,6 +54,9 @@ const CommunityPage: React.FC = () => {
   const [showCompose, setShowCompose] = useState(false);
   const [newContent, setNewContent] = useState('');
   const [isPosting, setIsPosting] = useState(false);
+  const [expandedPostId, setExpandedPostId] = useState<string | null>(null);
+  const [commentText, setCommentText] = useState('');
+  const [isCommenting, setIsCommenting] = useState(false);
 
   const fetchPosts = useCallback(async () => {
     try {
@@ -99,6 +110,41 @@ const CommunityPage: React.FC = () => {
       showToast('发布失败', 'error');
     } finally {
       setIsPosting(false);
+    }
+  };
+
+  const handleToggleComments = async (postId: string) => {
+    if (expandedPostId === postId) {
+      setExpandedPostId(null);
+      return;
+    }
+    setExpandedPostId(postId);
+    // Fetch comments if not already loaded
+    const post = posts.find(p => p.id === postId);
+    if (post && !post.comments) {
+      try {
+        const res: any = await api.get(`/community/posts/${postId}`);
+        setPosts(prev => prev.map(p => p.id === postId ? { ...p, comments: res.comments || [] } : p));
+      } catch {
+        // Silent fail
+      }
+    }
+  };
+
+  const handleAddComment = async (postId: string) => {
+    if (!commentText.trim()) return;
+    setIsCommenting(true);
+    try {
+      await api.post(`/community/posts/${postId}/comments`, { content: commentText.trim() });
+      setCommentText('');
+      showToast('评论成功！', 'success');
+      // Refresh comments
+      const res: any = await api.get(`/community/posts/${postId}`);
+      setPosts(prev => prev.map(p => p.id === postId ? { ...p, comments: res.comments || [], commentCount: (p.commentCount || 0) + 1 } : p));
+    } catch {
+      showToast('评论失败', 'error');
+    } finally {
+      setIsCommenting(false);
     }
   };
 
@@ -202,11 +248,69 @@ const CommunityPage: React.FC = () => {
                     <Heart size={14} fill={post.userLiked ? 'currentColor' : 'none'} />
                     <span>{post.likeCount || ''}</span>
                   </button>
-                  <div className="flex items-center gap-1 text-xs text-gray-500">
+                  <button
+                    onClick={() => handleToggleComments(post.id)}
+                    className={`flex items-center gap-1 text-xs transition-colors ${
+                      expandedPostId === post.id ? 'text-blue-400' : 'text-gray-500 hover:text-blue-400'
+                    }`}
+                  >
                     <MessageCircle size={14} />
                     <span>{post.commentCount || ''}</span>
-                  </div>
+                  </button>
                 </div>
+
+                {/* Comments Section */}
+                <AnimatePresence>
+                  {expandedPostId === post.id && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="mt-3 pt-3 border-t border-white/10 overflow-hidden"
+                    >
+                      {/* Comments List */}
+                      {post.comments && post.comments.length > 0 ? (
+                        <div className="space-y-2 mb-3 max-h-40 overflow-y-auto">
+                          {post.comments.map((comment) => (
+                            <div key={comment.id} className="flex gap-2">
+                              <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-[10px] text-gray-400 shrink-0">
+                                {comment.userNickname[0]}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs">
+                                  <span className="text-white font-medium">{comment.userNickname}</span>
+                                  <span className="text-gray-400 ml-1">{comment.content}</span>
+                                </p>
+                                <p className="text-[10px] text-gray-600 mt-0.5">{formatTime(comment.createdAt)}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-xs text-gray-600 mb-3">暂无评论</p>
+                      )}
+
+                      {/* Add Comment */}
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={expandedPostId === post.id ? commentText : ''}
+                          onChange={(e) => setCommentText(e.target.value)}
+                          placeholder="写评论..."
+                          className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-pixel-gold/50"
+                          onKeyDown={(e) => e.key === 'Enter' && handleAddComment(post.id)}
+                        />
+                        <button
+                          onClick={() => handleAddComment(post.id)}
+                          disabled={!commentText.trim() || isCommenting}
+                          className="px-3 py-1.5 bg-pixel-gold/20 text-pixel-gold rounded-lg text-xs disabled:opacity-50"
+                        >
+                          {isCommenting ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </motion.div>
             ))}
           </div>
