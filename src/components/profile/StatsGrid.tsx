@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { ShoppingCart, ScrollText, Sparkles } from 'lucide-react';
 import { useHistoryStore } from '../../stores/useHistoryStore';
@@ -10,8 +10,15 @@ export interface StatsGridProps {
 }
 
 export const StatsGrid: React.FC<StatsGridProps> = ({ onCartClick, onHistoryClick }) => {
-  const stats = useHistoryStore(state => state.getStats());
+  const history = useHistoryStore(state => state.history);
   const cartItemsCount = useCartStore(state => state.getTotalItems());
+
+  const stats = useMemo(() => ({
+    total: history.length,
+    tarot: history.filter(i => i.type === 'tarot').length,
+    natalChart: history.filter(i => i.type === 'natal-chart' || i.type === 'starchart').length,
+    daily: history.filter(i => i.type === 'daily-fortune').length,
+  }), [history]);
 
   return (
     <div className="grid grid-cols-3 gap-3 px-5 mt-5">

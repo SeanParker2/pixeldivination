@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Settings, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '../../stores/useUserStore';
@@ -41,8 +41,9 @@ function getLevelInfo(totalDivinations: number) {
 export const ProfileHeader: React.FC = () => {
   const navigate = useNavigate();
   const { profile } = useUserStore();
-  const stats = useHistoryStore(state => state.getStats());
-  const levelInfo = getLevelInfo(stats.total);
+  const history = useHistoryStore(state => state.history);
+  const totalDivinations = useMemo(() => history.length, [history]);
+  const levelInfo = getLevelInfo(totalDivinations);
 
   return (
     <div className="relative w-full h-[280px] mb-[60px]">

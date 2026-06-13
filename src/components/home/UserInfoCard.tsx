@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '../../stores/useUserStore';
 import { useHistoryStore } from '../../stores/useHistoryStore';
@@ -36,11 +36,12 @@ export const UserInfoCard: React.FC<UserInfoProps> = ({
 }) => {
   const navigate = useNavigate();
   const { profile } = useUserStore();
-  const stats = useHistoryStore(state => state.getStats());
+  const history = useHistoryStore(state => state.history);
+  const totalDivinations = useMemo(() => history.length, [history]);
 
   const displayDate = formatDate(profile.birthDate).split(' ')[0];
   const displayName = profile.nickname || '未命名';
-  const levelTitle = getLevelTitle(stats.total);
+  const levelTitle = getLevelTitle(totalDivinations);
 
   return (
     <div
