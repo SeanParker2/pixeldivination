@@ -88,21 +88,127 @@ function getPersonalityNumber(name: string): number {
   return sum;
 }
 
-// 完整数字命理计算
+// 计算人生周期（三大周期）
+function getLifeCycles(birthDate: string): { first: { number: number; period: string; meaning: string }; second: { number: number; period: string; meaning: string }; third: { number: number; period: string; meaning: string } } {
+  const parts = birthDate.split('-');
+  const month = parseInt(parts[1]);
+  const day = parseInt(parts[2]);
+  const year = parseInt(parts[0]);
+
+  const firstCycle = reduceNumber(month);
+  const secondCycle = reduceNumber(day);
+  const thirdCycle = reduceNumber(year);
+
+  const getMeaning = (num: number) => {
+    const meanings: Record<number, string> = {
+      1: '独立自主，开创事业',
+      2: '合作协调，建立关系',
+      3: '创意表达，社交活跃',
+      4: '脚踏实地，建立基础',
+      5: '变化自由，探索世界',
+      6: '责任关爱，家庭为重',
+      7: '内省智慧，精神成长',
+      8: '事业成就，财富积累',
+      9: '博爱奉献，完成使命',
+    };
+    return meanings[num] || '平稳发展';
+  };
+
+  return {
+    first: { number: firstCycle, period: '出生-30岁', meaning: getMeaning(firstCycle) },
+    second: { number: secondCycle, period: '31-60岁', meaning: getMeaning(secondCycle) },
+    third: { number: thirdCycle, period: '61岁以后', meaning: getMeaning(thirdCycle) },
+  };
+}
+
+// 计算生日数字
+function getBirthdayNumber(birthDate: string): number {
+  const parts = birthDate.split('-');
+  const day = parseInt(parts[2]);
+  return reduceNumber(day);
+}
+
+// 计算挑战数字
+function getChallengeNumbers(birthDate: string): { first: number; second: number; third: number; fourth: number } {
+  const parts = birthDate.split('-');
+  const month = parseInt(parts[1]);
+  const day = parseInt(parts[2]);
+  const year = parseInt(parts[0]);
+
+  const monthReduced = reduceNumber(month);
+  const dayReduced = reduceNumber(day);
+  const yearReduced = reduceNumber(year);
+
+  return {
+    first: Math.abs(monthReduced - dayReduced),
+    second: Math.abs(dayReduced - yearReduced),
+    third: Math.abs(reduceNumber(monthReduced - dayReduced) - reduceNumber(dayReduced - yearReduced)),
+    fourth: Math.abs(monthReduced - yearReduced),
+  };
+}
+
+// 计算巅峰数字（Pinnacles）
+function getPinnacles(birthDate: string): { first: number; second: number; third: number; fourth: number } {
+  const lifePath = getLifePathNumber(birthDate);
+  const parts = birthDate.split('-');
+  const month = parseInt(parts[1]);
+  const day = parseInt(parts[2]);
+  const year = parseInt(parts[0]);
+
+  const monthReduced = reduceNumber(month);
+  const dayReduced = reduceNumber(day);
+  const yearReduced = reduceNumber(year);
+
+  return {
+    first: reduceNumber(monthReduced + dayReduced),
+    second: reduceNumber(dayReduced + yearReduced),
+    third: reduceNumber(reduceNumber(monthReduced + dayReduced) + reduceNumber(dayReduced + yearReduced)),
+    fourth: reduceNumber(monthReduced + yearReduced),
+  };
+}
+
+// 计算成熟数字
+function getMaturityNumber(lifePath: number, birthDate: string): number {
+  const parts = birthDate.split('-');
+  const year = parseInt(parts[0]);
+  const yearReduced = reduceNumber(year);
+  return reduceNumber(lifePath + yearReduced);
+}
+
+// 辅助函数：数字简化
+function reduceNumber(num: number): number {
+  if (num === 11 || num === 22) return num;
+  while (num > 9) {
+    num = num.toString().split('').reduce((acc, d) => acc + parseInt(d), 0);
+  }
+  return Math.abs(num);
+}
+
+// 完整数字命理计算（专业版）
 export function calculateNumerology(birthDate: string, fullName?: string) {
   const lifePathNumber = getLifePathNumber(birthDate);
   const talentNumbers = getTalentNumbers(birthDate);
   const soulUrgeNumber = fullName ? getSoulUrgeNumber(fullName) : null;
   const personalityNumber = fullName ? getPersonalityNumber(fullName) : null;
-  
+  const birthdayNumber = getBirthdayNumber(birthDate);
+  const lifeCycles = getLifeCycles(birthDate);
+  const challengeNumbers = getChallengeNumbers(birthDate);
+  const pinnacles = getPinnacles(birthDate);
+  const maturityNumber = getMaturityNumber(lifePathNumber, birthDate);
+
   const meaningNumber = lifePathNumber === 11 ? 2 : lifePathNumber === 22 ? 4 : lifePathNumber;
   const meaning = NUMBER_MEANINGS[meaningNumber] || NUMBER_MEANINGS[1];
-  
+
   return {
     lifePathNumber,
     talentNumbers,
     soulUrgeNumber,
     personalityNumber,
+    birthdayNumber,
+    lifeCycles,
+    challengeNumbers,
+    pinnacles,
+    maturityNumber,
     meaning
   };
 }
@@ -202,9 +308,9 @@ const NUMBER_DETAILED_MEANINGS: Record<number, {
   },
 };
 
-// 生成数字命理报告
+// 生成数字命理报告（专业版）
 export function generateNumerologyReport(data: ReturnType<typeof calculateNumerology>) {
-  let report = '# 数字命理分析报告\n\n';
+  let report = '# 数字命理专业分析报告\n\n';
 
   // 生命灵数 - 核心数字
   report += `## 🌟 生命灵数：${data.lifePathNumber}\n\n`;
@@ -212,6 +318,12 @@ export function generateNumerologyReport(data: ReturnType<typeof calculateNumero
   report += `**核心关键词**：${data.meaning.keywords.join('、')}\n\n`;
   report += `**性格特点**：${data.meaning.personality}\n\n`;
   report += `**人生课题**：${data.meaning.lifePath}\n\n`;
+
+  // 生日数字
+  if (data.birthdayNumber) {
+    report += `## 🎂 生日数字：${data.birthdayNumber}\n\n`;
+    report += `生日数字代表你的天赋才能和与生俱来的能力。\n\n`;
+  }
 
   // 详细解读
   const detailed = NUMBER_DETAILED_MEANINGS[data.lifePathNumber];
@@ -276,11 +388,92 @@ export function generateNumerologyReport(data: ReturnType<typeof calculateNumero
     }
   }
 
+  // 人生周期
+  if (data.lifeCycles) {
+    report += `## 📅 人生三大周期\n\n`;
+    report += `| 周期 | 年龄段 | 主导数字 | 主题 |\n`;
+    report += `|------|--------|----------|------|\n`;
+    report += `| 第一周期 | ${data.lifeCycles.first.period} | ${data.lifeCycles.first.number} | ${data.lifeCycles.first.meaning} |\n`;
+    report += `| 第二周期 | ${data.lifeCycles.second.period} | ${data.lifeCycles.second.number} | ${data.lifeCycles.second.meaning} |\n`;
+    report += `| 第三周期 | ${data.lifeCycles.third.period} | ${data.lifeCycles.third.number} | ${data.lifeCycles.third.meaning} |\n\n`;
+    report += `人生周期揭示了你生命中不同阶段的主要能量和课题。\n\n`;
+  }
+
+  // 挑战数字
+  if (data.challengeNumbers) {
+    report += `## ⚠️ 人生挑战\n\n`;
+    report += `| 挑战 | 年龄段 | 数字 | 含义 |\n`;
+    report += `|------|--------|------|------|\n`;
+    report += `| 第一挑战 | 出生-30岁 | ${data.challengeNumbers.first} | ${getChallengeMeaning(data.challengeNumbers.first)} |\n`;
+    report += `| 第二挑战 | 31-60岁 | ${data.challengeNumbers.second} | ${getChallengeMeaning(data.challengeNumbers.second)} |\n`;
+    report += `| 第三挑战 | 61岁以后 | ${data.challengeNumbers.third} | ${getChallengeMeaning(data.challengeNumbers.third)} |\n`;
+    report += `| 主要挑战 | 一生 | ${data.challengeNumbers.fourth} | ${getChallengeMeaning(data.challengeNumbers.fourth)} |\n\n`;
+    report += `挑战数字揭示了你需要克服的困难和障碍。\n\n`;
+  }
+
+  // 巅峰数字
+  if (data.pinnacles) {
+    report += `## 🏔️ 人生巅峰\n\n`;
+    report += `| 巅峰 | 年龄段 | 数字 | 含义 |\n`;
+    report += `|------|--------|------|------|\n`;
+    report += `| 第一巅峰 | 出生-30岁 | ${data.pinnacles.first} | ${getPinnacleMeaning(data.pinnacles.first)} |\n`;
+    report += `| 第二巅峰 | 31-60岁 | ${data.pinnacles.second} | ${getPinnacleMeaning(data.pinnacles.second)} |\n`;
+    report += `| 第三巅峰 | 61岁以后 | ${data.pinnacles.third} | ${getPinnacleMeaning(data.pinnacles.third)} |\n`;
+    report += `| 主要巅峰 | 一生 | ${data.pinnacles.fourth} | ${getPinnacleMeaning(data.pinnacles.fourth)} |\n\n`;
+    report += `巅峰数字揭示了你人生中最辉煌的时期和机遇。\n\n`;
+  }
+
+  // 成熟数字
+  if (data.maturityNumber) {
+    report += `## 🌳 成熟数字：${data.maturityNumber}\n\n`;
+    report += `成熟数字代表你60岁以后的人生方向和精神追求。\n\n`;
+    const maturityMeaning = NUMBER_DETAILED_MEANINGS[data.maturityNumber];
+    if (maturityMeaning) {
+      report += `**成熟期特质**：${maturityMeaning.strengths.slice(0, 3).join('、')}\n\n`;
+      report += `**精神追求**：${maturityMeaning.spiritual}\n\n`;
+    }
+  }
+
   // 综合建议
   report += `## 💫 综合建议\n\n`;
   report += generateNumerologyAdvice(data);
 
   return report;
+}
+
+// 挑战数字含义
+function getChallengeMeaning(num: number): string {
+  const meanings: Record<number, string> = {
+    0: '无明显挑战，全面发展',
+    1: '需要克服自我中心和固执',
+    2: '需要克服过度敏感和依赖',
+    3: '需要克服注意力分散和表面化',
+    4: '需要克服固执和缺乏灵活性',
+    5: '需要克服不安定和逃避承诺',
+    6: '需要克服过度操心和控制欲',
+    7: '需要克服孤独和不信任',
+    8: '需要克服工作狂和物质主义',
+    9: '需要克服过度理想化和自我牺牲',
+  };
+  return meanings[num] || '需要平衡发展';
+}
+
+// 巅峰数字含义
+function getPinnacleMeaning(num: number): string {
+  const meanings: Record<number, string> = {
+    1: '开创领导，独立自主',
+    2: '合作协调，建立关系',
+    3: '创意表达，社交活跃',
+    4: '脚踏实地，建立基础',
+    5: '变化自由，探索世界',
+    6: '责任关爱，家庭为重',
+    7: '内省智慧，精神成长',
+    8: '事业成就，财富积累',
+    9: '博爱奉献，完成使命',
+    11: '灵性觉醒，直觉敏锐',
+    22: '大师数字，伟大成就',
+  };
+  return meanings[num] || '平稳发展';
 }
 
 function generateNumerologyAdvice(data: ReturnType<typeof calculateNumerology>): string {

@@ -66,7 +66,7 @@ describe('BaZi Calculator', () => {
 
       expect(report).toBeDefined();
       expect(typeof report).toBe('string');
-      expect(report).toContain('# 八字命理分析报告');
+      expect(report).toContain('# 八字命理专业分析报告');
       expect(report).toContain('四柱');
     });
   });
