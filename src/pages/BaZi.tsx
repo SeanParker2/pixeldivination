@@ -32,7 +32,10 @@ const BaZi: React.FC = () => {
   const [birthHour, setBirthHour] = useState(12);
   const [gender, setGender] = useState<'male' | 'female'>('male');
   const [result, setResult] = useState<string | null>(null);
+  const [divinationId, setDivinationId] = useState<string | null>(null);
+  const [hasAiReading, setHasAiReading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isAiLoading, setIsAiLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleCalculate = async () => {
@@ -54,6 +57,8 @@ const BaZi: React.FC = () => {
       });
 
       setResult(res.reading);
+      setDivinationId(res.id || null);
+      setHasAiReading(false);
       addHistory({
         type: 'bazi',
         summary: '八字命理分析',
@@ -71,8 +76,26 @@ const BaZi: React.FC = () => {
     }
   };
 
+  const handleAiReading = async () => {
+    if (!divinationId) return;
+    setIsAiLoading(true);
+    setError(null);
+    try {
+      const res = await divinationService.getAiReading(divinationId, activePersona);
+      setResult(res.reading);
+      setHasAiReading(true);
+    } catch (err: unknown) {
+      const axiosError = err as { isRateLimit?: boolean; userMessage?: string };
+      setError(axiosError.userMessage || 'AI 解读生成失败');
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
   const handleReset = () => {
     setResult(null);
+    setDivinationId(null);
+    setHasAiReading(false);
     setError(null);
   };
 
@@ -191,15 +214,37 @@ const BaZi: React.FC = () => {
               {/* Result Card */}
               <div className="glass-card p-5">
                 <div className="flex items-center gap-2 mb-4 pb-3 border-b border-white/10">
-                  <Sparkles size={14} className="text-pixel-gold" />
-                  <span className="text-pixel-gold font-bold text-sm">八字命理分析报告</span>
+                  <Sparkles size={14} className={hasAiReading ? 'text-pixel-gold' : 'text-blue-400'} />
+                  <span className={`font-bold text-sm ${hasAiReading ? 'text-pixel-gold' : 'text-blue-400'}`}>
+                    {hasAiReading ? 'AI 深度解读' : '八字命理分析'}
+                  </span>
                 </div>
                 <div className="prose prose-invert prose-sm max-w-none font-sans text-gray-200 leading-relaxed">
                   <ReactMarkdown>{result}</ReactMarkdown>
                 </div>
                 <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between">
                   <span className="text-[10px] text-gray-500">命理分析仅供参考</span>
-                  <span className="text-[10px] text-gray-500">Powered by AI</span>
+                  {!hasAiReading && divinationId ? (
+                    <button
+                      onClick={handleAiReading}
+                      disabled={isAiLoading}
+                      className="flex items-center gap-1.5 text-xs text-pixel-gold hover:text-pixel-gold/80 transition-colors disabled:opacity-50"
+                    >
+                      {isAiLoading ? (
+                        <>
+                          <Loader2 size={12} className="animate-spin" />
+                          AI 解读中...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles size={12} />
+                          AI 深度解读
+                        </>
+                      )}
+                    </button>
+                  ) : hasAiReading ? (
+                    <span className="text-[10px] text-gray-500">Powered by AI</span>
+                  ) : null}
                 </div>
               </div>
 

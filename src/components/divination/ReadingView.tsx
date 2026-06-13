@@ -11,7 +11,7 @@ import { playSound } from '../../lib/audio';
 import { ShareCard } from '../../components/share/ShareCard';
 
 export const ReadingView: React.FC = () => {
-  const { selectedCards, selectedSpread, drawnCards, resetDivination, generateReading, readingResult, spreadName, isLoadingAI, error } = useDivinationStore();
+  const { selectedCards, selectedSpread, drawnCards, resetDivination, generateReading, generateAiReading, readingResult, spreadName, hasAiReading, isLoadingAI, error } = useDivinationStore();
   const addHistoryEntry = useHistoryStore(state => state.addEntry);
   const userProfile = useUserStore(state => state.profile);
   const navigate = useNavigate();
@@ -223,20 +223,43 @@ export const ReadingView: React.FC = () => {
             >
               {/* Reading Header */}
               <div className="flex items-center gap-2 mb-4 pb-3 border-b border-white/10">
-                <Sparkles size={14} className="text-pixel-gold" />
-                <span className="text-pixel-gold font-bold text-sm">AI 深度解读</span>
+                <Sparkles size={14} className={hasAiReading ? 'text-pixel-gold' : 'text-blue-400'} />
+                <span className={`font-bold text-sm ${hasAiReading ? 'text-pixel-gold' : 'text-blue-400'}`}>
+                  {hasAiReading ? 'AI 深度解读' : '专业解读'}
+                </span>
                 <span className="text-gray-500 text-xs ml-auto">{spreadName || spreadConfig?.name}</span>
               </div>
-              
+
               {/* Reading Content */}
               <div className="prose prose-invert prose-sm max-w-none font-sans text-gray-200 leading-relaxed">
                 <ReactMarkdown>{readingResult}</ReactMarkdown>
               </div>
-              
+
               {/* Reading Footer */}
               <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between">
                 <span className="text-[10px] text-gray-500">解读仅供参考，请理性看待</span>
-                <span className="text-[10px] text-gray-500">Powered by AI</span>
+                {!hasAiReading && (
+                  <button
+                    onClick={generateAiReading}
+                    disabled={isLoadingAI}
+                    className="flex items-center gap-1.5 text-xs text-pixel-gold hover:text-pixel-gold/80 transition-colors disabled:opacity-50"
+                  >
+                    {isLoadingAI ? (
+                      <>
+                        <Loader2 size={12} className="animate-spin" />
+                        AI 解读中...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles size={12} />
+                        AI 深度解读
+                      </>
+                    )}
+                  </button>
+                )}
+                {hasAiReading && (
+                  <span className="text-[10px] text-gray-500">Powered by AI</span>
+                )}
               </div>
             </motion.div>
           )

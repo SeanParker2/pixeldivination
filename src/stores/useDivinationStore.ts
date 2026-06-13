@@ -103,9 +103,11 @@ interface DivinationState {
   drawnCards: DrawnCard[];
   isShuffling: boolean;
 
-  // AI State
+  // Reading State
   readingResult: string | null;
   spreadName: string | null;
+  divinationId: string | null;
+  hasAiReading: boolean;
   isLoadingAI: boolean;
   error: string | null;
 
@@ -115,6 +117,7 @@ interface DivinationState {
   selectCard: (card: TarotCard) => void;
   resetDivination: () => void;
   generateReading: (question?: string) => Promise<void>;
+  generateAiReading: () => Promise<void>;
 }
 
 export const useDivinationStore = create<DivinationState>((set, get) => ({
@@ -125,6 +128,8 @@ export const useDivinationStore = create<DivinationState>((set, get) => ({
   isShuffling: false,
   readingResult: null,
   spreadName: null,
+  divinationId: null,
+  hasAiReading: false,
   isLoadingAI: false,
   error: null,
 
@@ -174,12 +179,14 @@ export const useDivinationStore = create<DivinationState>((set, get) => ({
       drawnCards: [],
       readingResult: null,
       spreadName: null,
+      divinationId: null,
+      hasAiReading: false,
       error: null,
     });
   },
 
   generateReading: async (question) => {
-    const { selectedCards, selectedSpread } = get();
+    const { selectedSpread } = get();
 
     set({ isLoadingAI: true, error: null });
 
@@ -195,6 +202,8 @@ export const useDivinationStore = create<DivinationState>((set, get) => ({
         readingResult: result.reading,
         drawnCards: result.cards || [],
         spreadName: result.spreadName || null,
+        divinationId: result.id || null,
+        hasAiReading: false,
       });
     } catch (err: unknown) {
       const axiosError = err as { isRateLimit?: boolean; userMessage?: string };
@@ -202,6 +211,32 @@ export const useDivinationStore = create<DivinationState>((set, get) => ({
         set({ error: axiosError.userMessage || '今日免费次数已用完，请升级 Pro 会员享受无限次数' });
       } else {
         set({ error: axiosError.userMessage || '无法连接到宇宙信号，请稍后再试。' });
+      }
+    } finally {
+      set({ isLoadingAI: false });
+    }
+  },
+
+  generateAiReading: async () => {
+    const { divinationId } = get();
+    if (!divinationId) return;
+
+    set({ isLoadingAI: true, error: null });
+
+    try {
+      const activePersona = useUserStore.getState().activePersona;
+      const result = await divinationService.getAiReading(divinationId, activePersona);
+
+      set({
+        readingResult: result.reading,
+        hasAiReading: true,
+      });
+    } catch (err: unknown) {
+      const axiosError = err as { isRateLimit?: boolean; userMessage?: string };
+      if (axiosError.isRateLimit) {
+        set({ error: axiosError.userMessage || '今日免费次数已用完，请升级 Pro 会员享受无限次数' });
+      } else {
+        set({ error: axiosError.userMessage || 'AI 解读生成失败，请稍后再试。' });
       }
     } finally {
       set({ isLoadingAI: false });

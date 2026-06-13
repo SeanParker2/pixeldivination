@@ -138,6 +138,12 @@ export interface DivinationResult {
   spreadName?: string;
   baziData?: BaziResult;
   numerologyData?: NumerologyResult;
+  hasAiReading?: boolean;
+}
+
+export interface AiReadingResult {
+  reading: string;
+  cached: boolean;
 }
 
 export interface SpreadConfig {
@@ -207,6 +213,12 @@ export const divinationService = {
   // 获取占卜详情
   async getById(id: string): Promise<any> {
     const result: any = await api.get(`/divination/${id}`);
+    return result;
+  },
+
+  // 获取 AI 深度解读（按需调用，受限流保护）
+  async getAiReading(id: string, persona?: string): Promise<AiReadingResult> {
+    const result: any = await api.post(`/divination/${id}/ai-reading`, { persona });
     return result;
   },
 

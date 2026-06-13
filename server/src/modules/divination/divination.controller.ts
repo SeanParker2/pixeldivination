@@ -16,6 +16,7 @@ import {
   NumerologyDto,
 } from './dto/divination.dto';
 import { JwtAuthGuard } from '../auth/jwt.guard';
+import { AiThrottleGuard } from '../common/guards/ai-throttle.guard';
 
 @Controller('divination')
 @UseGuards(JwtAuthGuard)
@@ -40,6 +41,16 @@ export class DivinationController {
   @Post('numerology')
   async calculateNumerology(@Request() req, @Body() dto: NumerologyDto) {
     return this.divinationService.calculateNumerology(req.user.userId, dto);
+  }
+
+  @Post(':id/ai-reading')
+  @UseGuards(AiThrottleGuard)
+  async getAiReading(
+    @Param('id') id: string,
+    @Request() req,
+    @Body('persona') persona?: string,
+  ) {
+    return this.divinationService.getAiReading(id, req.user.userId, persona);
   }
 
   @Get('history')
